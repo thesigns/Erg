@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Erg.Core.World.Items;
 
-namespace Erg.Core.World;
+namespace Erg.Core.World.Generators;
 
-public class DungeonGenerator
+public class DungeonGenerator : IDungeonGenerator
 {
     private readonly int _width;
     private readonly int _height;
@@ -10,6 +13,7 @@ public class DungeonGenerator
 
     private HashSet<(int x, int y)> _floorTiles = new();
     private (int x, int y) _playerStart;
+    private int _nextRegionId = 1;
 
     public DungeonGenerator(int width, int height, Random random)
     {
@@ -36,7 +40,7 @@ public class DungeonGenerator
         int roomHeight = _random.Next(4, 8);
         int roomX = _random.Next(1, _width - roomWidth - 1);
         int roomY = _random.Next(1, _height - roomHeight - 1);
-        CarveRoom(area, roomX, roomY, roomWidth, roomHeight);
+        CarveRoom(area, roomX, roomY, roomWidth, roomHeight, _nextRegionId++);
 
         _playerStart = (roomX + roomWidth / 2, roomY + roomHeight / 2);
 
@@ -64,13 +68,15 @@ public class DungeonGenerator
         return _playerStart;
     }
 
-    private void CarveRoom(Area area, int roomX, int roomY, int width, int height)
+    private void CarveRoom(Area area, int roomX, int roomY, int width, int height, int regionId)
     {
         for (int y = roomY; y < roomY + height; y++)
         {
             for (int x = roomX; x < roomX + width; x++)
             {
-                area.SetTile(x, y, Tile.DungeonFloor);
+                var tile = Tile.DungeonFloor;
+                tile.RegionId = regionId;
+                area.SetTile(x, y, tile);
                 _floorTiles.Add((x, y));
             }
         }
@@ -199,20 +205,30 @@ public class DungeonGenerator
             return false;
 
         // Everything fits - carve corridor and room
-        foreach (var (cx, cy, isEntrance) in corridorTiles)
+        // Assign region IDs: each entrance gets its own, corridor tiles share one
+        int corridorRegionId = _nextRegionId++;
+
+        for (int i = 0; i < corridorTiles.Count; i++)
         {
+            var (cx, cy, isEntrance) = corridorTiles[i];
+            Tile tile;
+
             if (isEntrance)
             {
-                area.SetTile(cx, cy, GetRandomEntrance());
+                tile = GetRandomEntrance();
+                tile.RegionId = _nextRegionId++; // Each entrance gets unique region
             }
             else
             {
-                area.SetTile(cx, cy, Tile.DungeonFloor);
+                tile = Tile.DungeonFloor;
+                tile.RegionId = corridorRegionId; // Corridor tiles share region
             }
+
+            area.SetTile(cx, cy, tile);
             _floorTiles.Add((cx, cy));
         }
 
-        CarveRoom(area, roomX, roomY, newRoomWidth, newRoomHeight);
+        CarveRoom(area, roomX, roomY, newRoomWidth, newRoomHeight, _nextRegionId++);
 
         return true;
     }

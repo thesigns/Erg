@@ -8,6 +8,8 @@ public class FieldOfView
     public int Width => _area.Width;
     public int Height => _area.Height;
 
+    public bool RevealAll { get; set; }
+
     public FieldOfView(Area area)
     {
         _area = area;
@@ -18,6 +20,8 @@ public class FieldOfView
     {
         if (x < 0 || x >= Width || y < 0 || y >= Height)
             return false;
+        if (RevealAll)
+            return true;
         return _seen[x, y];
     }
 

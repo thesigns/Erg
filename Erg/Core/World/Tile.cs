@@ -8,6 +8,7 @@ public class Tile
     public bool Walkable { get; set; }
     public bool Transparent { get; set; }
     public string Name { get; set; }
+    public int RegionId { get; set; }
 
     public Critter? Critter { get; set; }
     public List<Item> Items { get; } = new();
@@ -36,14 +37,17 @@ public class Tile
     
     public Tile() : this('.', 0x808080FF, 0x000000FF, true, true, "Floor") { }
     
-    // Statyczne predefiniowane kafle
-    public static Tile Floor => new('.', 0x808080FF, 0x000000FF, true, true, "Floor");
-    public static Tile Wall => new('#', 0xFFFFFFFF, 0x000000FF, false, false, "Wall");
-    public static Tile Door => new('+', 0x8B4513FF, 0x000000FF, true, false, "Door");
-
     // Dungeon tiles
-    public static Tile DungeonFloor => new('.', 0x505050FF, 0x000000FF, true, true, "Floor");
+    public static Tile DungeonFloor => new('·', 0x505050FF, 0x000000FF, true, true, "Floor");
     public static Tile DungeonWall => new('#', 0x808080FF, 0x000000FF, false, false, "Wall");
-    public static Tile OpenDoor => new('/', 0x8B4513FF, 0x000000FF, true, true, "Open Door");
-    public static Tile ClosedDoor => new('+', 0x8B4513FF, 0x000000FF, false, false, "Closed Door");
+    public static Tile OpenDoor => new('□', 0x8B4513FF, 0x000000FF, true, true, "Open Door");
+    public static Tile ClosedDoor => new('▣', 0x8B4513FF, 0x000000FF, false, false, "Closed Door");
+
+    public static Tile RoomFloor => new('·', 0x606060FF, 0x000000FF, true, true, "Floor");
+    public static Tile CorridorFloor => new('·', 0x606060FF, 0x000000FF, true, true, "Floor");
+    public static Tile DeadEndFloor => new('·', 0x606060FF, 0x000000FF, true, true, "Floor");
+
+    // Special tiles
+    public static Tile EntranceFloor => new('·', 0x606060FF, 0x000000FF, true, true, "Entrance");
+    public static Tile SecretDoor => new('#', 0x808080FF, 0x000000FF, false, false, "Secret Door");
 }

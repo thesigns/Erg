@@ -1,5 +1,7 @@
-﻿using Erg.Core.Game;
+﻿using System;
+using Erg.Core.Game;
 using Erg.Core.World;
+using Erg.Core.World.Generators;
 
 public class Session
 {
@@ -15,7 +17,7 @@ public class Session
     {
         Random = new Random(config.Seed);
 
-        var generator = new DungeonGenerator(80, 20, Random);
+        var generator = new DungeonGenerator3(80, 20, Random);
         Area = generator.Generate();
 
         var (startX, startY) = generator.GetPlayerStartPosition();
@@ -92,6 +94,11 @@ public class Session
                 Area.SetTile(nx, ny, Tile.OpenDoor);
                 Messages.Add("You open a door.");
             }
+            else if (tile?.Name == "Secret Door")
+            {
+                Area.SetTile(nx, ny, Tile.EntranceFloor);
+                Messages.Add("You discover a secret passage!");
+            }
         }
     }
 
@@ -131,6 +138,7 @@ public class Session
                 Messages.Add($"You pick up {item.Count} {item.Name}s.");
             else
                 Messages.Add($"You pick up {item.Name}.");
+
         }
     }
 }

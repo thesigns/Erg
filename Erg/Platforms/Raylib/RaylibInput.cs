@@ -34,13 +34,18 @@ public class RaylibInput : IInput
         UpdateKey(KeyboardKey.Kp2, Raylib_cs.KeyboardKey.Kp2, now);
         UpdateKey(KeyboardKey.Kp3, Raylib_cs.KeyboardKey.Kp3, now);
         
+        UpdateKey(KeyboardKey.C, Raylib_cs.KeyboardKey.C, now);
+        UpdateKey(KeyboardKey.D, Raylib_cs.KeyboardKey.D, now);
+        UpdateKey(KeyboardKey.G, Raylib_cs.KeyboardKey.G, now);
         UpdateKey(KeyboardKey.I, Raylib_cs.KeyboardKey.I, now);
         UpdateKey(KeyboardKey.O, Raylib_cs.KeyboardKey.O, now);
-        UpdateKey(KeyboardKey.C, Raylib_cs.KeyboardKey.C, now);
-        UpdateKey(KeyboardKey.G, Raylib_cs.KeyboardKey.G, now);
+        
         UpdateKey(KeyboardKey.Escape, Raylib_cs.KeyboardKey.Escape, now);
         UpdateKey(KeyboardKey.Space, Raylib_cs.KeyboardKey.Space, now);
         UpdateKey(KeyboardKey.Enter, Raylib_cs.KeyboardKey.Enter, now);
+
+        // Cheat keys
+        UpdateKey(KeyboardKey.F5, Raylib_cs.KeyboardKey.F5, now);
     }
 
     private void UpdateKey(KeyboardKey key, Raylib_cs.KeyboardKey raylibKey, TimeSpan now)

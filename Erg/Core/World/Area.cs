@@ -1,4 +1,6 @@
-﻿namespace Erg.Core.World;
+﻿using System.Collections.Generic;
+
+namespace Erg.Core.World;
 
 public class Area
 {
@@ -104,7 +106,7 @@ public class Area
 
     public IReadOnlyList<Item> GetItems(int x, int y)
     {
-        return GetTile(x, y)?.Items ?? [];
+        return (IReadOnlyList<Item>?)GetTile(x, y)?.Items ?? [];
     }
 
     public Critter? GetBlockingCritter(int x, int y)

@@ -8,7 +8,8 @@ public class Game
     private IOutput _output;
     private IInput _input;
     private IGameView _currentView;
-    
+    private readonly CheatKeys _cheatKeys = new();
+
     private Session _currentSession;
     public Session CurrentSession => _currentSession;
     
@@ -31,6 +32,7 @@ public class Game
     public void Update()
     {
         _input.Update();
+        _cheatKeys.Update(_input, _currentSession);
         _currentView.Update(_input);
     }
     
