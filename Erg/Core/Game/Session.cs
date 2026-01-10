@@ -19,7 +19,7 @@ public class Session
 
         var (startX, startY) = generator.GetPlayerStartPosition();
         Player = new Player(startX, startY);
-        Area.AddEntity(Player);
+        Area.SetCritter(Player);
 
         Fov = new FieldOfView(Area);
         ComputeFov();
@@ -48,7 +48,7 @@ public class Session
         if (blocker != null)
             return false; // na razie nic więcej
 
-        critter.MoveTo(nx, ny);
+        Area.MoveCritter(critter, nx, ny);
         return true;
     }
 

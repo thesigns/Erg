@@ -8,7 +8,21 @@ public class Tile
     public bool Walkable { get; set; }
     public bool Transparent { get; set; }
     public string Name { get; set; }
-    
+
+    public Critter? Critter { get; set; }
+    public List<Item> Items { get; } = new();
+
+    public Glyph GetDisplayGlyph()
+    {
+        if (Critter != null)
+            return Critter.Glyph;
+
+        if (Items.Count > 0)
+            return Items[^1].Glyph;
+
+        return Glyph;
+    }
+
     public Tile(char character, uint foreground, uint background, bool walkable, bool transparent, string name)
     {
         Glyph = new Glyph(character, foreground, background);

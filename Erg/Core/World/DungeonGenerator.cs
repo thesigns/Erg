@@ -1,3 +1,5 @@
+using Erg.Core.World.Items;
+
 namespace Erg.Core.World;
 
 public class DungeonGenerator
@@ -51,6 +53,8 @@ public class DungeonGenerator
                 failures++;
             }
         }
+
+        PlaceItems(area);
 
         return area;
     }
@@ -286,5 +290,25 @@ public class DungeonGenerator
         }
 
         return true;
+    }
+
+    private void PlaceItems(Area area)
+    {
+        var availableFloors = _floorTiles
+            .Where(f => f != _playerStart)
+            .ToList();
+
+        int coinCount = _random.Next(5, 15);
+
+        for (int i = 0; i < coinCount && availableFloors.Count > 0; i++)
+        {
+            int index = _random.Next(availableFloors.Count);
+            var (x, y) = availableFloors[index];
+            availableFloors.RemoveAt(index);
+
+            int amount = _random.Next(1, 101);
+            var coin = new GoldCoin(x, y, amount);
+            area.AddItem(coin);
+        }
     }
 }

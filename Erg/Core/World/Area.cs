@@ -7,7 +7,6 @@ public class Area
     
     private Tile[,] _tiles;
     private bool[,] _explored;
-    private List<Entity> _entities;
     
     public Area(int width, int height)
     {
@@ -15,7 +14,6 @@ public class Area
         Height = height;
         _tiles = new Tile[width, height];
         _explored = new bool[width, height];
-        _entities = new List<Entity>();
         
         // Inicjalizacja kafli
         for (int y = 0; y < height; y++)
@@ -55,27 +53,64 @@ public class Area
         _explored[x, y] = true;
     }
 
-    public IEnumerable<Entity> Entities => _entities;
-    
-    public void AddEntity(Entity entity)
+    public void SetCritter(Critter critter)
     {
-        _entities.Add(entity);
+        var tile = GetTile(critter.X, critter.Y);
+        if (tile != null)
+            tile.Critter = critter;
     }
-    
-    public Critter? GetBlockingCritter(int x, int y)
+
+    public void MoveCritter(Critter critter, int newX, int newY)
     {
-        foreach (var entity in _entities)
+        var oldTile = GetTile(critter.X, critter.Y);
+        var newTile = GetTile(newX, newY);
+
+        if (oldTile != null)
+            oldTile.Critter = null;
+
+        critter.MoveTo(newX, newY);
+
+        if (newTile != null)
+            newTile.Critter = critter;
+    }
+
+    public void AddItem(Item item)
+    {
+        var tile = GetTile(item.X, item.Y);
+        if (tile == null) return;
+
+        foreach (var existing in tile.Items)
         {
-            if (entity is Critter critter &&
-                critter.BlocksMovement &&
-                critter.X == x &&
-                critter.Y == y)
+            if (existing.CanStackWith(item))
             {
-                return critter;
+                existing.StackWith(item);
+                return;
             }
         }
 
-        return null;
+        tile.Items.Add(item);
+    }
+
+    public void RemoveItem(Item item)
+    {
+        var tile = GetTile(item.X, item.Y);
+        tile?.Items.Remove(item);
+    }
+
+    public Critter? GetCritter(int x, int y)
+    {
+        return GetTile(x, y)?.Critter;
+    }
+
+    public IReadOnlyList<Item> GetItems(int x, int y)
+    {
+        return GetTile(x, y)?.Items ?? [];
+    }
+
+    public Critter? GetBlockingCritter(int x, int y)
+    {
+        var critter = GetTile(x, y)?.Critter;
+        return critter?.BlocksMovement == true ? critter : null;
     }
     
 }

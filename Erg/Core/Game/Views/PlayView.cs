@@ -71,7 +71,6 @@ public class PlayView : IGameView
     public void Render(IOutput output)
     {
         RenderArea(output);
-        RenderEntities(output);
         output.SetCursor(_session.Player.X, _session.Player.Y, true);
         output.Render();
     }
@@ -101,8 +100,8 @@ public class PlayView : IGameView
                 }
                 else
                 {
-                    // Show seen tiles normally
-                    output.PutGlyph(x, y, tile.Glyph);
+                    // Show seen tiles - tile decides what to display
+                    output.PutGlyph(x, y, tile.GetDisplayGlyph());
                 }
             }
         }
@@ -119,19 +118,5 @@ public class PlayView : IGameView
         uint dimmedFg = (uint)((r << 24) | (g << 16) | (b << 8) | a);
 
         return new Glyph(glyph.Character, dimmedFg, glyph.BackgroundColor);
-    }
-
-    private void RenderEntities(IOutput output)
-    {
-        var fov = _session.Fov;
-
-        foreach (var entity in _session.Area.Entities)
-        {
-            // Only show entities in seen tiles
-            if (fov.IsSeen(entity.X, entity.Y))
-            {
-                output.PutGlyph(entity.X, entity.Y, entity.Glyph);
-            }
-        }
     }
 }
