@@ -4,6 +4,7 @@ public abstract class Critter : Entity
 {
     public int Speed { get; protected set; }   // np. 100 = normal
     public int Energy { get; protected set; }  // akumulowana
+    public Inventory Inventory { get; } = new();
 
     protected Critter(
         string name,

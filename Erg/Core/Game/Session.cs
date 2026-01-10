@@ -7,6 +7,7 @@ public class Session
     public Area Area { get; }
     public Player Player { get; }
     public FieldOfView Fov { get; }
+    public MessageBuffer Messages { get; } = new();
 
     private const int ViewRadius = 10;
 
@@ -49,6 +50,25 @@ public class Session
             return false; // na razie nic więcej
 
         Area.MoveCritter(critter, nx, ny);
+
+        // Wyczyść stare wiadomości z poprzedniej tury
+        Messages.Clear();
+
+        // Sprawdź itemy na nowej pozycji
+        var items = Area.GetItems(nx, ny);
+        if (items.Count > 1)
+        {
+            Messages.Add("Several items are lying here.");
+        }
+        else if (items.Count == 1)
+        {
+            var item = items[0];
+            if (item.Count > 1)
+                Messages.Add($"{item.Count} {item.Name}s are lying here.");
+            else
+                Messages.Add($"{item.Name} is lying here.");
+        }
+
         return true;
     }
 
@@ -61,6 +81,7 @@ public class Session
 
     public void OpenAdjacentDoors()
     {
+        Messages.Clear();
         foreach (var (dx, dy) in AllDirections)
         {
             int nx = Player.X + dx;
@@ -69,12 +90,14 @@ public class Session
             if (tile?.Name == "Closed Door")
             {
                 Area.SetTile(nx, ny, Tile.OpenDoor);
+                Messages.Add("You open a door.");
             }
         }
     }
 
     public void CloseAdjacentDoors()
     {
+        Messages.Clear();
         foreach (var (dx, dy) in AllDirections)
         {
             int nx = Player.X + dx;
@@ -83,7 +106,31 @@ public class Session
             if (tile?.Name == "Open Door")
             {
                 Area.SetTile(nx, ny, Tile.ClosedDoor);
+                Messages.Add("You close a door.");
             }
+        }
+    }
+
+    public void PickUpItems()
+    {
+        Messages.Clear();
+
+        var tile = Area.GetTile(Player.X, Player.Y);
+        if (tile == null || tile.Items.Count == 0)
+        {
+            Messages.Add("There is nothing here to pick up.");
+            return;
+        }
+
+        foreach (var item in tile.Items.ToList())
+        {
+            Player.Inventory.Add(item);
+            Area.RemoveItem(item);
+
+            if (item.Count > 1)
+                Messages.Add($"You pick up {item.Count} {item.Name}s.");
+            else
+                Messages.Add($"You pick up {item.Name}.");
         }
     }
 }

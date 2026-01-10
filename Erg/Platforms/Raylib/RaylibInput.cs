@@ -37,8 +37,10 @@ public class RaylibInput : IInput
         UpdateKey(KeyboardKey.I, Raylib_cs.KeyboardKey.I, now);
         UpdateKey(KeyboardKey.O, Raylib_cs.KeyboardKey.O, now);
         UpdateKey(KeyboardKey.C, Raylib_cs.KeyboardKey.C, now);
+        UpdateKey(KeyboardKey.G, Raylib_cs.KeyboardKey.G, now);
         UpdateKey(KeyboardKey.Escape, Raylib_cs.KeyboardKey.Escape, now);
         UpdateKey(KeyboardKey.Space, Raylib_cs.KeyboardKey.Space, now);
+        UpdateKey(KeyboardKey.Enter, Raylib_cs.KeyboardKey.Enter, now);
     }
 
     private void UpdateKey(KeyboardKey key, Raylib_cs.KeyboardKey raylibKey, TimeSpan now)

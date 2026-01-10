@@ -15,6 +15,16 @@ public class PlayView : IGameView
 
     public void Update(IInput input)
     {
+        // Blokuj tylko gdy są wiadomości do przewinięcia (nie mieszczą się w 2 liniach)
+        if (_session.Messages.NeedsMorePrompt)
+        {
+            if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Space))
+                _session.Messages.ShowNext();
+            else if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Enter))
+                _session.Messages.SkipAll();
+            return; // Blokuj ruch dopóki nie przewinie wszystkich
+        }
+
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.I))
         {
             _game.SwitchView(new InventoryView(_game, this));
@@ -32,6 +42,12 @@ public class PlayView : IGameView
         {
             _session.CloseAdjacentDoors();
             _session.ComputeFov();
+            return;
+        }
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.G))
+        {
+            _session.PickUpItems();
             return;
         }
 
@@ -71,8 +87,33 @@ public class PlayView : IGameView
     public void Render(IOutput output)
     {
         RenderArea(output);
+        RenderMessages(output);
         output.SetCursor(_session.Player.X, _session.Player.Y, true);
         output.Render();
+    }
+
+    private void RenderMessages(IOutput output)
+    {
+        var (line1, line2, showMore) = _session.Messages.GetDisplayLines();
+
+        // Wyczyść linie 23-24
+        for (int x = 0; x < 80; x++)
+        {
+            output.PutGlyph(x, 23, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 24, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+        }
+
+        // Renderuj tekst
+        RenderTextLine(output, 23, line1);
+        RenderTextLine(output, 24, showMore ? line2 + " (more)" : line2);
+    }
+
+    private void RenderTextLine(IOutput output, int row, string text)
+    {
+        for (int i = 0; i < text.Length && i < 80; i++)
+        {
+            output.PutGlyph(i, row, new Glyph(text[i], 0xFFFFFFFF, 0x000000FF));
+        }
     }
 
     private void RenderArea(IOutput output)
