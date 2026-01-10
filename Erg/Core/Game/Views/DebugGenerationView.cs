@@ -20,7 +20,7 @@ public class DebugGenerationView : IGameView
     public DebugGenerationView(Game game)
     {
         _game = game;
-        var random = new Random(1); // constant seed is temporary
+        var random = new Random(Environment.TickCount);
         _generator = new DungeonGenerator3(80, MapHeight, random);
         _enumerator = _generator.GenerateStepByStep().GetEnumerator();
         _log.Add("Naciśnij SPACJĘ aby wykonać następny krok");

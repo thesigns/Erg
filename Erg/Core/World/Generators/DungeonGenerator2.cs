@@ -818,7 +818,7 @@ public class DungeonGenerator2 : IDungeonGenerator
     private void CleanupOrphanDoors(Area area)
     {
         // DEBUG: All door cleanup passes disabled to diagnose missing doors
-        // TODO: Re-enable after fixing door placement
+        // Re-enable after fixing door placement
 
         /*
         // Pass 1: Remove orphan doors (doors with <2 cardinal walkable neighbors)
