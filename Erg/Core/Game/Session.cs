@@ -6,10 +6,11 @@ using Erg.Core.World.Generators;
 public class Session
 {
     public Random Random { get; }
-    public Area Area { get; }
+    public Area Area { get; private set; }
     public Player Player { get; }
-    public FieldOfView Fov { get; }
+    public FieldOfView Fov { get; private set; }
     public MessageBuffer Messages { get; } = new();
+    public int CurrentLevel => Area.Level;
 
     private const int ViewRadius = 10;
 
@@ -147,5 +148,61 @@ public class Session
                 Messages.Add($"You pick up {item.Name}.");
 
         }
+    }
+
+    public bool IsPlayerOnStairsDown()
+    {
+        var tile = Area.GetTile(Player.X, Player.Y);
+        return tile?.Type == TileType.StairsDown;
+    }
+
+    public bool IsPlayerOnStairsUp()
+    {
+        var tile = Area.GetTile(Player.X, Player.Y);
+        return tile?.Type == TileType.StairsUp;
+    }
+
+    public void GoDownStairs()
+    {
+        int newLevel = Area.Level + 1;
+        RegenerateArea(newLevel, startOnStairsUp: true);
+    }
+
+    public void GoUpStairs()
+    {
+        int newLevel = Area.Level - 1;
+        RegenerateArea(newLevel, startOnStairsUp: false);
+    }
+
+    private void RegenerateArea(int newLevel, bool startOnStairsUp)
+    {
+        var generator = new DungeonGenerator3(80, 20, Random, level: newLevel);
+        Area = generator.Generate();
+
+        var startPos = startOnStairsUp
+            ? FindTileOfType(TileType.StairsUp)
+            : FindTileOfType(TileType.StairsDown);
+
+        Player.MoveTo(startPos.x, startPos.y);
+        Area.SetCritter(Player);
+
+        Fov = new FieldOfView(Area);
+        ComputeFov();
+
+        Messages.Clear();
+        var startTile = Area.GetTile(Player.X, Player.Y);
+        if (startTile != null)
+        {
+            Messages.Add($"{startTile.Name}.");
+        }
+    }
+
+    private (int x, int y) FindTileOfType(TileType type)
+    {
+        for (int y = 0; y < Area.Height; y++)
+            for (int x = 0; x < Area.Width; x++)
+                if (Area.GetTile(x, y)?.Type == type)
+                    return (x, y);
+        return (0, 0);
     }
 }

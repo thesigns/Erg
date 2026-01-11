@@ -25,6 +25,35 @@ public class PlayView : IGameView
             return; // Blokuj ruch dopóki nie przewinie wszystkich
         }
 
+        // Obsługa schodów
+        bool shiftHeld = input.KeyHeld.GetValueOrDefault(KeyboardKey.LeftShift) ||
+                         input.KeyHeld.GetValueOrDefault(KeyboardKey.RightShift);
+
+        // Shift+> - schodzenie w dół
+        if (shiftHeld && input.KeyPulse.GetValueOrDefault(KeyboardKey.Period))
+        {
+            if (_session.IsPlayerOnStairsDown())
+            {
+                _session.GoDownStairs();
+                return;
+            }
+        }
+
+        // Shift+< - wchodzenie w górę
+        if (shiftHeld && input.KeyPulse.GetValueOrDefault(KeyboardKey.Comma))
+        {
+            if (_session.IsPlayerOnStairsUp())
+            {
+                if (_session.CurrentLevel == 1)
+                {
+                    _game.SwitchView(new GameSummaryView(_game));
+                    return;
+                }
+                _session.GoUpStairs();
+                return;
+            }
+        }
+
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.I))
         {
             _game.SwitchView(new InventoryView(_game, this));

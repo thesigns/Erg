@@ -46,6 +46,12 @@ public class RaylibInput : IInput
 
         // Cheat keys
         UpdateKey(KeyboardKey.F5, Raylib_cs.KeyboardKey.F5, now);
+
+        // Stairs keys
+        UpdateKey(KeyboardKey.Period, Raylib_cs.KeyboardKey.Period, now);
+        UpdateKey(KeyboardKey.Comma, Raylib_cs.KeyboardKey.Comma, now);
+        UpdateKey(KeyboardKey.LeftShift, Raylib_cs.KeyboardKey.LeftShift, now);
+        UpdateKey(KeyboardKey.RightShift, Raylib_cs.KeyboardKey.RightShift, now);
     }
 
     private void UpdateKey(KeyboardKey key, Raylib_cs.KeyboardKey raylibKey, TimeSpan now)
