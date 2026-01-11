@@ -21,7 +21,7 @@ public class DebugGenerationView : IGameView
     {
         _game = game;
         var random = new Random(Environment.TickCount);
-        _generator = new DungeonGenerator3(80, MapHeight, random);
+        _generator = new DungeonGenerator3(80, MapHeight, random, level: 1);
         _enumerator = _generator.GenerateStepByStep().GetEnumerator();
         _log.Add("Naciśnij SPACJĘ aby wykonać następny krok");
         _log.Add("Naciśnij ESC aby wrócić do menu");

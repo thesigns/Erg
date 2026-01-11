@@ -7,6 +7,7 @@ public class DungeonGenerator3 : IDungeonGenerator
     private readonly int _width;
     private readonly int _height;
     private readonly Random _random;
+    private readonly int _level;
 
     private int _nextRegionId = 1;
     private readonly List<RoomInfo> _rooms = new();
@@ -25,16 +26,17 @@ public class DungeonGenerator3 : IDungeonGenerator
     private const int EdgeMargin = 2;  // Minimum distance from map edges
     private const int MaxConsecutiveFails = 100;
 
-    public DungeonGenerator3(int width, int height, Random random)
+    public DungeonGenerator3(int width, int height, Random random, int level = 1)
     {
         _width = width;
         _height = height;
         _random = random;
+        _level = level;
     }
 
     public Area Generate()
     {
-        var area = new Area(_width, _height);
+        var area = new Area(_width, _height, _level);
 
         // Fill with rock
         for (int y = 0; y < _height; y++)
@@ -102,7 +104,7 @@ public class DungeonGenerator3 : IDungeonGenerator
     /// </summary>
     public IEnumerable<GenerationStep> GenerateStepByStep()
     {
-        var area = new Area(_width, _height);
+        var area = new Area(_width, _height, _level);
 
         // Fill with rock
         for (int y = 0; y < _height; y++)
@@ -622,89 +624,142 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     #region Phase 4: Room Specialization
 
-    private enum RoomSpecialization
+    private enum RoomShapeSpecialization
     {
         None,
         CornerColumns,
         RoundedCorners,
-        WaterContainer,
         CenterCross,
         CenterCrossRoundedCorners
     }
 
+    private enum RoomFeatureSpecialization
+    {
+        None,
+        WaterContainer
+    }
+
     private void SpecializeRooms(Area area)
+    {
+        SpecializeRoomShapes(area);
+        SpecializeRoomFeatures(area);
+    }
+
+    private void SpecializeRoomShapes(Area area)
     {
         foreach (var room in _rooms)
         {
-            // 50% chance to be a special room
+            // 50% chance for shape specialization
             if (_random.Next(100) >= 50)
                 continue;
 
-            // Roll for specialization type
-            var specialization = RollSpecialization();
-            ApplySpecialization(area, room, specialization);
+            var specialization = RollShapeSpecialization();
+            ApplyShapeSpecialization(area, room, specialization);
+        }
+    }
+
+    private void SpecializeRoomFeatures(Area area)
+    {
+        foreach (var room in _rooms)
+        {
+            // 20% chance for feature specialization
+            if (_random.Next(100) >= 20)
+                continue;
+
+            var specialization = RollFeatureSpecialization();
+            ApplyFeatureSpecialization(area, room, specialization);
         }
     }
 
     private IEnumerable<GenerationStep> SpecializeRoomsStepByStep(Area area)
     {
-        int specializedCount = 0;
+        int shapeCount = 0;
+        int featureCount = 0;
 
+        // Phase 4a: Shape specialization
         foreach (var room in _rooms)
         {
-            // 50% chance to be a special room
             if (_random.Next(100) >= 50)
                 continue;
 
-            // Roll for specialization type
-            var specialization = RollSpecialization();
-            ApplySpecialization(area, room, specialization);
-            specializedCount++;
+            var specialization = RollShapeSpecialization();
+            ApplyShapeSpecialization(area, room, specialization);
+            shapeCount++;
 
             yield return new GenerationStep(
-                $"Pokój {room.Index}: {specialization}",
+                $"Pokój {room.Index}: kształt {specialization}",
                 area);
         }
 
         yield return new GenerationStep(
-            $"Etap 4 zakończony: {specializedCount} pokoi specjalnych",
+            $"Etap 4a zakończony: {shapeCount} pokoi z kształtem specjalnym",
+            area);
+
+        // Phase 4b: Feature specialization
+        foreach (var room in _rooms)
+        {
+            if (_random.Next(100) >= 20)
+                continue;
+
+            var specialization = RollFeatureSpecialization();
+            ApplyFeatureSpecialization(area, room, specialization);
+            featureCount++;
+
+            yield return new GenerationStep(
+                $"Pokój {room.Index}: cecha {specialization}",
+                area);
+        }
+
+        yield return new GenerationStep(
+            $"Etap 4b zakończony: {featureCount} pokoi z cechą specjalną",
             area);
     }
 
-    private RoomSpecialization RollSpecialization()
+    private RoomShapeSpecialization RollShapeSpecialization()
     {
         int roll = _random.Next(100);
 
-        if (roll < 20)
-            return RoomSpecialization.CornerColumns;
-        else if (roll < 40)
-            return RoomSpecialization.RoundedCorners;
-        else if (roll < 60)
-            return RoomSpecialization.WaterContainer;
-        else if (roll < 80)
-            return RoomSpecialization.CenterCross;
+        if (roll < 25)
+            return RoomShapeSpecialization.CornerColumns;
+        else if (roll < 50)
+            return RoomShapeSpecialization.RoundedCorners;
+        else if (roll < 75)
+            return RoomShapeSpecialization.CenterCross;
         else
-            return RoomSpecialization.CenterCrossRoundedCorners;
+            return RoomShapeSpecialization.CenterCrossRoundedCorners;
     }
 
-    private void ApplySpecialization(Area area, RoomInfo room, RoomSpecialization specialization)
+    private RoomFeatureSpecialization RollFeatureSpecialization()
+    {
+        // Currently only WaterContainer, but ready for more
+        return RoomFeatureSpecialization.WaterContainer;
+    }
+
+    private void ApplyShapeSpecialization(Area area, RoomInfo room, RoomShapeSpecialization specialization)
     {
         switch (specialization)
         {
-            case RoomSpecialization.CornerColumns:
+            case RoomShapeSpecialization.CornerColumns:
                 ApplyCornerColumns(area, room);
                 break;
-            case RoomSpecialization.RoundedCorners:
+            case RoomShapeSpecialization.RoundedCorners:
                 ApplyRoundedCorners(area, room);
                 break;
-            case RoomSpecialization.WaterContainer:
-                ApplyWaterContainer(area, room);
-                break;
-            case RoomSpecialization.CenterCross:
+            case RoomShapeSpecialization.CenterCross:
                 ApplyCenterCross(area, room);
                 break;
-            case RoomSpecialization.CenterCrossRoundedCorners:
+            case RoomShapeSpecialization.CenterCrossRoundedCorners:
                 ApplyCenterCrossRoundedCorners(area, room);
+                break;
+        }
+    }
+
+    private void ApplyFeatureSpecialization(Area area, RoomInfo room, RoomFeatureSpecialization specialization)
+    {
+        switch (specialization)
+        {
+            case RoomFeatureSpecialization.WaterContainer:
+                ApplyWaterContainer(area, room);
                 break;
         }
     }
@@ -772,31 +827,62 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void ApplyWaterContainer(Area area, RoomInfo room)
     {
+        // Pass 1: Fill all walkable tiles with DeepWater
         for (int y = room.Y; y < room.Y + room.Height; y++)
         {
             for (int x = room.X; x < room.X + room.Width; x++)
             {
-                // Check if tile is on the outer edge (adjacent to walls)
-                bool isOuterEdge = x == room.X || x == room.X + room.Width - 1 ||
-                                   y == room.Y || y == room.Y + room.Height - 1;
-
-                Tile tile;
-                if (isOuterEdge)
+                var currentTile = area.GetTile(x, y);
+                if (currentTile != null && currentTile.Walkable)
                 {
-                    tile = Tile.ShallowWater;
+                    var waterTile = Tile.DeepWater;
+                    waterTile.RegionId = room.RegionId;
+                    area.SetTile(x, y, waterTile);
+                    _floorTiles.Remove((x, y));
                 }
-                else
-                {
-                    tile = Tile.DeepWater;
-                }
-
-                // Preserve room's RegionId so door processing recognizes this as a room
-                tile.RegionId = room.RegionId;
-                area.SetTile(x, y, tile);
-
-                _floorTiles.Remove((x, y));
             }
         }
+
+        // Pass 2: Convert DeepWater adjacent to non-walkable tiles to ShallowWater
+        for (int y = room.Y; y < room.Y + room.Height; y++)
+        {
+            for (int x = room.X; x < room.X + room.Width; x++)
+            {
+                var currentTile = area.GetTile(x, y);
+                if (currentTile != null && currentTile.Type == TileType.DeepWater && IsAdjacentToSolidTile(area, x, y))
+                {
+                    var shallowTile = Tile.ShallowWater;
+                    shallowTile.RegionId = room.RegionId;
+                    area.SetTile(x, y, shallowTile);
+                }
+            }
+        }
+    }
+
+    private bool IsAdjacentToSolidTile(Area area, int x, int y)
+    {
+        // Check all 8 directions (including diagonals)
+        // Returns true if adjacent to a solid tile (wall/rock), excluding water tiles
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || nx >= _width || ny < 0 || ny >= _height)
+                    continue;
+
+                var neighbor = area.GetTile(nx, ny);
+                if (neighbor != null && !neighbor.Walkable &&
+                    neighbor.Type != TileType.DeepWater &&
+                    neighbor.Type != TileType.ShallowWater)
+                    return true;
+            }
+        }
+        return false;
     }
 
     private void ApplyCenterCross(Area area, RoomInfo room)

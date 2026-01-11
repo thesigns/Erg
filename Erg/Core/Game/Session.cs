@@ -17,7 +17,7 @@ public class Session
     {
         Random = new Random(config.Seed);
 
-        var generator = new DungeonGenerator3(80, 20, Random);
+        var generator = new DungeonGenerator3(80, 20, Random, level: 1);
         Area = generator.Generate();
 
         var (startX, startY) = generator.GetPlayerStartPosition();

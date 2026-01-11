@@ -87,9 +87,22 @@ public class PlayView : IGameView
     public void Render(IOutput output)
     {
         RenderArea(output);
+        RenderStatusLine(output);
         RenderMessages(output);
         output.SetCursor(_session.Player.X, _session.Player.Y, true);
         output.Render();
+    }
+
+    private void RenderStatusLine(IOutput output)
+    {
+        // Wyczyść linię 20
+        for (int x = 0; x < 80; x++)
+        {
+            output.PutGlyph(x, 20, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+        }
+
+        string levelText = $"Level: {_session.Area.Level}";
+        RenderTextLine(output, 20, levelText);
     }
 
     private void RenderMessages(IOutput output)
