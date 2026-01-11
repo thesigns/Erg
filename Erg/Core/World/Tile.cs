@@ -6,6 +6,7 @@ public class Tile
 {
     public Glyph Glyph { get; set; }
     public bool Walkable { get; set; }
+    public bool Swimable { get; set; }
     public bool Transparent { get; set; }
     public string Name { get; set; }
     public int RegionId { get; set; }
@@ -30,10 +31,11 @@ public class Tile
     }
 
     public Tile(char character, uint foreground, uint background, bool walkable, bool transparent, string name,
-        TileType type = TileType.Floor, TileStructure structure = TileStructure.None)
+        TileType type = TileType.Floor, TileStructure structure = TileStructure.None, bool swimable = false)
     {
         Glyph = new Glyph(character, foreground, background);
         Walkable = walkable;
+        Swimable = swimable;
         Transparent = transparent;
         Name = name;
         Type = type;
@@ -44,7 +46,7 @@ public class Tile
 
     // Floor factory with structure parameter
     public static Tile Floor(TileStructure structure) =>
-        new('·', 0x606060FF, 0x000000FF, true, true, "Floor", TileType.Floor, structure);
+        new('.', 0x808080FF, 0x000000FF, true, true, "Floor", TileType.Floor, structure);
 
     // Dungeon tiles
     public static Tile DungeonWall =>
@@ -64,5 +66,12 @@ public class Tile
         new('#', 0x505050FF, 0x000000FF, false, false, "Rock", TileType.Rock);
 
     public static Tile ImpenetrableRock =>
-        new('#', 0x303030FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock);
+        new('#', 0x505050FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock);
+
+    // Water tiles
+    public static Tile ShallowWater =>
+        new('≈', 0x2848FFFF, 0x000000FF, true, true, "Shallow Water", TileType.ShallowWater);
+
+    public static Tile DeepWater =>
+        new('≈', 0x1020AAFF, 0x000000FF, false, true, "Deep Water", TileType.DeepWater, TileStructure.None, true);
 }

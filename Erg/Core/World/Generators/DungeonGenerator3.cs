@@ -50,8 +50,20 @@ public class DungeonGenerator3 : IDungeonGenerator
         // Remove disconnected rooms
         RemoveDisconnectedRooms(area);
 
+        // Specialize rooms
+        SpecializeRooms(area);
+
+        // Generate dead ends
+        GenerateDeadEnds(area);
+
         // Process doors
         ProcessDoors(area);
+
+        // Process walls
+        ProcessWalls(area);
+
+        // Process impenetrable rock on edges
+        ProcessImpenetrableRock(area);
 
         // Place items in rooms
         PlaceItems(area);
@@ -116,13 +128,21 @@ public class DungeonGenerator3 : IDungeonGenerator
             yield return step;
         }
 
-        // Phase 4: Process doors
+        // Phase 6: Process doors
         ProcessDoors(area);
-        yield return new GenerationStep("Etap 4 zakończony: przetworzono drzwi", area);
+        yield return new GenerationStep("Etap 6 zakończony: przetworzono drzwi", area);
 
-        // Phase 5: Place items
+        // Phase 7: Process walls
+        ProcessWalls(area);
+        yield return new GenerationStep("Etap 7 zakończony: przetworzono ściany", area);
+
+        // Phase 8: Process impenetrable rock on edges
+        ProcessImpenetrableRock(area);
+        yield return new GenerationStep("Etap 8 zakończony: krawędzie mapy", area);
+
+        // Phase 9: Place items
         PlaceItems(area);
-        yield return new GenerationStep("Etap 5 zakończony: rozmieszczono przedmioty", area);
+        yield return new GenerationStep("Etap 9 zakończony: rozmieszczono przedmioty", area);
 
         // Set player start in a connected room
         var connectedRoom = _rooms.FirstOrDefault(r => r.Connected) ?? _rooms.FirstOrDefault();
@@ -341,6 +361,18 @@ public class DungeonGenerator3 : IDungeonGenerator
         else
         {
             yield return new GenerationStep("Etap 3 zakończony: brak niepołączonych pokoi", area);
+        }
+
+        // Phase 4: Specialize rooms
+        foreach (var step in SpecializeRoomsStepByStep(area))
+        {
+            yield return step;
+        }
+
+        // Phase 5: Generate dead ends
+        foreach (var step in GenerateDeadEndsStepByStep(area))
+        {
+            yield return step;
         }
     }
 
@@ -595,7 +627,489 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     #endregion
 
-    #region Phase 4: Door Processing
+    #region Phase 4: Room Specialization
+
+    private enum RoomSpecialization
+    {
+        None,
+        CornerColumns,
+        RoundedCorners,
+        WaterContainer,
+        CenterCross,
+        CenterCrossRoundedCorners
+    }
+
+    private void SpecializeRooms(Area area)
+    {
+        foreach (var room in _rooms)
+        {
+            // 50% chance to be a special room
+            if (_random.Next(100) >= 50)
+                continue;
+
+            // Roll for specialization type
+            var specialization = RollSpecialization();
+            ApplySpecialization(area, room, specialization);
+        }
+    }
+
+    private IEnumerable<GenerationStep> SpecializeRoomsStepByStep(Area area)
+    {
+        int specializedCount = 0;
+
+        foreach (var room in _rooms)
+        {
+            // 50% chance to be a special room
+            if (_random.Next(100) >= 50)
+                continue;
+
+            // Roll for specialization type
+            var specialization = RollSpecialization();
+            ApplySpecialization(area, room, specialization);
+            specializedCount++;
+
+            yield return new GenerationStep(
+                $"Pokój {room.Index}: {specialization}",
+                area);
+        }
+
+        yield return new GenerationStep(
+            $"Etap 4 zakończony: {specializedCount} pokoi specjalnych",
+            area);
+    }
+
+    private RoomSpecialization RollSpecialization()
+    {
+        int roll = _random.Next(100);
+
+        if (roll < 20)
+            return RoomSpecialization.CornerColumns;
+        else if (roll < 40)
+            return RoomSpecialization.RoundedCorners;
+        else if (roll < 60)
+            return RoomSpecialization.WaterContainer;
+        else if (roll < 80)
+            return RoomSpecialization.CenterCross;
+        else
+            return RoomSpecialization.CenterCrossRoundedCorners;
+    }
+
+    private void ApplySpecialization(Area area, RoomInfo room, RoomSpecialization specialization)
+    {
+        switch (specialization)
+        {
+            case RoomSpecialization.CornerColumns:
+                ApplyCornerColumns(area, room);
+                break;
+            case RoomSpecialization.RoundedCorners:
+                ApplyRoundedCorners(area, room);
+                break;
+            case RoomSpecialization.WaterContainer:
+                ApplyWaterContainer(area, room);
+                break;
+            case RoomSpecialization.CenterCross:
+                ApplyCenterCross(area, room);
+                break;
+            case RoomSpecialization.CenterCrossRoundedCorners:
+                ApplyCenterCrossRoundedCorners(area, room);
+                break;
+        }
+    }
+
+    private void ApplyCornerColumns(Area area, RoomInfo room)
+    {
+        // Place rock columns at inner corners (1 tile from walls)
+        var columnPositions = new[]
+        {
+            (room.X + 1, room.Y + 1),                         // Top-left
+            (room.X + room.Width - 2, room.Y + 1),            // Top-right
+            (room.X + 1, room.Y + room.Height - 2),           // Bottom-left
+            (room.X + room.Width - 2, room.Y + room.Height - 2) // Bottom-right
+        };
+
+        foreach (var (x, y) in columnPositions)
+        {
+            area.SetTile(x, y, Tile.Rock);
+            _floorTiles.Remove((x, y));
+        }
+    }
+
+    private void ApplyRoundedCorners(Area area, RoomInfo room)
+    {
+        // Actual corner positions of the room
+        var cornerPositions = new[]
+        {
+            (room.X, room.Y),                                 // Top-left
+            (room.X + room.Width - 1, room.Y),                // Top-right
+            (room.X, room.Y + room.Height - 1),               // Bottom-left
+            (room.X + room.Width - 1, room.Y + room.Height - 1) // Bottom-right
+        };
+
+        foreach (var (x, y) in cornerPositions)
+        {
+            // Check if corner is adjacent to an entrance (horizontally or vertically)
+            if (IsAdjacentToEntrance(area, x, y))
+                continue;
+
+            // Not adjacent to entrance - replace with rock
+            area.SetTile(x, y, Tile.Rock);
+            _floorTiles.Remove((x, y));
+        }
+    }
+
+    private bool IsAdjacentToEntrance(Area area, int x, int y)
+    {
+        var directions = new[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
+
+        foreach (var (dx, dy) in directions)
+        {
+            int nx = x + dx;
+            int ny = y + dy;
+
+            if (nx < 0 || nx >= _width || ny < 0 || ny >= _height)
+                continue;
+
+            var tile = area.GetTile(nx, ny);
+            if (tile != null && tile.Structure == TileStructure.Entrance)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void ApplyWaterContainer(Area area, RoomInfo room)
+    {
+        for (int y = room.Y; y < room.Y + room.Height; y++)
+        {
+            for (int x = room.X; x < room.X + room.Width; x++)
+            {
+                // Check if tile is on the outer edge (adjacent to walls)
+                bool isOuterEdge = x == room.X || x == room.X + room.Width - 1 ||
+                                   y == room.Y || y == room.Y + room.Height - 1;
+
+                Tile tile;
+                if (isOuterEdge)
+                {
+                    tile = Tile.ShallowWater;
+                }
+                else
+                {
+                    tile = Tile.DeepWater;
+                }
+
+                // Preserve room's RegionId so door processing recognizes this as a room
+                tile.RegionId = room.RegionId;
+                area.SetTile(x, y, tile);
+
+                _floorTiles.Remove((x, y));
+            }
+        }
+    }
+
+    private void ApplyCenterCross(Area area, RoomInfo room)
+    {
+        // Requires minimum 5x5 room
+        if (room.Width < 5 || room.Height < 5)
+            return;
+
+        var crossTiles = new HashSet<(int, int)>();
+
+        // Determine center column(s)
+        int cx1, cx2;
+        if (room.Width % 2 == 1) // odd width - single center column
+        {
+            cx1 = cx2 = room.X + room.Width / 2;
+        }
+        else // even width - 2 center columns
+        {
+            cx1 = room.X + room.Width / 2 - 1;
+            cx2 = room.X + room.Width / 2;
+        }
+
+        // Determine center row(s)
+        int cy1, cy2;
+        if (room.Height % 2 == 1) // odd height - single center row
+        {
+            cy1 = cy2 = room.Y + room.Height / 2;
+        }
+        else // even height - 2 center rows
+        {
+            cy1 = room.Y + room.Height / 2 - 1;
+            cy2 = room.Y + room.Height / 2;
+        }
+
+        // Vertical arm: center columns, extending 1 row above and below center
+        for (int x = cx1; x <= cx2; x++)
+        {
+            for (int y = cy1 - 1; y <= cy2 + 1; y++)
+            {
+                crossTiles.Add((x, y));
+            }
+        }
+
+        // Horizontal arm: center rows, extending 1 column left and right of center
+        for (int y = cy1; y <= cy2; y++)
+        {
+            for (int x = cx1 - 1; x <= cx2 + 1; x++)
+            {
+                crossTiles.Add((x, y));
+            }
+        }
+
+        // Apply tiles
+        foreach (var (x, y) in crossTiles)
+        {
+            area.SetTile(x, y, Tile.Rock);
+            _floorTiles.Remove((x, y));
+        }
+    }
+
+    private void ApplyCenterCrossRoundedCorners(Area area, RoomInfo room)
+    {
+        // Requires minimum 5x5 room (from CenterCross requirement)
+        if (room.Width < 5 || room.Height < 5)
+            return;
+
+        // Apply both specializations
+        ApplyCenterCross(area, room);
+        ApplyRoundedCorners(area, room);
+    }
+
+    #endregion
+
+    #region Phase 5: Dead End Generation
+
+    private void GenerateDeadEnds(Area area)
+    {
+        int deadEndsCreated = 0;
+        int maxAttempts = 300;
+        int attempts = 0;
+
+        while (deadEndsCreated < 20 && attempts < maxAttempts)
+        {
+            attempts++;
+            if (TryCreateDeadEnd(area))
+                deadEndsCreated++;
+        }
+    }
+
+    private IEnumerable<GenerationStep> GenerateDeadEndsStepByStep(Area area)
+    {
+        int deadEndsCreated = 0;
+        int maxAttempts = 100;
+        int attempts = 0;
+
+        while (deadEndsCreated < 10 && attempts < maxAttempts)
+        {
+            attempts++;
+            if (TryCreateDeadEnd(area))
+            {
+                deadEndsCreated++;
+                yield return new GenerationStep($"Dead end {deadEndsCreated} utworzony", area);
+            }
+        }
+
+        yield return new GenerationStep($"Etap 5 zakończony: {deadEndsCreated} dead-endów", area);
+    }
+
+    private bool TryCreateDeadEnd(Area area)
+    {
+        // Find candidate rocks: adjacent to exactly one corridor floor
+        var candidates = new List<(int x, int y, int dx, int dy)>();
+
+        for (int scanY = 1; scanY < _height - 1; scanY++)
+        {
+            for (int scanX = 1; scanX < _width - 1; scanX++)
+            {
+                var tile = area.GetTile(scanX, scanY);
+                if (tile == null || tile.Type != TileType.Rock)
+                    continue;
+
+                // Check if adjacent to exactly one corridor floor
+                var corridorNeighbor = GetSingleCorridorNeighbor(area, scanX, scanY);
+                if (corridorNeighbor != null)
+                {
+                    // Direction is opposite to the corridor (going away from it)
+                    int dirX = scanX - corridorNeighbor.Value.x;
+                    int dirY = scanY - corridorNeighbor.Value.y;
+                    candidates.Add((scanX, scanY, dirX, dirY));
+                }
+            }
+        }
+
+        if (candidates.Count == 0)
+            return false;
+
+        // Pick random candidate
+        var candidate = candidates[_random.Next(candidates.Count)];
+
+        // Get the source corridor position to exclude from adjacency checks
+        var sourceCorridorPos = GetSingleCorridorNeighbor(area, candidate.x, candidate.y)!.Value;
+
+        // Carve the dead end
+        var carvedTiles = new List<(int x, int y)>();
+        int x = candidate.x;
+        int y = candidate.y;
+        int dx = candidate.dx;
+        int dy = candidate.dy;
+        int segmentLength = _random.Next(3, 7);
+        int stepsInSegment = 0;
+
+        while (true)
+        {
+            // Check if we can carve this tile
+            if (!CanCarveDeadEndTile(area, x, y, carvedTiles, sourceCorridorPos))
+                break;
+
+            // Carve the tile
+            var corridorTile = Tile.Floor(TileStructure.Corridor);
+            corridorTile.RegionId = _nextRegionId;
+            area.SetTile(x, y, corridorTile);
+            carvedTiles.Add((x, y));
+            _floorTiles.Add((x, y));
+
+            stepsInSegment++;
+
+            // Check if we should change direction
+            if (stepsInSegment >= segmentLength)
+            {
+                // Try to turn 90 degrees
+                var newDir = TryTurn90Degrees(area, x, y, dx, dy, carvedTiles, sourceCorridorPos);
+                if (newDir == null)
+                    break; // Can't turn, end here
+
+                dx = newDir.Value.dx;
+                dy = newDir.Value.dy;
+                segmentLength = _random.Next(3, 7);
+                stepsInSegment = 0;
+            }
+
+            // Move to next position
+            x += dx;
+            y += dy;
+
+            // Safety limit
+            if (carvedTiles.Count > 30)
+                break;
+        }
+
+        if (carvedTiles.Count > 0)
+        {
+            _nextRegionId++;
+            return true;
+        }
+
+        return false;
+    }
+
+    private (int x, int y)? GetSingleCorridorNeighbor(Area area, int x, int y)
+    {
+        var directions = new[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
+        (int x, int y)? found = null;
+        int count = 0;
+
+        foreach (var (dx, dy) in directions)
+        {
+            int nx = x + dx;
+            int ny = y + dy;
+
+            var tile = area.GetTile(nx, ny);
+            if (tile != null && tile.Structure == TileStructure.Corridor)
+            {
+                count++;
+                found = (nx, ny);
+            }
+        }
+
+        return count == 1 ? found : null;
+    }
+
+    private bool CanCarveDeadEndTile(Area area, int x, int y, List<(int x, int y)> carvedTiles, (int x, int y) sourceCorridorPos)
+    {
+        // Must be within bounds (with margin of 2 for DungeonWall + ImpenetrableRock on edges)
+        if (x < 2 || x >= _width - 2 || y < 2 || y >= _height - 2)
+            return false;
+
+        // Must be rock
+        var tile = area.GetTile(x, y);
+        if (tile == null || tile.Type != TileType.Rock)
+            return false;
+
+        // Check if carving this would break through to another area
+        // Count adjacent walkable tiles (including diagonals), excluding our carved tiles and source corridor
+        int adjacentWalkable = CountAdjacentWalkable(area, x, y, carvedTiles, sourceCorridorPos);
+
+        // If any adjacent walkable tile (not counting our carved corridor and source), we'd break through
+        return adjacentWalkable == 0;
+    }
+
+    private int CountAdjacentWalkable(Area area, int x, int y, List<(int x, int y)> excludeTiles, (int x, int y) sourceCorridorPos)
+    {
+        var allDirections = new[]
+        {
+            (-1, -1), (0, -1), (1, -1),
+            (-1, 0),          (1, 0),
+            (-1, 1),  (0, 1),  (1, 1)
+        };
+
+        int count = 0;
+        foreach (var (dx, dy) in allDirections)
+        {
+            int nx = x + dx;
+            int ny = y + dy;
+
+            // Skip our own carved tiles
+            if (excludeTiles.Contains((nx, ny)))
+                continue;
+
+            // Skip the source corridor
+            if (nx == sourceCorridorPos.x && ny == sourceCorridorPos.y)
+                continue;
+
+            var tile = area.GetTile(nx, ny);
+            if (tile != null && tile.Walkable)
+                count++;
+        }
+
+        return count;
+    }
+
+    private (int dx, int dy)? TryTurn90Degrees(Area area, int x, int y, int currentDx, int currentDy, List<(int x, int y)> carvedTiles, (int x, int y) sourceCorridorPos)
+    {
+        // Get perpendicular directions
+        var turns = new List<(int dx, int dy)>();
+
+        if (currentDx != 0) // Moving horizontally, try vertical
+        {
+            turns.Add((0, -1));
+            turns.Add((0, 1));
+        }
+        else // Moving vertically, try horizontal
+        {
+            turns.Add((-1, 0));
+            turns.Add((1, 0));
+        }
+
+        // Shuffle
+        if (_random.Next(2) == 0)
+            turns.Reverse();
+
+        // Try each direction
+        foreach (var (dx, dy) in turns)
+        {
+            int nx = x + dx;
+            int ny = y + dy;
+
+            if (CanCarveDeadEndTile(area, nx, ny, carvedTiles, sourceCorridorPos))
+                return (dx, dy);
+        }
+
+        return null;
+    }
+
+    #endregion
+
+    #region Phase 6: Door Processing
 
     private void ProcessDoors(Area area)
     {
@@ -664,11 +1178,83 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     #endregion
 
-    #region Phase 5: Item Placement
+    #region Phase 7: Wall Processing
+
+    private void ProcessWalls(Area area)
+    {
+        // Przeleć przez wszystkie tilesy z wyłączeniem krawędzi mapy
+        for (int y = 1; y < _height - 1; y++)
+        {
+            for (int x = 1; x < _width - 1; x++)
+            {
+                var tile = area.GetTile(x, y);
+                if (tile == null || tile.Type != TileType.Rock)
+                    continue;
+
+                // Sprawdź czy sąsiaduje z nie-skałą (8 kierunków)
+                if (HasNonRockNeighbor(area, x, y))
+                {
+                    area.SetTile(x, y, Tile.DungeonWall);
+                }
+            }
+        }
+    }
+
+    private bool HasNonRockNeighbor(Area area, int x, int y)
+    {
+        // 8 kierunków: góra, dół, lewo, prawo + 4 skosy
+        var directions = new[]
+        {
+            (-1, -1), (0, -1), (1, -1),
+            (-1,  0),          (1,  0),
+            (-1,  1), (0,  1), (1,  1)
+        };
+
+        foreach (var (dx, dy) in directions)
+        {
+            int nx = x + dx;
+            int ny = y + dy;
+
+            // Sprawdź granice mapy
+            if (nx < 0 || nx >= _width || ny < 0 || ny >= _height)
+                continue;
+
+            var neighbor = area.GetTile(nx, ny);
+            if (neighbor != null && neighbor.Type != TileType.Rock && neighbor.Type != TileType.Wall)
+                return true;
+        }
+
+        return false;
+    }
+
+    #endregion
+
+    #region Phase 8: Impenetrable Rock Processing
+
+    private void ProcessImpenetrableRock(Area area)
+    {
+        // Górna i dolna krawędź
+        for (int x = 0; x < _width; x++)
+        {
+            area.SetTile(x, 0, Tile.ImpenetrableRock);
+            area.SetTile(x, _height - 1, Tile.ImpenetrableRock);
+        }
+
+        // Lewa i prawa krawędź (bez rogów, już ustawione)
+        for (int y = 1; y < _height - 1; y++)
+        {
+            area.SetTile(0, y, Tile.ImpenetrableRock);
+            area.SetTile(_width - 1, y, Tile.ImpenetrableRock);
+        }
+    }
+
+    #endregion
+
+    #region Phase 9: Item Placement
 
     private void PlaceItems(Area area)
     {
-        // Collect all room floor tiles
+        // Collect all room floor tiles (only actual floors, not water/rocks)
         var roomFloors = new List<(int x, int y)>();
         foreach (var room in _rooms)
         {
@@ -676,7 +1262,9 @@ public class DungeonGenerator3 : IDungeonGenerator
             {
                 for (int x = room.X; x < room.X + room.Width; x++)
                 {
-                    roomFloors.Add((x, y));
+                    // Only add if it's still a floor tile
+                    if (_floorTiles.Contains((x, y)))
+                        roomFloors.Add((x, y));
                 }
             }
         }

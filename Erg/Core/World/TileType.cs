@@ -8,5 +8,7 @@ public enum TileType
     ImpenetrableRock,
     OpenDoor,
     ClosedDoor,
-    SecretDoor
+    SecretDoor,
+    ShallowWater,
+    DeepWater
 }
