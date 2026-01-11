@@ -61,7 +61,7 @@ public class Tile
     public static Tile SecretDoor =>
         new('#', 0x808080FF, 0x000000FF, false, false, "Secret Door", TileType.SecretDoor, TileStructure.Entrance);
 
-    // For future use (Etap 2)
+    // Natural rocks
     public static Tile Rock =>
         new('#', 0x505050FF, 0x000000FF, false, false, "Rock", TileType.Rock);
 
