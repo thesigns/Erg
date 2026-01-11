@@ -89,14 +89,14 @@ public class Session
             int nx = Player.X + dx;
             int ny = Player.Y + dy;
             var tile = Area.GetTile(nx, ny);
-            if (tile?.Name == "Closed Door")
+            if (tile?.Type == TileType.ClosedDoor)
             {
                 Area.SetTile(nx, ny, Tile.OpenDoor);
                 Messages.Add("You open a door.");
             }
-            else if (tile?.Name == "Secret Door")
+            else if (tile?.Type == TileType.SecretDoor)
             {
-                Area.SetTile(nx, ny, Tile.EntranceFloor);
+                Area.SetTile(nx, ny, Tile.Floor(TileStructure.Entrance));
                 Messages.Add("You discover a secret passage!");
             }
         }
@@ -110,7 +110,7 @@ public class Session
             int nx = Player.X + dx;
             int ny = Player.Y + dy;
             var tile = Area.GetTile(nx, ny);
-            if (tile?.Name == "Open Door")
+            if (tile?.Type == TileType.OpenDoor)
             {
                 Area.SetTile(nx, ny, Tile.ClosedDoor);
                 Messages.Add("You close a door.");

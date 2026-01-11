@@ -22,6 +22,7 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     // Room placement
     private const int RoomMargin = 3;  // Minimum walls between rooms
+    private const int EdgeMargin = 2;  // Minimum distance from map edges
     private const int MaxConsecutiveFails = 100;
 
     public DungeonGenerator3(int width, int height, Random random)
@@ -35,16 +36,19 @@ public class DungeonGenerator3 : IDungeonGenerator
     {
         var area = new Area(_width, _height);
 
-        // Fill with walls
+        // Fill with rock
         for (int y = 0; y < _height; y++)
             for (int x = 0; x < _width; x++)
-                area.SetTile(x, y, Tile.DungeonWall);
+                area.SetTile(x, y, Tile.Rock);
 
         // Generate rooms
         GenerateRooms(area);
 
         // Connect rooms with corridors
         ConnectRooms(area);
+
+        // Remove disconnected rooms
+        RemoveDisconnectedRooms(area);
 
         // Process doors
         ProcessDoors(area);
@@ -92,11 +96,11 @@ public class DungeonGenerator3 : IDungeonGenerator
     {
         var area = new Area(_width, _height);
 
-        // Fill with walls
+        // Fill with rock
         for (int y = 0; y < _height; y++)
             for (int x = 0; x < _width; x++)
-                area.SetTile(x, y, Tile.DungeonWall);
-        yield return new GenerationStep("Wypełniono ścianami", area);
+                area.SetTile(x, y, Tile.Rock);
+        yield return new GenerationStep("Wypełniono skałą", area);
 
         // Generate rooms with step-by-step feedback
         foreach (var step in GenerateRoomsStepByStep(area))
@@ -112,13 +116,13 @@ public class DungeonGenerator3 : IDungeonGenerator
             yield return step;
         }
 
-        // Phase 3: Process doors
+        // Phase 4: Process doors
         ProcessDoors(area);
-        yield return new GenerationStep("Etap 3 zakończony: przetworzono drzwi", area);
+        yield return new GenerationStep("Etap 4 zakończony: przetworzono drzwi", area);
 
-        // Phase 4: Place items
+        // Phase 5: Place items
         PlaceItems(area);
-        yield return new GenerationStep("Etap 4 zakończony: rozmieszczono przedmioty", area);
+        yield return new GenerationStep("Etap 5 zakończony: rozmieszczono przedmioty", area);
 
         // Set player start in a connected room
         var connectedRoom = _rooms.FirstOrDefault(r => r.Connected) ?? _rooms.FirstOrDefault();
@@ -188,11 +192,11 @@ public class DungeonGenerator3 : IDungeonGenerator
         int roomWidth = MaxRoomWidth;
         int roomHeight = MaxRoomHeight;
 
-        // Random position (must leave space for margin + border wall)
-        int minX = 1;
-        int minY = 1;
-        int maxX = _width - MinRoomWidth - 1;
-        int maxY = _height - MinRoomHeight - 1;
+        // Random position (must leave space for edge margin)
+        int minX = EdgeMargin;
+        int minY = EdgeMargin;
+        int maxX = _width - MinRoomWidth - EdgeMargin;
+        int maxY = _height - MinRoomHeight - EdgeMargin;
 
         if (maxX < minX || maxY < minY)
             return (false, null);
@@ -218,15 +222,15 @@ public class DungeonGenerator3 : IDungeonGenerator
             {
                 roomWidth--;
                 // Clamp to available space
-                if (roomX + roomWidth > _width - 1)
-                    roomWidth = _width - 1 - roomX;
+                if (roomX + roomWidth > _width - EdgeMargin)
+                    roomWidth = _width - EdgeMargin - roomX;
             }
             else
             {
                 roomHeight--;
                 // Clamp to available space
-                if (roomY + roomHeight > _height - 1)
-                    roomHeight = _height - 1 - roomY;
+                if (roomY + roomHeight > _height - EdgeMargin)
+                    roomHeight = _height - EdgeMargin - roomY;
             }
             shrinkWidth = !shrinkWidth;
         }
@@ -237,9 +241,9 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private bool CanPlaceRoom(Area area, int roomX, int roomY, int roomWidth, int roomHeight)
     {
-        // 1. Check map bounds - only 1 tile margin from edges
-        if (roomX < 1 || roomY < 1 ||
-            roomX + roomWidth > _width - 1 || roomY + roomHeight > _height - 1)
+        // 1. Check map bounds - EdgeMargin tiles from edges
+        if (roomX < EdgeMargin || roomY < EdgeMargin ||
+            roomX + roomWidth > _width - EdgeMargin || roomY + roomHeight > _height - EdgeMargin)
             return false;
 
         // 2. Check room area + RoomMargin for other floors (rooms)
@@ -274,7 +278,7 @@ public class DungeonGenerator3 : IDungeonGenerator
         {
             for (int x = roomX; x < roomX + roomWidth; x++)
             {
-                var tile = Tile.RoomFloor;  // RED for debug
+                var tile = Tile.Floor(TileStructure.Room);
                 tile.RegionId = regionId;
                 area.SetTile(x, y, tile);
                 _floorTiles.Add((x, y));
@@ -324,8 +328,20 @@ public class DungeonGenerator3 : IDungeonGenerator
         }
 
         int connectedRooms = _rooms.Count(r => r.Connected);
-        string status = connectedRooms == _rooms.Count ? "wszystkie połączone" : $"{connectedRooms}/{_rooms.Count} pokoi połączonych";
+        int totalRooms = _rooms.Count;
+        string status = connectedRooms == totalRooms ? "wszystkie połączone" : $"{connectedRooms}/{totalRooms} pokoi połączonych";
         yield return new GenerationStep($"Etap 2 zakończony: {_corridors.Count} korytarzy, {status}", area);
+
+        // Phase 3: Remove disconnected rooms
+        int removedCount = RemoveDisconnectedRooms(area);
+        if (removedCount > 0)
+        {
+            yield return new GenerationStep($"Etap 3 zakończony: usunięto {removedCount} niepołączonych pokoi", area);
+        }
+        else
+        {
+            yield return new GenerationStep("Etap 3 zakończony: brak niepołączonych pokoi", area);
+        }
     }
 
     private (bool Success, int SourceRoomIndex, string TargetType, int TargetIndex, List<(int x, int y)>? Path) TryCreateCorridor(Area area)
@@ -392,7 +408,7 @@ public class DungeonGenerator3 : IDungeonGenerator
                     for (int i = 1; i < path.Count - 1; i++)
                     {
                         var (px, py) = path[i];
-                        var corridorTile = Tile.CorridorFloor;
+                        var corridorTile = Tile.Floor(TileStructure.Corridor);
                         corridorTile.RegionId = corridorRegionId;
                         area.SetTile(px, py, corridorTile);
                         _floorTiles.Add((px, py));
@@ -539,7 +555,7 @@ public class DungeonGenerator3 : IDungeonGenerator
         if (x < 0 || x >= _width || y < 0 || y >= _height)
             return false;
         var tile = area.GetTile(x, y);
-        return tile != null && (tile.Name == "Open Door" || tile.Name == "Closed Door");
+        return tile != null && tile.Type is TileType.OpenDoor or TileType.ClosedDoor;
     }
 
     private void PlaceDoor(Area area, int x, int y)
@@ -552,7 +568,34 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     #endregion
 
-    #region Phase 3: Door Processing
+    #region Phase 3: Remove Disconnected Rooms
+
+    private int RemoveDisconnectedRooms(Area area)
+    {
+        var disconnectedRooms = _rooms.Where(r => !r.Connected).ToList();
+
+        foreach (var room in disconnectedRooms)
+        {
+            // Fill room tiles with Rock
+            for (int y = room.Y; y < room.Y + room.Height; y++)
+            {
+                for (int x = room.X; x < room.X + room.Width; x++)
+                {
+                    area.SetTile(x, y, Tile.Rock);
+                    _floorTiles.Remove((x, y));
+                }
+            }
+
+            // Remove from rooms list
+            _rooms.Remove(room);
+        }
+
+        return disconnectedRooms.Count;
+    }
+
+    #endregion
+
+    #region Phase 4: Door Processing
 
     private void ProcessDoors(Area area)
     {
@@ -567,8 +610,8 @@ public class DungeonGenerator3 : IDungeonGenerator
 
                 if (allAdjacentFloorsAreCorridor)
                 {
-                    // Door between corridors - replace with EntranceFloor
-                    var entrance = Tile.EntranceFloor;
+                    // Door between corridors - replace with Entrance floor
+                    var entrance = Tile.Floor(TileStructure.Entrance);
                     entrance.RegionId = tile.RegionId;
                     area.SetTile(x, y, entrance);
                 }
@@ -616,12 +659,12 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private bool IsDoorTile(Tile tile)
     {
-        return tile.Name == "Open Door" || tile.Name == "Closed Door";
+        return tile.Type is TileType.OpenDoor or TileType.ClosedDoor;
     }
 
     #endregion
 
-    #region Phase 4: Item Placement
+    #region Phase 5: Item Placement
 
     private void PlaceItems(Area area)
     {
