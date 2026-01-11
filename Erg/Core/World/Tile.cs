@@ -46,7 +46,7 @@ public class Tile
 
     // Floor factory with structure parameter
     public static Tile Floor(TileStructure structure) =>
-        new('.', 0x808080FF, 0x000000FF, true, true, "Floor", TileType.Floor, structure);
+        new('.', 0x505050FF, 0x000000FF, true, true, "Floor", TileType.Floor, structure);
 
     // Dungeon tiles
     public static Tile DungeonWall =>
