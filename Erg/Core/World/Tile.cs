@@ -68,6 +68,13 @@ public class Tile
     public static Tile ImpenetrableRock =>
         new('#', 0x505050FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock);
 
+    // Stairs tiles
+    public static Tile StairsUp =>
+        new('<', 0xC0C0C0FF, 0x000000FF, true, true, "Stairs Up", TileType.StairsUp, TileStructure.Room);
+
+    public static Tile StairsDown =>
+        new('>', 0xC0C0C0FF, 0x000000FF, true, true, "Stairs Down", TileType.StairsDown, TileStructure.Room);
+
     // Water tiles
     public static Tile ShallowWater =>
         new('≈', 0x2848FFFF, 0x000000FF, true, true, "Shallow Water", TileType.ShallowWater);

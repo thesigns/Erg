@@ -10,5 +10,7 @@ public enum TileType
     ClosedDoor,
     SecretDoor,
     ShallowWater,
-    DeepWater
+    DeepWater,
+    StairsUp,
+    StairsDown
 }

@@ -65,15 +65,11 @@ public class DungeonGenerator3 : IDungeonGenerator
         // Process impenetrable rock on edges
         ProcessImpenetrableRock(area);
 
+        // Place stairs
+        PlaceStairs(area);
+
         // Place items in rooms
         PlaceItems(area);
-
-        // Set player start in a connected room
-        var connectedRoom = _rooms.FirstOrDefault(r => r.Connected) ?? _rooms.FirstOrDefault();
-        if (connectedRoom != null)
-        {
-            _playerStart = (connectedRoom.CenterX, connectedRoom.CenterY);
-        }
 
         return area;
     }
@@ -140,16 +136,13 @@ public class DungeonGenerator3 : IDungeonGenerator
         ProcessImpenetrableRock(area);
         yield return new GenerationStep("Etap 8 zakończony: krawędzie mapy", area);
 
-        // Phase 9: Place items
-        PlaceItems(area);
-        yield return new GenerationStep("Etap 9 zakończony: rozmieszczono przedmioty", area);
+        // Phase 9: Place stairs
+        PlaceStairs(area);
+        yield return new GenerationStep("Etap 9 zakończony: umieszczono schody", area);
 
-        // Set player start in a connected room
-        var connectedRoom = _rooms.FirstOrDefault(r => r.Connected) ?? _rooms.FirstOrDefault();
-        if (connectedRoom != null)
-        {
-            _playerStart = (connectedRoom.CenterX, connectedRoom.CenterY);
-        }
+        // Phase 10: Place items
+        PlaceItems(area);
+        yield return new GenerationStep("Etap 10 zakończony: rozmieszczono przedmioty", area);
     }
 
     #region Phase 1: Room Generation
@@ -1250,7 +1243,69 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     #endregion
 
-    #region Phase 9: Item Placement
+    #region Phase 9: Stairs Placement
+
+    private void PlaceStairs(Area area)
+    {
+        // Zbierz wszystkie floor tilesy z TileStructure.Room
+        var roomFloors = new List<(int x, int y)>();
+        for (int y = 0; y < _height; y++)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                var tile = area.GetTile(x, y);
+                if (tile != null && tile.Type == TileType.Floor && tile.Structure == TileStructure.Room)
+                {
+                    roomFloors.Add((x, y));
+                }
+            }
+        }
+
+        if (roomFloors.Count < 2) return;
+
+        // Umieść StairsUp na losowym ufloorze
+        int upIndex = _random.Next(roomFloors.Count);
+        var (upX, upY) = roomFloors[upIndex];
+        var stairsUp = Tile.StairsUp;
+        stairsUp.RegionId = area.GetTile(upX, upY)!.RegionId;
+        area.SetTile(upX, upY, stairsUp);
+        roomFloors.RemoveAt(upIndex);
+
+        // Ustaw pozycję startową gracza na StairsUp
+        _playerStart = (upX, upY);
+
+        // Wylosuj do 10 kandydatów na StairsDown
+        var candidates = new List<(int x, int y)>();
+        int candidateCount = Math.Min(10, roomFloors.Count);
+        for (int i = 0; i < candidateCount; i++)
+        {
+            int idx = _random.Next(roomFloors.Count);
+            candidates.Add(roomFloors[idx]);
+            roomFloors.RemoveAt(idx);
+        }
+
+        // Wybierz kandydata najdalszego od StairsUp
+        (int x, int y) farthest = candidates[0];
+        double maxDistance = 0;
+        foreach (var (cx, cy) in candidates)
+        {
+            double distance = Math.Sqrt((cx - upX) * (cx - upX) + (cy - upY) * (cy - upY));
+            if (distance > maxDistance)
+            {
+                maxDistance = distance;
+                farthest = (cx, cy);
+            }
+        }
+
+        // Umieść StairsDown
+        var stairsDown = Tile.StairsDown;
+        stairsDown.RegionId = area.GetTile(farthest.x, farthest.y)!.RegionId;
+        area.SetTile(farthest.x, farthest.y, stairsDown);
+    }
+
+    #endregion
+
+    #region Phase 10: Item Placement
 
     private void PlaceItems(Area area)
     {
