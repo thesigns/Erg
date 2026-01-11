@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Erg.Core.Game;
@@ -49,25 +50,34 @@ public class MessageBuffer
     private List<string> GetWrappedLines()
     {
         var result = new List<string>();
-        foreach (var msg in _messages)
+        var fullText = string.Join(" ", _messages);
+
+        if (string.IsNullOrEmpty(fullText))
+            return result;
+
+        var words = fullText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var currentLine = "";
+
+        foreach (var word in words)
         {
-            var words = msg.Split(' ');
-            var currentLine = "";
-            foreach (var word in words)
+            if (currentLine.Length == 0)
             {
-                if (currentLine.Length + word.Length + 1 > LineWidth)
-                {
-                    result.Add(currentLine.TrimEnd());
-                    currentLine = word + " ";
-                }
-                else
-                {
-                    currentLine += word + " ";
-                }
+                currentLine = word;
             }
-            if (currentLine.Length > 0)
-                result.Add(currentLine.TrimEnd());
+            else if (currentLine.Length + 1 + word.Length <= LineWidth)
+            {
+                currentLine += " " + word;
+            }
+            else
+            {
+                result.Add(currentLine);
+                currentLine = word;
+            }
         }
+
+        if (currentLine.Length > 0)
+            result.Add(currentLine);
+
         return result;
     }
 }

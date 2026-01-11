@@ -26,6 +26,12 @@ public class Session
 
         Fov = new FieldOfView(Area);
         ComputeFov();
+
+        var startTile = Area.GetTile(Player.X, Player.Y);
+        if (startTile != null)
+        {
+            Messages.Add($"{startTile.Name}.");
+        }
     }
 
     public void ComputeFov()
@@ -55,6 +61,7 @@ public class Session
 
         // Wyczyść stare wiadomości z poprzedniej tury
         Messages.Clear();
+        Messages.Add($"{tile.Name}.");
 
         // Sprawdź itemy na nowej pozycji
         var items = Area.GetItems(nx, ny);
