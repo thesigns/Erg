@@ -100,6 +100,71 @@ public class Session
         _ => ""
     };
 
+    public void Examine(int dx, int dy)
+    {
+        int tx = Player.X + dx;
+        int ty = Player.Y + dy;
+
+        var tile = Area.GetTile(tx, ty);
+        if (tile == null)
+        {
+            Messages.Clear();
+            Messages.Add("There is nothing there.");
+            return;
+        }
+
+        Messages.Clear();
+        Messages.Add(BuildExamineDescription(tile));
+    }
+
+    private string BuildExamineDescription(Tile tile)
+    {
+        var parts = new List<string>();
+
+        // 1. Tile name
+        parts.Add($"This is {GetArticle(tile.Name)} {tile.Name}.");
+
+        // 2. Inscription (if any)
+        if (!string.IsNullOrEmpty(tile.Inscription))
+            parts.Add($"There is an inscription: \"{tile.Inscription}\"");
+
+        // 3. Critter (if any)
+        if (tile.Critter != null)
+        {
+            if (tile.Critter == Player)
+                parts.Add("You see yourself standing here. Looking good!");
+            else
+                parts.Add($"There is {GetArticle(tile.Critter.Name)} {tile.Critter.Name} here.");
+        }
+
+        // 4. Items (if any)
+        if (tile.Items.Count > 0)
+        {
+            parts.Add(DescribeItems(tile.Items));
+        }
+
+        return string.Join(" ", parts);
+    }
+
+    private static string GetArticle(string noun)
+    {
+        if (string.IsNullOrEmpty(noun)) return "a";
+        char first = char.ToLower(noun[0]);
+        return "aeiou".Contains(first) ? "an" : "a";
+    }
+
+    private static string DescribeItems(List<Item> items)
+    {
+        if (items.Count == 1)
+        {
+            var item = items[0];
+            if (item.Count > 1)
+                return $"There are {item.Count} {item.Name}s lying here.";
+            return $"There is {GetArticle(item.Name)} {item.Name} lying here.";
+        }
+        return "There are several items lying here.";
+    }
+
     private static readonly (int dx, int dy)[] AllDirections =
     {
         (-1, -1), (0, -1), (1, -1),
