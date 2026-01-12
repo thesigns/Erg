@@ -12,12 +12,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Assets\VictorMono-Medium.ttf">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Assets\VictorMono-License.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="Assets\CascadiaCode-Light.ttf">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
