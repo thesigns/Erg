@@ -6,7 +6,7 @@ public class Tile
 {
     public Glyph Glyph { get; set; }
     public bool Walkable { get; set; }
-    public bool Swimable { get; set; }
+    public bool Swimmable { get; set; }
     public bool Transparent { get; set; }
     public string Name { get; set; }
     public int RegionId { get; set; }
@@ -31,11 +31,11 @@ public class Tile
     }
 
     public Tile(char character, uint foreground, uint background, bool walkable, bool transparent, string name,
-        TileType type = TileType.Floor, TileStructure structure = TileStructure.None, bool swimable = false)
+        TileType type = TileType.Floor, TileStructure structure = TileStructure.None, bool swimmable = false)
     {
         Glyph = new Glyph(character, foreground, background);
         Walkable = walkable;
-        Swimable = swimable;
+        Swimmable = swimmable;
         Transparent = transparent;
         Name = name;
         Type = type;
