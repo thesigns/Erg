@@ -58,10 +58,22 @@ public class Session
         if (blocker != null)
             return false; // na razie nic więcej
 
+        // Zapisz stary SpecialEffect przed ruchem
+        var oldTile = Area.GetTile(critter.X, critter.Y);
+        var oldEffect = oldTile?.SpecialEffect ?? SpecialEffect.None;
+
         Area.MoveCritter(critter, nx, ny);
 
         // Wyczyść stare wiadomości z poprzedniej tury
         Messages.Clear();
+
+        // Sprawdź czy wchodzimy na kafelek z innym SpecialEffect
+        var newEffect = tile.SpecialEffect;
+        if (newEffect != oldEffect && newEffect != SpecialEffect.None)
+        {
+            Messages.Add(GetSpecialEffectMessage(newEffect));
+        }
+
         Messages.Add($"{tile.Name}.");
 
         // Sprawdź itemy na nowej pozycji
@@ -81,6 +93,12 @@ public class Session
 
         return true;
     }
+
+    private static string GetSpecialEffectMessage(SpecialEffect effect) => effect switch
+    {
+        SpecialEffect.UndeadAura => "A chill of death hangs over this place.",
+        _ => ""
+    };
 
     private static readonly (int dx, int dy)[] AllDirections =
     {

@@ -636,7 +636,8 @@ public class DungeonGenerator3 : IDungeonGenerator
     private enum RoomFeatureSpecialization
     {
         None,
-        WaterContainer
+        WaterContainer,
+        Graveyard
     }
 
     private void SpecializeRooms(Area area)
@@ -731,8 +732,11 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private RoomFeatureSpecialization RollFeatureSpecialization()
     {
-        // Currently only WaterContainer, but ready for more
-        return RoomFeatureSpecialization.WaterContainer;
+        int roll = _random.Next(100);
+        if (roll < 50)
+            return RoomFeatureSpecialization.WaterContainer;
+        else
+            return RoomFeatureSpecialization.Graveyard;
     }
 
     private void ApplyShapeSpecialization(Area area, RoomInfo room, RoomShapeSpecialization specialization)
@@ -760,6 +764,9 @@ public class DungeonGenerator3 : IDungeonGenerator
         {
             case RoomFeatureSpecialization.WaterContainer:
                 ApplyWaterContainer(area, room);
+                break;
+            case RoomFeatureSpecialization.Graveyard:
+                ApplyGraveyard(area, room);
                 break;
         }
     }
@@ -883,6 +890,31 @@ public class DungeonGenerator3 : IDungeonGenerator
             }
         }
         return false;
+    }
+
+    private void ApplyGraveyard(Area area, RoomInfo room)
+    {
+        // Set UndeadAura on ALL tiles and replace 20% of Floor tiles with Grave
+        for (int y = room.Y; y < room.Y + room.Height; y++)
+        {
+            for (int x = room.X; x < room.X + room.Width; x++)
+            {
+                var currentTile = area.GetTile(x, y);
+                if (currentTile == null) continue;
+
+                // Set UndeadAura on all tiles in the room
+                currentTile.SpecialEffect = SpecialEffect.UndeadAura;
+
+                // 20% chance to replace Floor with Grave
+                if (currentTile.Type == TileType.Floor && _random.Next(100) < 20)
+                {
+                    var grave = Tile.Grave(_random);
+                    grave.RegionId = room.RegionId;
+                    grave.SpecialEffect = SpecialEffect.UndeadAura;
+                    area.SetTile(x, y, grave);
+                }
+            }
+        }
     }
 
     private void ApplyCenterCross(Area area, RoomInfo room)

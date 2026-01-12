@@ -12,5 +12,6 @@ public enum TileType
     ShallowWater,
     DeepWater,
     StairsUp,
-    StairsDown
+    StairsDown,
+    Grave
 }
