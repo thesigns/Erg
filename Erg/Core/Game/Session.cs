@@ -4,6 +4,7 @@ using Erg.Core;
 using Erg.Core.Combat;
 using Erg.Core.Game;
 using Erg.Core.World;
+using Erg.Core.World.Behaviors;
 using Erg.Core.World.Critters;
 using Erg.Core.World.Generators;
 
@@ -306,6 +307,12 @@ public class Session
         }
     }
 
+    public void PlayerWait()
+    {
+        Messages.Clear();
+        Messages.Add("You wait.");
+    }
+
     public bool IsPlayerOnStairsDown()
     {
         var tile = Area.GetTile(Player.X, Player.Y);
@@ -364,29 +371,28 @@ public class Session
 
     public void ProcessCritterTurns()
     {
+        int segments = CritterAction.StandardCost / Player.Speed;
         var critters = GetAllCritters().Where(c => c != Player).ToList();
 
-        foreach (var critter in critters)
+        for (int seg = 0; seg < segments; seg++)
         {
-            ProcessCritterTurn(critter);
-        }
-    }
-
-    private void ProcessCritterTurn(Critter critter)
-    {
-        critter.GainEnergy();
-
-        while (critter.CanAct())
-        {
-            if (critter.Behavior == null)
+            foreach (var critter in critters)
             {
-                critter.SpendEnergy(1000);
-                break;
-            }
+                critter.GainEnergy();
 
-            var action = critter.Behavior.DecideAction(critter, this);
-            action.Execute(critter, this);
-            critter.SpendEnergy(action.EnergyCost);
+                while (critter.CanAct())
+                {
+                    if (critter.Behavior == null)
+                    {
+                        critter.SpendEnergy(CritterAction.StandardCost);
+                        break;
+                    }
+
+                    var action = critter.Behavior.DecideAction(critter, this);
+                    action.Execute(critter, this);
+                    critter.SpendEnergy(action.EnergyCost);
+                }
+            }
         }
     }
 

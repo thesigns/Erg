@@ -138,6 +138,14 @@ public class PlayView : IGameView
             return;
         }
 
+        // Numpad 5 - Wait
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp5))
+        {
+            _session.PlayerWait();
+            _session.ProcessCritterTurns();
+            return;
+        }
+
         if (TryReadMovement(input, out int dx, out int dy))
         {
             var result = _session.TryMoveOrAttack(dx, dy);

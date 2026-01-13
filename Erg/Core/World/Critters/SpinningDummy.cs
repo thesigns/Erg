@@ -12,7 +12,7 @@ public class SpinningDummy : Critter
             character: 'T',
             fg: 0xFF4444FF,  // Czerwony (jasny)
             bg: 0x000000FF,
-            speed: 100,
+            speed: 200,
             behavior: new SpinAttackBehavior())
     {
     }
