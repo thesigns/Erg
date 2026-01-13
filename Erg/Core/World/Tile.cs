@@ -24,7 +24,7 @@ public class Tile
             return Critter.Glyph;
 
         if (Items.Count >= 2)
-            return new Glyph('%', 0x8B4513FF, 0x000000FF);
+            return new Glyph('½', 0x8B4513FF, 0x000000FF);
 
         if (Items.Count == 1)
             return Items[0].Glyph;
@@ -113,6 +113,6 @@ public class Tile
     ];
 
     public static Tile Grave(Random random) =>
-        new('†', 0x505050FF, 0x000000FF, true, true, "Grave", TileType.Grave, TileStructure.Room,
+        new('±', 0x505050FF, 0x000000FF, true, true, "Grave", TileType.Grave, TileStructure.Room,
             inscription: GraveInscriptions[random.Next(GraveInscriptions.Length)]);
 }

@@ -9,7 +9,7 @@ public class SpinningDummy : Critter
             name: "Spinning Dummy",
             x: x,
             y: y,
-            character: 'T',
+            character: 't',
             fg: 0xFF4444FF,  // Czerwony (jasny)
             bg: 0x000000FF,
             speed: 200,
