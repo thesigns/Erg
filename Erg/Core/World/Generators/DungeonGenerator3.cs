@@ -594,7 +594,6 @@ public class DungeonGenerator3 : IDungeonGenerator
         var door = Tile.ClosedDoor;
         door.RegionId = _nextRegionId++;
         area.SetTile(x, y, door);
-        _floorTiles.Add((x, y));
     }
 
     #endregion
@@ -1396,9 +1395,9 @@ public class DungeonGenerator3 : IDungeonGenerator
         // Ustaw pozycję startową gracza na StairsUp
         _playerStart = (upX, upY);
 
-        // Wylosuj do 10 kandydatów na StairsDown
+        // Wylosuj do 3 kandydatów na StairsDown
         var candidates = new List<(int x, int y)>();
-        int candidateCount = Math.Min(10, roomFloors.Count);
+        int candidateCount = Math.Min(3, roomFloors.Count);
         for (int i = 0; i < candidateCount; i++)
         {
             int idx = _random.Next(roomFloors.Count);
