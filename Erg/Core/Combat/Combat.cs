@@ -1,6 +1,6 @@
 using Erg.Core.Game;
 
-namespace Erg.Core;
+namespace Erg.Core.Combat;
 
 public static class Combat
 {
