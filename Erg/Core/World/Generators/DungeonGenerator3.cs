@@ -1,3 +1,4 @@
+using Erg.Core.World.Critters;
 using Erg.Core.World.Items;
 
 namespace Erg.Core.World.Generators;
@@ -72,6 +73,9 @@ public class DungeonGenerator3 : IDungeonGenerator
 
         // Place items in rooms
         PlaceItems(area);
+
+        // Place critters
+        PlaceCritters(area);
 
         return area;
     }
@@ -1457,6 +1461,33 @@ public class DungeonGenerator3 : IDungeonGenerator
             int goldAmount = _random.Next(1, 101);
             var coin = new GoldCoin(x, y, goldAmount);
             area.AddItem(coin);
+        }
+    }
+
+    #endregion
+
+    #region Phase 11: Critter Placement
+
+    private void PlaceCritters(Area area)
+    {
+        var availableFloors = _floorTiles.ToList();
+
+        if (availableFloors.Count == 0) return;
+
+        // Place 5 Dummies
+        int critterCount = 5;
+        for (int i = 0; i < critterCount && availableFloors.Count > 0; i++)
+        {
+            int index = _random.Next(availableFloors.Count);
+            var (x, y) = availableFloors[index];
+            availableFloors.RemoveAt(index);
+
+            // Skip if tile already has a critter
+            var tile = area.GetTile(x, y);
+            if (tile?.Critter != null) continue;
+
+            var dummy = new Dummy(x, y);
+            area.SetCritter(dummy);
         }
     }
 

@@ -45,35 +45,10 @@ public class Session
         Fov = new FieldOfView(Area);
         ComputeFov();
 
-        SpawnTestDummy();
-
         var startTile = Area.GetTile(Player.X, Player.Y);
         if (startTile != null)
         {
             Messages.Add($"{startTile.Name}.");
-        }
-    }
-
-    private void SpawnTestDummy()
-    {
-        // Znajdz walkable tile blisko gracza do testow
-        for (int dy = -3; dy <= 3; dy++)
-        {
-            for (int dx = -3; dx <= 3; dx++)
-            {
-                if (dx == 0 && dy == 0) continue;
-
-                int x = Player.X + dx;
-                int y = Player.Y + dy;
-
-                var tile = Area.GetTile(x, y);
-                if (tile != null && tile.Walkable && tile.Critter == null)
-                {
-                    var dummy = new Dummy(x, y);
-                    Area.SetCritter(dummy);
-                    return;
-                }
-            }
         }
     }
 
