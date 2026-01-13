@@ -30,6 +30,7 @@ public class Session
     public FieldOfView Fov { get; private set; }
     public MessageBuffer Messages { get; } = new();
     public int CurrentLevel => Area.Level;
+    public int TurnCount { get; private set; }
 
     private const int ViewRadius = 10;
 
@@ -68,6 +69,11 @@ public class Session
         // Check FOV visibility
         // Future: also check critter.IsInvisible flag
         return Fov.IsSeen(critter.X, critter.Y);
+    }
+
+    public void IncrementTurn()
+    {
+        TurnCount++;
     }
 
     public bool TryMovePlayer(int dx, int dy)

@@ -169,6 +169,7 @@ public class PlayView : IGameView
 
     private bool ProcessTurnAndCheckDeath()
     {
+        _session.IncrementTurn();
         _session.ProcessCritterTurns();
         if (!_session.Player.IsAlive)
         {
