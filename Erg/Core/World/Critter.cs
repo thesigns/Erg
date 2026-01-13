@@ -15,6 +15,9 @@ public abstract class Critter : Entity
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
 
+    // Combat - TODO: w przyszłości zmienić na klasę/struct obsługującą notację kości (np. 2d6+5)
+    public int MeleeDamage { get; protected set; }
+
     // Stos wrogow - wrog na gorze to aktualny cel
     private readonly List<Critter> _enemies = new();
     public IReadOnlyList<Critter> Enemies => _enemies;
@@ -29,6 +32,7 @@ public abstract class Critter : Entity
         uint bg,
         int speed,
         int maxHitPoints = 10,
+        int meleeDamage = 1,
         IBehavior? behavior = null)
         : base(name, x, y, character, fg, bg)
     {
@@ -36,6 +40,7 @@ public abstract class Critter : Entity
         Energy = 0;
         MaxHitPoints = maxHitPoints;
         HitPoints = maxHitPoints;
+        MeleeDamage = meleeDamage;
         Behavior = behavior;
     }
 

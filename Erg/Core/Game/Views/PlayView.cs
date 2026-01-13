@@ -8,6 +8,8 @@ public class PlayView : IGameView
     private readonly Game _game;
     private Session _session => _game.CurrentSession;
     private bool _awaitingExamineDirection = false;
+    private bool _awaitingAttackConfirmation = false;
+    private Critter? _pendingAttackTarget = null;
 
     public PlayView(Game game)
     {
@@ -40,6 +42,29 @@ public class PlayView : IGameView
             {
                 _session.Examine(edx, edy);
                 _awaitingExamineDirection = false;
+            }
+            return; // Block other input while waiting
+        }
+
+        // Attack confirmation
+        if (_awaitingAttackConfirmation && _pendingAttackTarget != null)
+        {
+            if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Y))
+            {
+                _session.PlayerAttack(_pendingAttackTarget);
+                _awaitingAttackConfirmation = false;
+                _pendingAttackTarget = null;
+                _session.ProcessCritterTurns();
+                return;
+            }
+
+            if (input.KeyPulse.GetValueOrDefault(KeyboardKey.N) ||
+                input.KeyPulse.GetValueOrDefault(KeyboardKey.Escape))
+            {
+                _awaitingAttackConfirmation = false;
+                _pendingAttackTarget = null;
+                _session.Messages.Clear();
+                return;
             }
             return; // Block other input while waiting
         }
@@ -115,9 +140,20 @@ public class PlayView : IGameView
 
         if (TryReadMovement(input, out int dx, out int dy))
         {
-            if (_session.TryMovePlayer(dx, dy))
+            var result = _session.TryMoveOrAttack(dx, dy);
+
+            if (result.Moved)
             {
                 _session.ComputeFov();
+                _session.ProcessCritterTurns();
+            }
+            else if (result.NeedsConfirmation && result.Target != null)
+            {
+                _awaitingAttackConfirmation = true;
+                _pendingAttackTarget = result.Target;
+            }
+            else if (result.Attacked)
+            {
                 _session.ProcessCritterTurns();
             }
         }

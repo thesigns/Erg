@@ -1,9 +1,24 @@
 ﻿using System;
 using System.Linq;
+using Erg.Core;
 using Erg.Core.Game;
 using Erg.Core.World;
 using Erg.Core.World.Critters;
 using Erg.Core.World.Generators;
+
+public struct MoveResult
+{
+    public bool Moved;
+    public bool Attacked;
+    public bool NeedsConfirmation;
+    public Critter? Target;
+
+    public static MoveResult Movement() => new() { Moved = true };
+    public static MoveResult Attack() => new() { Attacked = true };
+    public static MoveResult Blocked() => new();
+    public static MoveResult ConfirmAttack(Critter target) =>
+        new() { NeedsConfirmation = true, Target = target };
+}
 
 public class Session
 {
@@ -70,6 +85,49 @@ public class Session
     public bool TryMovePlayer(int dx, int dy)
     {
         return TryMove(Player, dx, dy);
+    }
+
+    public MoveResult TryMoveOrAttack(int dx, int dy)
+    {
+        int nx = Player.X + dx;
+        int ny = Player.Y + dy;
+
+        var tile = Area.GetTile(nx, ny);
+        if (tile == null || !tile.Walkable)
+            return MoveResult.Blocked();
+
+        var blocker = Area.GetBlockingCritter(nx, ny);
+        if (blocker != null)
+        {
+            // Hostile critter - attack immediately
+            if (blocker.Enemies.Contains(Player))
+            {
+                PlayerAttack(blocker);
+                return MoveResult.Attack();
+            }
+
+            // Non-hostile - ask for confirmation
+            Messages.Clear();
+            Messages.Add($"{blocker.Name} isn't hostile. Do you want to attack him? [y/n]");
+            return MoveResult.ConfirmAttack(blocker);
+        }
+
+        // Normal movement
+        if (TryMove(Player, dx, dy))
+            return MoveResult.Movement();
+
+        return MoveResult.Blocked();
+    }
+
+    public void PlayerAttack(Critter target)
+    {
+        Messages.Clear();
+        Combat.MeleeAttack(Player, target, Messages);
+
+        if (!target.IsAlive)
+        {
+            Area.RemoveCritter(target);
+        }
     }
 
     private bool TryMove(Critter critter, int dx, int dy)

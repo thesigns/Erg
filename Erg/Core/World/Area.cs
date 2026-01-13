@@ -64,6 +64,13 @@ public class Area
             tile.Critter = critter;
     }
 
+    public void RemoveCritter(Critter critter)
+    {
+        var tile = GetTile(critter.X, critter.Y);
+        if (tile != null && tile.Critter == critter)
+            tile.Critter = null;
+    }
+
     public void MoveCritter(Critter critter, int newX, int newY)
     {
         var oldTile = GetTile(critter.X, critter.Y);
