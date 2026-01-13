@@ -23,8 +23,8 @@ public class DebugGenerationView : IGameView
         var random = new Random(Environment.TickCount);
         _generator = new DungeonGenerator3(80, MapHeight, random, level: 1);
         _enumerator = _generator.GenerateStepByStep().GetEnumerator();
-        _log.Add("Naciśnij SPACJĘ aby wykonać następny krok");
-        _log.Add("Naciśnij ESC aby wrócić do menu");
+        _log.Add("Press SPACE to execute next step");
+        _log.Add("Press ESC to return to menu");
     }
 
     public void Update(IInput input)
@@ -50,7 +50,7 @@ public class DebugGenerationView : IGameView
             else
             {
                 _finished = true;
-                _log.Add("--- KONIEC GENERACJI ---");
+                _log.Add("--- GENERATION COMPLETE ---");
             }
         }
     }
@@ -69,7 +69,7 @@ public class DebugGenerationView : IGameView
         // Render separator line
         writer.Locate(0, MapHeight);
         writer.SetForegroundColor(100, 100, 100);
-        writer.Write(new string('─', 80));
+        writer.Write(new string('-', 80));
 
         // Render log (bottom part)
         RenderLog(output, writer);

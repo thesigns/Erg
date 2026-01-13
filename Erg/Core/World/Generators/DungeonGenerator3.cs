@@ -114,7 +114,7 @@ public class DungeonGenerator3 : IDungeonGenerator
         for (int y = 0; y < _height; y++)
             for (int x = 0; x < _width; x++)
                 area.SetTile(x, y, Tile.Rock);
-        yield return new GenerationStep("Wypełniono skałą", area);
+        yield return new GenerationStep("Filled with rock", area);
 
         // Generate rooms with step-by-step feedback
         foreach (var step in GenerateRoomsStepByStep(area))
@@ -122,7 +122,7 @@ public class DungeonGenerator3 : IDungeonGenerator
             yield return step;
         }
 
-        yield return new GenerationStep($"Etap 1 zakończony: {_rooms.Count} pokoi", area);
+        yield return new GenerationStep($"Phase 1 complete: {_rooms.Count} rooms", area);
 
         // Phase 2: Connect rooms with corridors
         foreach (var step in ConnectRoomsStepByStep(area))
@@ -132,23 +132,23 @@ public class DungeonGenerator3 : IDungeonGenerator
 
         // Phase 6: Process doors
         ProcessDoors(area);
-        yield return new GenerationStep("Etap 6 zakończony: przetworzono drzwi", area);
+        yield return new GenerationStep("Phase 6 complete: doors processed", area);
 
         // Phase 7: Process walls
         ProcessWalls(area);
-        yield return new GenerationStep("Etap 7 zakończony: przetworzono ściany", area);
+        yield return new GenerationStep("Phase 7 complete: walls processed", area);
 
         // Phase 8: Process impenetrable rock on edges
         ProcessImpenetrableRock(area);
-        yield return new GenerationStep("Etap 8 zakończony: krawędzie mapy", area);
+        yield return new GenerationStep("Phase 8 complete: map edges sealed", area);
 
         // Phase 9: Place stairs
         PlaceStairs(area);
-        yield return new GenerationStep("Etap 9 zakończony: umieszczono schody", area);
+        yield return new GenerationStep("Phase 9 complete: stairs placed", area);
 
         // Phase 10: Place items
         PlaceItems(area);
-        yield return new GenerationStep("Etap 10 zakończony: rozmieszczono przedmioty", area);
+        yield return new GenerationStep("Phase 10 complete: items placed", area);
     }
 
     #region Phase 1: Room Generation
@@ -182,7 +182,7 @@ public class DungeonGenerator3 : IDungeonGenerator
             {
                 consecutiveFails = 0;
                 yield return new GenerationStep(
-                    $"Pokój {result.Room!.Index}: ({result.Room.X},{result.Room.Y}) {result.Room.Width}x{result.Room.Height}",
+                    $"Room {result.Room!.Index}: ({result.Room.X},{result.Room.Y}) {result.Room.Width}x{result.Room.Height}",
                     area);
             }
             else
@@ -192,12 +192,12 @@ public class DungeonGenerator3 : IDungeonGenerator
                 // Only report milestone fails
                 if (consecutiveFails == 50)
                 {
-                    yield return new GenerationStep($"50 prób nieudanych...", area);
+                    yield return new GenerationStep($"50 attempts failed...", area);
                 }
             }
         }
 
-        yield return new GenerationStep($"Zakończono po {MaxConsecutiveFails} nieudanych próbach", area);
+        yield return new GenerationStep($"Finished after {MaxConsecutiveFails} failed attempts", area);
     }
 
     private bool TryPlaceRoom(Area area)
@@ -315,7 +315,7 @@ public class DungeonGenerator3 : IDungeonGenerator
     {
         if (_rooms.Count < 2)
         {
-            yield return new GenerationStep("Za mało pokoi do połączenia", area);
+            yield return new GenerationStep("Too few rooms to connect", area);
             yield break;
         }
 
@@ -335,9 +335,9 @@ public class DungeonGenerator3 : IDungeonGenerator
                 consecutiveFails = 0;
                 var start = result.Path![0];
                 var end = result.Path[^1];
-                string targetType = result.TargetType == "room" ? $"pokój {result.TargetIndex}" : $"korytarz {result.TargetIndex}";
+                string targetType = result.TargetType == "room" ? $"room {result.TargetIndex}" : $"corridor {result.TargetIndex}";
                 yield return new GenerationStep(
-                    $"Korytarz {_corridors.Count - 1}: pokój {result.SourceRoomIndex}→{targetType} ({start.x},{start.y})→({end.x},{end.y}) dł.{result.Path.Count}",
+                    $"Corridor {_corridors.Count - 1}: room {result.SourceRoomIndex}→{targetType} ({start.x},{start.y})→({end.x},{end.y}) len.{result.Path.Count}",
                     area);
             }
             else
@@ -348,18 +348,18 @@ public class DungeonGenerator3 : IDungeonGenerator
 
         int connectedRooms = _rooms.Count(r => r.Connected);
         int totalRooms = _rooms.Count;
-        string status = connectedRooms == totalRooms ? "wszystkie połączone" : $"{connectedRooms}/{totalRooms} pokoi połączonych";
-        yield return new GenerationStep($"Etap 2 zakończony: {_corridors.Count} korytarzy, {status}", area);
+        string status = connectedRooms == totalRooms ? "all connected" : $"{connectedRooms}/{totalRooms} rooms connected";
+        yield return new GenerationStep($"Phase 2 complete: {_corridors.Count} corridors, {status}", area);
 
         // Phase 3: Remove disconnected rooms
         int removedCount = RemoveDisconnectedRooms(area);
         if (removedCount > 0)
         {
-            yield return new GenerationStep($"Etap 3 zakończony: usunięto {removedCount} niepołączonych pokoi", area);
+            yield return new GenerationStep($"Phase 3 complete: removed {removedCount} disconnected rooms", area);
         }
         else
         {
-            yield return new GenerationStep("Etap 3 zakończony: brak niepołączonych pokoi", area);
+            yield return new GenerationStep("Phase 3 complete: no disconnected rooms", area);
         }
 
         // Phase 4: Specialize rooms
@@ -691,12 +691,12 @@ public class DungeonGenerator3 : IDungeonGenerator
             shapeCount++;
 
             yield return new GenerationStep(
-                $"Pokój {room.Index}: kształt {specialization}",
+                $"Room {room.Index}: shape {specialization}",
                 area);
         }
 
         yield return new GenerationStep(
-            $"Etap 4a zakończony: {shapeCount} pokoi z kształtem specjalnym",
+            $"Phase 4a complete: {shapeCount} rooms with special shape",
             area);
 
         // Phase 4b: Feature specialization
@@ -710,12 +710,12 @@ public class DungeonGenerator3 : IDungeonGenerator
             featureCount++;
 
             yield return new GenerationStep(
-                $"Pokój {room.Index}: cecha {specialization}",
+                $"Room {room.Index}: feature {specialization}",
                 area);
         }
 
         yield return new GenerationStep(
-            $"Etap 4b zakończony: {featureCount} pokoi z cechą specjalną",
+            $"Phase 4b complete: {featureCount} rooms with special feature",
             area);
     }
 
@@ -1019,11 +1019,11 @@ public class DungeonGenerator3 : IDungeonGenerator
             if (TryCreateDeadEnd(area))
             {
                 deadEndsCreated++;
-                yield return new GenerationStep($"Dead end {deadEndsCreated} utworzony", area);
+                yield return new GenerationStep($"Dead end {deadEndsCreated} created", area);
             }
         }
 
-        yield return new GenerationStep($"Etap 5 zakończony: {deadEndsCreated} dead-endów", area);
+        yield return new GenerationStep($"Phase 5 complete: {deadEndsCreated} dead ends", area);
     }
 
     private bool TryCreateDeadEnd(Area area)
