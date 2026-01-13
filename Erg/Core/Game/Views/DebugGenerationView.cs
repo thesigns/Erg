@@ -18,10 +18,12 @@ public class DebugGenerationView : IGameView
     private const int LogLines = 5;
     private const int MapHeight = 20;
 
-    public DebugGenerationView(Game game)
+    public DebugGenerationView(Game game) : this(game, Environment.TickCount) { }
+
+    public DebugGenerationView(Game game, int seed)
     {
         _game = game;
-        _seed = Environment.TickCount;
+        _seed = seed;
         _generator = new DungeonGenerator3(80, MapHeight, _seed, level: 1);
         _enumerator = _generator.GenerateStepByStep().GetEnumerator();
         _log.Add("Press SPACE to execute next step");
@@ -52,7 +54,7 @@ public class DebugGenerationView : IGameView
             else
             {
                 _finished = true;
-                _log.Add("--- GENERATION COMPLETE ---");
+                _log.Add("--- GENERATION COMPLETE (R: restart, N: new seed) ---");
             }
         }
 
@@ -64,7 +66,20 @@ public class DebugGenerationView : IGameView
                 _currentArea = step.Area;
             }
             _finished = true;
-            _log.Add("--- GENERATION COMPLETE ---");
+            _log.Add("--- GENERATION COMPLETE (R: restart, N: new seed) ---");
+        }
+
+        // Restart handlers when finished
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.R) && _finished)
+        {
+            _game.SwitchView(new DebugGenerationView(_game, _seed));
+            return;
+        }
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.N) && _finished)
+        {
+            _game.SwitchView(new DebugGenerationView(_game));
+            return;
         }
     }
 
