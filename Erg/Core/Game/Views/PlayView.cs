@@ -54,7 +54,7 @@ public class PlayView : IGameView
                 _session.PlayerAttack(_pendingAttackTarget);
                 _awaitingAttackConfirmation = false;
                 _pendingAttackTarget = null;
-                _session.ProcessCritterTurns();
+                if (ProcessTurnAndCheckDeath()) return;
                 return;
             }
 
@@ -88,7 +88,7 @@ public class PlayView : IGameView
             if (_session.IsPlayerOnStairsDown())
             {
                 _session.GoDownStairs();
-                _session.ProcessCritterTurns();
+                if (ProcessTurnAndCheckDeath()) return;
                 return;
             }
         }
@@ -104,7 +104,7 @@ public class PlayView : IGameView
                     return;
                 }
                 _session.GoUpStairs();
-                _session.ProcessCritterTurns();
+                if (ProcessTurnAndCheckDeath()) return;
                 return;
             }
         }
@@ -119,7 +119,7 @@ public class PlayView : IGameView
         {
             _session.OpenAdjacentDoors();
             _session.ComputeFov();
-            _session.ProcessCritterTurns();
+            if (ProcessTurnAndCheckDeath()) return;
             return;
         }
 
@@ -127,14 +127,14 @@ public class PlayView : IGameView
         {
             _session.CloseAdjacentDoors();
             _session.ComputeFov();
-            _session.ProcessCritterTurns();
+            if (ProcessTurnAndCheckDeath()) return;
             return;
         }
 
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.G))
         {
             _session.PickUpItems();
-            _session.ProcessCritterTurns();
+            if (ProcessTurnAndCheckDeath()) return;
             return;
         }
 
@@ -142,7 +142,7 @@ public class PlayView : IGameView
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp5))
         {
             _session.PlayerWait();
-            _session.ProcessCritterTurns();
+            if (ProcessTurnAndCheckDeath()) return;
             return;
         }
 
@@ -153,7 +153,7 @@ public class PlayView : IGameView
             if (result.Moved)
             {
                 _session.ComputeFov();
-                _session.ProcessCritterTurns();
+                if (ProcessTurnAndCheckDeath()) return;
             }
             else if (result.NeedsConfirmation && result.Target != null)
             {
@@ -162,9 +162,20 @@ public class PlayView : IGameView
             }
             else if (result.Attacked)
             {
-                _session.ProcessCritterTurns();
+                if (ProcessTurnAndCheckDeath()) return;
             }
         }
+    }
+
+    private bool ProcessTurnAndCheckDeath()
+    {
+        _session.ProcessCritterTurns();
+        if (!_session.Player.IsAlive)
+        {
+            _game.SwitchView(new GameSummaryView(_game));
+            return true;
+        }
+        return false;
     }
 
     private bool TryReadMovement(IInput input, out int dx, out int dy)
