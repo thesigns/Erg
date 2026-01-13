@@ -27,11 +27,11 @@ public class DungeonGenerator3 : IDungeonGenerator
     private const int EdgeMargin = 2;  // Minimum distance from map edges
     private const int MaxConsecutiveFails = 100;
 
-    public DungeonGenerator3(int width, int height, Random random, int level = 1)
+    public DungeonGenerator3(int width, int height, int seed, int level = 1)
     {
         _width = width;
         _height = height;
-        _random = random;
+        _random = new Random(seed);
         _level = level;
     }
 

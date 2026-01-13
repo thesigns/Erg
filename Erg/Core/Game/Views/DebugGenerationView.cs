@@ -11,6 +11,7 @@ public class DebugGenerationView : IGameView
     private readonly DungeonGenerator3 _generator;
     private readonly IEnumerator<GenerationStep> _enumerator;
     private readonly List<string> _log = new();
+    private readonly int _seed;
     private Area? _currentArea;
     private bool _finished;
 
@@ -20,10 +21,11 @@ public class DebugGenerationView : IGameView
     public DebugGenerationView(Game game)
     {
         _game = game;
-        var random = new Random(Environment.TickCount);
-        _generator = new DungeonGenerator3(80, MapHeight, random, level: 1);
+        _seed = Environment.TickCount;
+        _generator = new DungeonGenerator3(80, MapHeight, _seed, level: 1);
         _enumerator = _generator.GenerateStepByStep().GetEnumerator();
         _log.Add("Press SPACE to execute next step");
+        _log.Add("Press ENTER to finish generation");
         _log.Add("Press ESC to return to menu");
     }
 
@@ -52,6 +54,17 @@ public class DebugGenerationView : IGameView
                 _finished = true;
                 _log.Add("--- GENERATION COMPLETE ---");
             }
+        }
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Enter) && !_finished)
+        {
+            while (_enumerator.MoveNext())
+            {
+                var step = _enumerator.Current;
+                _currentArea = step.Area;
+            }
+            _finished = true;
+            _log.Add("--- GENERATION COMPLETE ---");
         }
     }
 
@@ -111,9 +124,13 @@ public class DebugGenerationView : IGameView
             writer.Write(line);
         }
 
-        // Show step counter
-        writer.Locate(60, MapHeight);
+        // Show seed on the left
+        writer.Locate(3, MapHeight);
         writer.SetForegroundColor(255, 255, 0);
+        writer.Write($"[Seed: {_seed}]");
+
+        // Show step counter on the right
+        writer.Locate(68, MapHeight);
         writer.Write($"[Step {_log.Count - 2}]");
     }
 }

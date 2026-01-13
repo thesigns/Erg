@@ -39,7 +39,7 @@ public class Session
     {
         Random = new Random(config.Seed);
 
-        var generator = new DungeonGenerator3(80, 20, Random, level: 1);
+        var generator = new DungeonGenerator3(80, 20, Random.Next(), level: 1);
         Area = generator.Generate();
 
         var (startX, startY) = generator.GetPlayerStartPosition();
@@ -360,7 +360,7 @@ public class Session
 
     private void RegenerateArea(int newLevel, bool startOnStairsUp)
     {
-        var generator = new DungeonGenerator3(80, 20, Random, level: newLevel);
+        var generator = new DungeonGenerator3(80, 20, Random.Next(), level: newLevel);
         Area = generator.Generate();
 
         var startPos = startOnStairsUp
