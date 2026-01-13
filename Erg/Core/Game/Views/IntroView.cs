@@ -33,7 +33,7 @@ public class IntroView : IGameView
         writer.Clear();
         writer.Locate(4, 2);
         writer.SetForegroundColor(255, 255, 0);
-        writer.Write("Endless roguelike game");
+        writer.Write("Erg: Endless roguelike game");
         writer.Locate(4, 3);
         writer.SetForegroundColor(155, 155, 0);
         writer.Write("Development version");
