@@ -5,5 +5,6 @@ public enum TileStructure
     None,
     Room,
     Corridor,
-    Entrance
+    Entrance,
+    Cave
 }

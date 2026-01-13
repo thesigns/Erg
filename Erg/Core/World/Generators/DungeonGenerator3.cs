@@ -14,6 +14,7 @@ public class DungeonGenerator3 : IDungeonGenerator
     private readonly List<RoomInfo> _rooms = new();
     private readonly List<CorridorInfo> _corridors = new();
     private readonly HashSet<(int, int)> _floorTiles = new();
+    private readonly HashSet<(int, int)> _caveTiles = new();
     private (int x, int y) _playerStart;
 
     // Room size constraints
@@ -26,6 +27,9 @@ public class DungeonGenerator3 : IDungeonGenerator
     private const int RoomMargin = 3;  // Minimum walls between rooms
     private const int EdgeMargin = 2;  // Minimum distance from map edges
     private const int MaxConsecutiveFails = 100;
+
+    // Cave generation
+    private const int MinRemovedRoomsForCave = 3;  // Min removed rooms to generate cave
 
     public DungeonGenerator3(int width, int height, int seed, int level = 1)
     {
@@ -51,7 +55,11 @@ public class DungeonGenerator3 : IDungeonGenerator
         ConnectRooms(area);
 
         // Remove disconnected rooms
-        RemoveDisconnectedRooms(area);
+        int removedCount = RemoveDisconnectedRooms(area);
+
+        // Generate caves in unused space (only if enough rooms were removed)
+        if (removedCount >= MinRemovedRoomsForCave)
+            GenerateCaves(area);
 
         // Specialize rooms
         SpecializeRooms(area);
@@ -366,6 +374,21 @@ public class DungeonGenerator3 : IDungeonGenerator
             yield return new GenerationStep("Phase 3 complete: no disconnected rooms", area);
         }
 
+        // Phase 3b: Generate caves (only if enough rooms were removed)
+        if (removedCount >= MinRemovedRoomsForCave)
+        {
+            GenerateCaves(area);
+            if (_caveTiles.Count > 0)
+            {
+                var (cx, cy) = _caveTiles.First();
+                yield return new GenerationStep($"Phase 3b complete: cave at ({cx},{cy})", area);
+            }
+            else
+            {
+                yield return new GenerationStep("Phase 3b complete: no space for cave", area);
+            }
+        }
+
         // Phase 4: Specialize rooms
         foreach (var step in SpecializeRoomsStepByStep(area))
         {
@@ -630,6 +653,407 @@ public class DungeonGenerator3 : IDungeonGenerator
         }
 
         return disconnectedRooms.Count;
+    }
+
+    #endregion
+
+    #region Phase 3b: Cave Generation
+
+    private void GenerateCaves(Area area)
+    {
+        // Find the best spot for cave center using multi-source BFS from all floor tiles
+        // Combined with distance from map edges
+
+        // Step 1: Calculate distance from floors using multi-source BFS
+        var distanceFromFloors = new int[_width, _height];
+        for (int y = 0; y < _height; y++)
+            for (int x = 0; x < _width; x++)
+                distanceFromFloors[x, y] = int.MaxValue;
+
+        var queue = new Queue<(int x, int y)>();
+
+        // Initialize BFS from all floor tiles AND map edges
+        foreach (var (fx, fy) in _floorTiles)
+        {
+            distanceFromFloors[fx, fy] = 0;
+            queue.Enqueue((fx, fy));
+        }
+
+        // Treat map edges as floor tiles (distance 0)
+        for (int x = 0; x < _width; x++)
+        {
+            if (distanceFromFloors[x, 0] == int.MaxValue)
+            {
+                distanceFromFloors[x, 0] = 0;
+                queue.Enqueue((x, 0));
+            }
+            if (distanceFromFloors[x, _height - 1] == int.MaxValue)
+            {
+                distanceFromFloors[x, _height - 1] = 0;
+                queue.Enqueue((x, _height - 1));
+            }
+        }
+        for (int y = 1; y < _height - 1; y++)
+        {
+            if (distanceFromFloors[0, y] == int.MaxValue)
+            {
+                distanceFromFloors[0, y] = 0;
+                queue.Enqueue((0, y));
+            }
+            if (distanceFromFloors[_width - 1, y] == int.MaxValue)
+            {
+                distanceFromFloors[_width - 1, y] = 0;
+                queue.Enqueue((_width - 1, y));
+            }
+        }
+
+        // BFS to fill distance map (4-directional for Manhattan distance)
+        var directions = new[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
+        while (queue.Count > 0)
+        {
+            var (x, y) = queue.Dequeue();
+            int currentDist = distanceFromFloors[x, y];
+
+            foreach (var (dx, dy) in directions)
+            {
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || nx >= _width || ny < 0 || ny >= _height)
+                    continue;
+
+                if (distanceFromFloors[nx, ny] > currentDist + 1)
+                {
+                    distanceFromFloors[nx, ny] = currentDist + 1;
+                    queue.Enqueue((nx, ny));
+                }
+            }
+        }
+
+        // Step 2: Collect all rock tiles with maximum distance score
+        var candidates = new List<(int x, int y)>();
+        int bestScore = 0;
+
+        // Margin of 2 from edges (for DungeonWall + ImpenetrableRock)
+        for (int y = 2; y < _height - 2; y++)
+        {
+            for (int x = 2; x < _width - 2; x++)
+            {
+                var tile = area.GetTile(x, y);
+                if (tile == null || tile.Type != TileType.Rock)
+                    continue;
+
+                int score = distanceFromFloors[x, y];
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    candidates.Clear();
+                    candidates.Add((x, y));
+                }
+                else if (score == bestScore)
+                {
+                    candidates.Add((x, y));
+                }
+            }
+        }
+
+        // Step 2b: Pick point closest to centroid of all candidates
+        int bestX = -1, bestY = -1;
+        if (candidates.Count > 0)
+        {
+            double centroidX = candidates.Average(c => c.x);
+            double centroidY = candidates.Average(c => c.y);
+
+            double minDist = double.MaxValue;
+            foreach (var (cx, cy) in candidates)
+            {
+                double dist = (cx - centroidX) * (cx - centroidX) + (cy - centroidY) * (cy - centroidY);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    bestX = cx;
+                    bestY = cy;
+                }
+            }
+        }
+
+        // Step 3: Generate cave from the center point
+        if (bestX >= 0 && bestY >= 0)
+        {
+            GenerateCaveFromLocation(area, bestX, bestY);
+        }
+    }
+
+    private void GenerateCaveFromLocation(Area area, int centerX, int centerY)
+    {
+        int caveRegionId = _nextRegionId++;
+        var localCaveTiles = new HashSet<(int x, int y)>();
+
+        // Phase 1: Drunkard's Walk - create main structure
+        int numWalkers = _random.Next(4, 7);  // 4-6 walkers
+        for (int i = 0; i < numWalkers; i++)
+        {
+            int steps = _random.Next(15, 31);  // 15-30 steps
+            DrunkardWalk(area, centerX, centerY, localCaveTiles, caveRegionId, steps);
+        }
+
+        // Phase 2: Widen passages - make corridors thicker
+        for (int pass = 0; pass < 2; pass++)
+        {
+            WidenCave(area, localCaveTiles, caveRegionId);
+        }
+
+        // Phase 3: Add stalagmites - rock columns in open areas
+        AddStalagmites(area, localCaveTiles);
+
+        // Phase 4: Connect to dungeon
+        ConnectCaveToDungeon(area, localCaveTiles, caveRegionId);
+    }
+
+    private void DrunkardWalk(Area area, int startX, int startY, HashSet<(int x, int y)> caveTiles, int regionId, int maxSteps)
+    {
+        var directions = new[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
+        int x = startX;
+        int y = startY;
+        var dir = directions[_random.Next(4)];
+
+        for (int step = 0; step < maxSteps; step++)
+        {
+            // Check bounds
+            if (x < 2 || x >= _width - 2 || y < 2 || y >= _height - 2)
+                break;
+
+            // Check if we'd touch non-cave walkable
+            if (TouchesNonCaveWalkable(area, x, y, caveTiles))
+                break;
+
+            // Place cave tile if it's rock
+            var tile = area.GetTile(x, y);
+            if (tile != null && tile.Type == TileType.Rock)
+            {
+                var caveTile = Tile.Floor(TileStructure.Cave);
+                caveTile.RegionId = regionId;
+                area.SetTile(x, y, caveTile);
+                caveTiles.Add((x, y));
+                _caveTiles.Add((x, y));
+                _floorTiles.Add((x, y));
+            }
+
+            // 70% continue same direction, 30% change direction
+            if (_random.Next(100) < 30)
+            {
+                dir = directions[_random.Next(4)];
+            }
+
+            x += dir.Item1;
+            y += dir.Item2;
+        }
+    }
+
+    private void WidenCave(Area area, HashSet<(int x, int y)> caveTiles, int regionId)
+    {
+        var directions = new[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
+        var tilesToAdd = new List<(int x, int y)>();
+
+        foreach (var (cx, cy) in caveTiles)
+        {
+            foreach (var (dx, dy) in directions)
+            {
+                int nx = cx + dx;
+                int ny = cy + dy;
+
+                // Skip if out of bounds
+                if (nx < 2 || nx >= _width - 2 || ny < 2 || ny >= _height - 2)
+                    continue;
+
+                // Skip if already cave
+                if (caveTiles.Contains((nx, ny)))
+                    continue;
+
+                var tile = area.GetTile(nx, ny);
+                if (tile == null || tile.Type != TileType.Rock)
+                    continue;
+
+                // Skip if touches non-cave walkable
+                if (TouchesNonCaveWalkable(area, nx, ny, caveTiles))
+                    continue;
+
+                // 40% chance to widen
+                if (_random.Next(100) < 40)
+                {
+                    tilesToAdd.Add((nx, ny));
+                }
+            }
+        }
+
+        foreach (var (x, y) in tilesToAdd)
+        {
+            if (caveTiles.Contains((x, y))) continue;  // May have been added by another iteration
+
+            var caveTile = Tile.Floor(TileStructure.Cave);
+            caveTile.RegionId = regionId;
+            area.SetTile(x, y, caveTile);
+            caveTiles.Add((x, y));
+            _caveTiles.Add((x, y));
+            _floorTiles.Add((x, y));
+        }
+    }
+
+    private void AddStalagmites(Area area, HashSet<(int x, int y)> caveTiles)
+    {
+        var tilesToConvert = new List<(int x, int y)>();
+
+        foreach (var (cx, cy) in caveTiles)
+        {
+            // Count cave neighbors in 3x3 area
+            int caveNeighbors = 0;
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    if (dx == 0 && dy == 0) continue;
+                    if (caveTiles.Contains((cx + dx, cy + dy)))
+                        caveNeighbors++;
+                }
+            }
+
+            // If surrounded by cave (>=7 neighbors), 8% chance for stalagmite
+            if (caveNeighbors >= 7 && _random.Next(100) < 8)
+            {
+                tilesToConvert.Add((cx, cy));
+            }
+        }
+
+        foreach (var (x, y) in tilesToConvert)
+        {
+            area.SetTile(x, y, Tile.Rock);
+            caveTiles.Remove((x, y));
+            _caveTiles.Remove((x, y));
+            _floorTiles.Remove((x, y));
+        }
+    }
+
+    private void ConnectCaveToDungeon(Area area, HashSet<(int x, int y)> caveTiles, int regionId)
+    {
+        if (caveTiles.Count == 0) return;
+
+        // Find the cave tile closest to any dungeon floor
+        int bestCaveX = -1, bestCaveY = -1;
+        int bestDungeonX = -1, bestDungeonY = -1;
+        int bestDistance = int.MaxValue;
+
+        foreach (var (cx, cy) in caveTiles)
+        {
+            foreach (var (fx, fy) in _floorTiles)
+            {
+                // Skip cave tiles
+                if (caveTiles.Contains((fx, fy))) continue;
+
+                int dist = Math.Abs(cx - fx) + Math.Abs(cy - fy);
+                if (dist < bestDistance)
+                {
+                    bestDistance = dist;
+                    bestCaveX = cx;
+                    bestCaveY = cy;
+                    bestDungeonX = fx;
+                    bestDungeonY = fy;
+                }
+            }
+        }
+
+        if (bestCaveX < 0) return;
+
+        // Dig a corridor from cave to dungeon
+        int x = bestCaveX;
+        int y = bestCaveY;
+
+        // First move horizontally, then vertically
+        int dx = bestDungeonX > x ? 1 : (bestDungeonX < x ? -1 : 0);
+        int dy = bestDungeonY > y ? 1 : (bestDungeonY < y ? -1 : 0);
+
+        // Horizontal part
+        while (x != bestDungeonX)
+        {
+            x += dx;
+            var tile = area.GetTile(x, y);
+            if (tile != null && !tile.Walkable)
+            {
+                var corridorTile = Tile.Floor(TileStructure.Cave);
+                corridorTile.RegionId = regionId;
+                area.SetTile(x, y, corridorTile);
+                caveTiles.Add((x, y));
+                _caveTiles.Add((x, y));
+                _floorTiles.Add((x, y));
+            }
+            else if (tile != null && tile.Walkable && tile.Structure != TileStructure.Cave)
+            {
+                // Reached dungeon - place door one tile back
+                x -= dx;
+                if (!caveTiles.Contains((x, y)))
+                {
+                    var door = Tile.ClosedDoor;
+                    door.RegionId = regionId;
+                    area.SetTile(x, y, door);
+                }
+                return;
+            }
+        }
+
+        // Vertical part
+        while (y != bestDungeonY)
+        {
+            y += dy;
+            var tile = area.GetTile(x, y);
+            if (tile != null && !tile.Walkable)
+            {
+                var corridorTile = Tile.Floor(TileStructure.Cave);
+                corridorTile.RegionId = regionId;
+                area.SetTile(x, y, corridorTile);
+                caveTiles.Add((x, y));
+                _caveTiles.Add((x, y));
+                _floorTiles.Add((x, y));
+            }
+            else if (tile != null && tile.Walkable && tile.Structure != TileStructure.Cave)
+            {
+                // Reached dungeon - place door one tile back
+                y -= dy;
+                if (!caveTiles.Contains((x, y)))
+                {
+                    var door = Tile.ClosedDoor;
+                    door.RegionId = regionId;
+                    area.SetTile(x, y, door);
+                }
+                return;
+            }
+        }
+    }
+
+    private bool TouchesNonCaveWalkable(Area area, int x, int y, HashSet<(int x, int y)> caveTiles)
+    {
+        // Check all 8 directions for walkable non-cave tiles
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || nx >= _width || ny < 0 || ny >= _height)
+                    continue;
+
+                // Skip if it's already a cave tile
+                if (caveTiles.Contains((nx, ny)))
+                    continue;
+
+                var tile = area.GetTile(nx, ny);
+                if (tile != null && tile.Walkable)
+                    return true;  // Found walkable non-cave tile
+            }
+        }
+        return false;
     }
 
     #endregion
@@ -1317,10 +1741,36 @@ public class DungeonGenerator3 : IDungeonGenerator
                 // Sprawdź czy sąsiaduje z nie-skałą (8 kierunków)
                 if (HasNonRockNeighbor(area, x, y))
                 {
+                    // Nie zamieniaj na DungeonWall jeśli sąsiaduje z Cave (naturalne skały)
+                    if (HasCaveNeighbor(area, x, y))
+                        continue;
+
                     area.SetTile(x, y, Tile.DungeonWall);
                 }
             }
         }
+    }
+
+    private bool HasCaveNeighbor(Area area, int x, int y)
+    {
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx < 0 || nx >= _width || ny < 0 || ny >= _height)
+                    continue;
+
+                var tile = area.GetTile(nx, ny);
+                if (tile != null && tile.Structure == TileStructure.Cave)
+                    return true;
+            }
+        }
+        return false;
     }
 
     private bool HasNonRockNeighbor(Area area, int x, int y)
@@ -1377,14 +1827,14 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void PlaceStairs(Area area)
     {
-        // Zbierz wszystkie floor tilesy z TileStructure.Room
+        // Zbierz wszystkie floor tilesy
         var roomFloors = new List<(int x, int y)>();
         for (int y = 0; y < _height; y++)
         {
             for (int x = 0; x < _width; x++)
             {
                 var tile = area.GetTile(x, y);
-                if (tile != null && tile.Type == TileType.Floor && tile.Structure == TileStructure.Room)
+                if (tile != null && tile.Type == TileType.Floor)
                 {
                     roomFloors.Add((x, y));
                 }
