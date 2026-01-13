@@ -44,9 +44,8 @@ public class RaylibOutput : IOutput
 
         var cp = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; // Ascii
         cp += "ĄĆĘŁŃÓŚŹŻąćęłńóśźż"; // Polish
-        cp += "·□■▣≈⬟±†"; // Tiles
-        cp += "½¤"; // Items
-        cp += ""; // Critters
+        cp += "·□▣≈±"; // Tiles
+        cp += "¤×"; // Items
         
         var codepoints = cp.Select(c => (int)c).ToArray();
 

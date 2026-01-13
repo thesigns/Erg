@@ -1,4 +1,5 @@
 using Erg.Core.World.Behaviors;
+using Erg.Core.World.Items;
 
 namespace Erg.Core.World.Critters;
 
@@ -15,5 +16,11 @@ public class Dummy : Critter
             speed: 100,
             behavior: PassiveBehavior.Instance)
     {
+    }
+
+    public override void OnDeath(Area area)
+    {
+        base.OnDeath(area);
+        area.AddItem(new DummyCorpse(X, Y));
     }
 }

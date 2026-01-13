@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Erg.Core.Types;
 using Erg.Core.World;
 using Erg.Core.World.Behaviors;
@@ -85,5 +86,16 @@ public abstract class Critter : Entity
     public void Heal(int amount)
     {
         HitPoints = Math.Min(MaxHitPoints, HitPoints + amount);
+    }
+
+    // Wywoływane przy śmierci - upuszcza inventory
+    public virtual void OnDeath(Area area)
+    {
+        foreach (var item in Inventory.Items.ToList())
+        {
+            item.MoveTo(X, Y);
+            area.AddItem(item);
+        }
+        Inventory.Clear();
     }
 }

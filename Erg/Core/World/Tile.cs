@@ -24,7 +24,7 @@ public class Tile
             return Critter.Glyph;
 
         if (Items.Count >= 2)
-            return new Glyph('½', 0x8B4513FF, 0x000000FF);
+            return new Glyph('%', 0x8B4513FF, 0x000000FF);
 
         if (Items.Count == 1)
             return Items[0].Glyph;

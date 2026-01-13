@@ -33,4 +33,9 @@ public class Inventory
     }
 
     public int Count => _items.Count;
+
+    public void Clear()
+    {
+        _items.Clear();
+    }
 }

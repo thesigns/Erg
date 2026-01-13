@@ -59,6 +59,17 @@ public class Session
         Fov.Compute(Player.X, Player.Y, ViewRadius);
     }
 
+    public bool CanPlayerSee(Critter critter)
+    {
+        // Player always sees themselves
+        if (critter == Player)
+            return true;
+
+        // Check FOV visibility
+        // Future: also check critter.IsInvisible flag
+        return Fov.IsSeen(critter.X, critter.Y);
+    }
+
     public bool TryMovePlayer(int dx, int dy)
     {
         return TryMove(Player, dx, dy);
@@ -99,10 +110,11 @@ public class Session
     public void PlayerAttack(Critter target)
     {
         Messages.Clear();
-        Combat.MeleeAttack(Player, target, Messages, Random);
+        Combat.MeleeAttack(Player, target, this);
 
         if (!target.IsAlive)
         {
+            target.OnDeath(Area);
             Area.RemoveCritter(target);
         }
     }

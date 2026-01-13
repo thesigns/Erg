@@ -25,10 +25,13 @@ public class SpinAttackAction : CritterAction
 
         if (target != null && target.IsAlive)
         {
-            Combat.Combat.MeleeAttack(critter, target, session.Messages, session.Random);
+            Combat.Combat.MeleeAttack(critter, target, session);
 
             if (!target.IsAlive)
+            {
+                target.OnDeath(session.Area);
                 session.Area.RemoveCritter(target);
+            }
         }
         // Jeśli brak celu - atak "w powietrze", energia i tak zużyta
 

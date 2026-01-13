@@ -1,4 +1,5 @@
 using Erg.Core.World.Behaviors;
+using Erg.Core.World.Items;
 
 namespace Erg.Core.World.Critters;
 
@@ -15,5 +16,11 @@ public class SpinningDummy : Critter
             speed: 200,
             behavior: new SpinAttackBehavior())
     {
+    }
+
+    public override void OnDeath(Area area)
+    {
+        base.OnDeath(area);
+        area.AddItem(new SpinningDummyCorpse(X, Y));
     }
 }
