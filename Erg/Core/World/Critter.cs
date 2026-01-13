@@ -1,10 +1,24 @@
-﻿using Erg.Core.World;
+﻿using System;
+using System.Collections.Generic;
+using Erg.Core.World;
+using Erg.Core.World.Behaviors;
 
 public abstract class Critter : Entity
 {
     public int Speed { get; protected set; }   // np. 100 = normal
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
+    public IBehavior? Behavior { get; protected set; }
+
+    // Hit Points
+    public int MaxHitPoints { get; protected set; }
+    public int HitPoints { get; protected set; }
+    public bool IsAlive => HitPoints > 0;
+
+    // Stos wrogow - wrog na gorze to aktualny cel
+    private readonly List<Critter> _enemies = new();
+    public IReadOnlyList<Critter> Enemies => _enemies;
+    public Critter? CurrentEnemy => _enemies.Count > 0 ? _enemies[^1] : null;
 
     protected Critter(
         string name,
@@ -13,11 +27,16 @@ public abstract class Critter : Entity
         char character,
         uint fg,
         uint bg,
-        int speed)
+        int speed,
+        int maxHitPoints = 10,
+        IBehavior? behavior = null)
         : base(name, x, y, character, fg, bg)
     {
         Speed = speed;
         Energy = 0;
+        MaxHitPoints = maxHitPoints;
+        HitPoints = maxHitPoints;
+        Behavior = behavior;
     }
 
     public void GainEnergy()
@@ -25,13 +44,40 @@ public abstract class Critter : Entity
         Energy += Speed;
     }
 
-    public bool CanAct(int cost)
+    public bool CanAct()
     {
-        return Energy >= cost;
+        return Energy >= 0;
     }
 
     public void SpendEnergy(int cost)
     {
         Energy -= cost;
+    }
+
+    // Dodaj wroga na stos (jesli juz jest - przeniesc na gore)
+    public void AddEnemy(Critter enemy)
+    {
+        _enemies.Remove(enemy);
+        _enemies.Add(enemy);
+    }
+
+    // Usun wroga ze stosu (np. gdy umrze)
+    public void RemoveEnemy(Critter enemy)
+    {
+        _enemies.Remove(enemy);
+    }
+
+    // Otrzymaj obrazenia
+    public void TakeDamage(int damage, Critter? attacker = null)
+    {
+        HitPoints = Math.Max(0, HitPoints - damage);
+        if (attacker != null)
+            AddEnemy(attacker);
+    }
+
+    // Ulecz
+    public void Heal(int amount)
+    {
+        HitPoints = Math.Min(MaxHitPoints, HitPoints + amount);
     }
 }

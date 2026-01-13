@@ -63,6 +63,7 @@ public class PlayView : IGameView
             if (_session.IsPlayerOnStairsDown())
             {
                 _session.GoDownStairs();
+                _session.ProcessCritterTurns();
                 return;
             }
         }
@@ -78,6 +79,7 @@ public class PlayView : IGameView
                     return;
                 }
                 _session.GoUpStairs();
+                _session.ProcessCritterTurns();
                 return;
             }
         }
@@ -92,6 +94,7 @@ public class PlayView : IGameView
         {
             _session.OpenAdjacentDoors();
             _session.ComputeFov();
+            _session.ProcessCritterTurns();
             return;
         }
 
@@ -99,12 +102,14 @@ public class PlayView : IGameView
         {
             _session.CloseAdjacentDoors();
             _session.ComputeFov();
+            _session.ProcessCritterTurns();
             return;
         }
 
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.G))
         {
             _session.PickUpItems();
+            _session.ProcessCritterTurns();
             return;
         }
 
@@ -113,6 +118,7 @@ public class PlayView : IGameView
             if (_session.TryMovePlayer(dx, dy))
             {
                 _session.ComputeFov();
+                _session.ProcessCritterTurns();
             }
         }
     }
@@ -182,14 +188,19 @@ public class PlayView : IGameView
 
     private void RenderStatusLine(IOutput output)
     {
-        // Wyczyść linię 20
+        // Wyczyść linie 20-21
         for (int x = 0; x < 80; x++)
         {
             output.PutGlyph(x, 20, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 21, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
         }
 
         string levelText = $"Level: {_session.Area.Level}";
         RenderTextLine(output, 20, levelText);
+
+        var player = _session.Player;
+        string statsText = $"HP: {player.HitPoints}/{player.MaxHitPoints}  Speed: {player.Speed}";
+        RenderTextLine(output, 21, statsText);
     }
 
     private void RenderMessages(IOutput output)

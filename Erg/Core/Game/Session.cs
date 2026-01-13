@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Erg.Core.Game;
 using Erg.Core.World;
+using Erg.Core.World.Critters;
 using Erg.Core.World.Generators;
 
 public class Session
@@ -28,10 +30,35 @@ public class Session
         Fov = new FieldOfView(Area);
         ComputeFov();
 
+        SpawnTestDummy();
+
         var startTile = Area.GetTile(Player.X, Player.Y);
         if (startTile != null)
         {
             Messages.Add($"{startTile.Name}.");
+        }
+    }
+
+    private void SpawnTestDummy()
+    {
+        // Znajdz walkable tile blisko gracza do testow
+        for (int dy = -3; dy <= 3; dy++)
+        {
+            for (int dx = -3; dx <= 3; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int x = Player.X + dx;
+                int y = Player.Y + dy;
+
+                var tile = Area.GetTile(x, y);
+                if (tile != null && tile.Walkable && tile.Critter == null)
+                {
+                    var dummy = new Dummy(x, y);
+                    Area.SetCritter(dummy);
+                    return;
+                }
+            }
         }
     }
 
@@ -134,7 +161,19 @@ public class Session
             if (tile.Critter == Player)
                 parts.Add("You see yourself standing here. Looking good!");
             else
+            {
                 parts.Add($"There is {GetArticle(tile.Critter.Name)} {tile.Critter.Name} here.");
+
+                // Sprawdź relację do gracza
+                if (tile.Critter.Enemies.Contains(Player))
+                    parts.Add("He is hostile.");
+                else
+                    parts.Add("He doesn't care about you.");
+
+                // Sprawdź zdrowie
+                if (tile.Critter.HitPoints < tile.Critter.MaxHitPoints)
+                    parts.Add("He is wounded.");
+            }
         }
 
         // 4. Items (if any)
@@ -287,5 +326,46 @@ public class Session
                 if (Area.GetTile(x, y)?.Type == type)
                     return (x, y);
         return (0, 0);
+    }
+
+    public void ProcessCritterTurns()
+    {
+        var critters = GetAllCritters().Where(c => c != Player).ToList();
+
+        foreach (var critter in critters)
+        {
+            ProcessCritterTurn(critter);
+        }
+    }
+
+    private void ProcessCritterTurn(Critter critter)
+    {
+        critter.GainEnergy();
+
+        while (critter.CanAct())
+        {
+            if (critter.Behavior == null)
+            {
+                critter.SpendEnergy(1000);
+                break;
+            }
+
+            var action = critter.Behavior.DecideAction(critter, this);
+            action.Execute(critter, this);
+            critter.SpendEnergy(action.EnergyCost);
+        }
+    }
+
+    private IEnumerable<Critter> GetAllCritters()
+    {
+        for (int y = 0; y < Area.Height; y++)
+        {
+            for (int x = 0; x < Area.Width; x++)
+            {
+                var critter = Area.GetCritter(x, y);
+                if (critter != null)
+                    yield return critter;
+            }
+        }
     }
 }
