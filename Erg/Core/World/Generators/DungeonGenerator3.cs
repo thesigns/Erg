@@ -388,6 +388,11 @@ public class DungeonGenerator3 : IDungeonGenerator
         RoomInfo sourceRoom;
         if (connectedRooms.Count == 0)
         {
+            // Don't start a new network if main network exists but is maxed out
+            if (_rooms.Any(r => r.Connected))
+                return (false, -1, "", -1, null);
+
+            // This branch now only executes when NO rooms are connected yet (first corridor)
             var availableRooms = _rooms.Where(r => r.DoorCount < RoomInfo.MaxDoors).ToList();
             if (availableRooms.Count == 0)
                 return (false, -1, "", -1, null);
