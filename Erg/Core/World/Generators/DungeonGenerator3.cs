@@ -1473,8 +1473,7 @@ public class DungeonGenerator3 : IDungeonGenerator
 
         if (availableFloors.Count == 0) return;
 
-        // Place 5 Dummies
-        int critterCount = 5;
+        int critterCount = _random.Next(4, 9); // 4-8 przeciwników
         for (int i = 0; i < critterCount && availableFloors.Count > 0; i++)
         {
             int index = _random.Next(availableFloors.Count);
@@ -1485,8 +1484,12 @@ public class DungeonGenerator3 : IDungeonGenerator
             var tile = area.GetTile(x, y);
             if (tile?.Critter != null) continue;
 
-            var dummy = new Dummy(x, y);
-            area.SetCritter(dummy);
+            // 50% Dummy, 50% SpinningDummy
+            Critter critter = _random.Next(2) == 0
+                ? new Dummy(x, y)
+                : new SpinningDummy(x, y);
+
+            area.SetCritter(critter);
         }
     }
 
