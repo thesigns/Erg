@@ -149,6 +149,10 @@ public class DungeonGenerator3 : IDungeonGenerator
         // Phase 10: Place items
         PlaceItems(area);
         yield return new GenerationStep("Phase 10 complete: items placed", area);
+
+        // Phase 11: Place critters
+        PlaceCritters(area);
+        yield return new GenerationStep("Phase 11 complete: critters placed", area);
     }
 
     #region Phase 1: Room Generation

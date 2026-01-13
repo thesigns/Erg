@@ -87,7 +87,7 @@ public class DebugGenerationView : IGameView
                 var tile = area.GetTile(x, y);
                 if (tile != null)
                 {
-                    output.PutGlyph(x, y, tile.Glyph);
+                    output.PutGlyph(x, y, tile.GetDisplayGlyph());
                 }
             }
         }
