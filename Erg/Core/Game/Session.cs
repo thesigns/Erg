@@ -97,7 +97,7 @@ public class Session
     public void PlayerAttack(Critter target)
     {
         Messages.Clear();
-        Combat.MeleeAttack(Player, target, Messages);
+        Combat.MeleeAttack(Player, target, Messages, Random);
 
         if (!target.IsAlive)
         {

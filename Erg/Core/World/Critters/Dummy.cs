@@ -9,7 +9,7 @@ public class Dummy : Critter
             name: "Dummy",
             x: x,
             y: y,
-            character: 'Y',
+            character: 'T',
             fg: 0xD2B48CFF,
             bg: 0x000000FF,
             speed: 100,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Erg.Core.Types;
 using Erg.Core.World;
 using Erg.Core.World.Behaviors;
 
@@ -15,8 +16,8 @@ public abstract class Critter : Entity
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
 
-    // Combat - TODO: w przyszłości zmienić na klasę/struct obsługującą notację kości (np. 2d6+5)
-    public int MeleeDamage { get; protected set; }
+    // Combat
+    public Dice MeleeDamage { get; protected set; }
 
     // Stos wrogow - wrog na gorze to aktualny cel
     private readonly List<Critter> _enemies = new();
@@ -32,7 +33,7 @@ public abstract class Critter : Entity
         uint bg,
         int speed,
         int maxHitPoints = 10,
-        int meleeDamage = 1,
+        Dice? meleeDamage = null,
         IBehavior? behavior = null)
         : base(name, x, y, character, fg, bg)
     {
@@ -40,7 +41,7 @@ public abstract class Critter : Entity
         Energy = 0;
         MaxHitPoints = maxHitPoints;
         HitPoints = maxHitPoints;
-        MeleeDamage = meleeDamage;
+        MeleeDamage = meleeDamage ?? new Dice(1, 4);
         Behavior = behavior;
     }
 

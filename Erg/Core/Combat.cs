@@ -4,9 +4,9 @@ namespace Erg.Core;
 
 public static class Combat
 {
-    public static void MeleeAttack(Critter attacker, Critter defender, MessageBuffer messages)
+    public static void MeleeAttack(Critter attacker, Critter defender, MessageBuffer messages, Random random)
     {
-        int damage = attacker.MeleeDamage;
+        int damage = attacker.MeleeDamage.Roll(random);
         defender.TakeDamage(damage, attacker);
 
         messages.Add($"{attacker.Name} hits {defender.Name} for {damage} damage.");
