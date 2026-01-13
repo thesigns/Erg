@@ -100,7 +100,7 @@ public class PlayView : IGameView
             {
                 if (_session.CurrentLevel == 1)
                 {
-                    _game.SwitchView(new GameSummaryView(_game));
+                    _game.SwitchView(new GameSummaryView(_game, GameEndReason.Escaped));
                     return;
                 }
                 _session.GoUpStairs();
@@ -173,7 +173,7 @@ public class PlayView : IGameView
         _session.ProcessCritterTurns();
         if (!_session.Player.IsAlive)
         {
-            _game.SwitchView(new GameSummaryView(_game));
+            _game.SwitchView(new GameSummaryView(_game, GameEndReason.Died));
             return true;
         }
         return false;

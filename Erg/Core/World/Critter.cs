@@ -19,6 +19,7 @@ public abstract class Critter : Entity
 
     // Combat
     public Dice MeleeDamage { get; protected set; }
+    public Critter? KilledBy { get; private set; }
 
     // Stos wrogow - wrog na gorze to aktualny cel
     private readonly List<Critter> _enemies = new();
@@ -79,7 +80,11 @@ public abstract class Critter : Entity
     {
         HitPoints = Math.Max(0, HitPoints - damage);
         if (attacker != null)
+        {
             AddEnemy(attacker);
+            if (!IsAlive)
+                KilledBy = attacker;
+        }
     }
 
     // Ulecz

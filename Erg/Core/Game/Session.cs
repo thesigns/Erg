@@ -31,6 +31,7 @@ public class Session
     public MessageBuffer Messages { get; } = new();
     public int CurrentLevel => Area.Level;
     public int TurnCount { get; private set; }
+    public int DeepestLevel { get; private set; } = 1;
 
     private const int ViewRadius = 10;
 
@@ -346,6 +347,8 @@ public class Session
     public void GoDownStairs()
     {
         int newLevel = Area.Level + 1;
+        if (newLevel > DeepestLevel)
+            DeepestLevel = newLevel;
         RegenerateArea(newLevel, startOnStairsUp: true);
     }
 
