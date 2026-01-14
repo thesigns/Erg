@@ -1,4 +1,5 @@
 .claude/
+tmpclaude*cwd
 .idea/
 .vs/
 bin/
