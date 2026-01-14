@@ -1930,25 +1930,44 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void PlaceCritters(Area area)
     {
-        var availableFloors = _floorTiles.ToList();
+        // Collect spawn positions: floor tiles + water tiles (water added 2x for higher chance)
+        var availablePositions = new List<(int x, int y, bool isWater)>();
 
-        if (availableFloors.Count == 0) return;
+        foreach (var (x, y) in _floorTiles)
+            availablePositions.Add((x, y, false));
+
+        // Add water tiles twice for higher spawn chance
+        for (int y = 0; y < _height; y++)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                var tile = area.GetTile(x, y);
+                if (tile?.Type == TileType.ShallowWater || tile?.Type == TileType.DeepWater)
+                {
+                    availablePositions.Add((x, y, true));
+                    availablePositions.Add((x, y, true)); // 2x for higher chance
+                }
+            }
+        }
+
+        if (availablePositions.Count == 0) return;
 
         int critterCount = _random.Next(4, 9); // 4-8 przeciwników
-        for (int i = 0; i < critterCount && availableFloors.Count > 0; i++)
+        for (int i = 0; i < critterCount && availablePositions.Count > 0; i++)
         {
-            int index = _random.Next(availableFloors.Count);
-            var (x, y) = availableFloors[index];
-            availableFloors.RemoveAt(index);
+            int index = _random.Next(availablePositions.Count);
+            var (x, y, isWater) = availablePositions[index];
+
+            // Remove all entries for this position
+            availablePositions.RemoveAll(p => p.x == x && p.y == y);
 
             // Skip if tile already has a critter
             var tile = area.GetTile(x, y);
             if (tile?.Critter != null) continue;
 
-            // 50% Dummy, 50% SpinningDummy
-            Critter critter = _random.Next(2) == 0
-                ? new Dummy(x, y)
-                : new SpinningDummy(x, y);
+            Critter critter = isWater
+                ? new Amoeba(x, y)
+                : _random.Next(2) == 0 ? new Dummy(x, y) : new SpinningDummy(x, y);
 
             area.SetCritter(critter);
         }

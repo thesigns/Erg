@@ -1,3 +1,5 @@
+using Erg.Core.World.Critters;
+
 namespace Erg.Core.World.Behaviors;
 
 public class AmoebaBehavior : IBehavior
@@ -85,7 +87,7 @@ public class AmoebaBehavior : IBehavior
                 if (dx == 0 && dy == 0) continue;
 
                 var other = session.Area.GetCritter(critter.X + dx, critter.Y + dy);
-                if (other != null && other != critter)
+                if (other != null && other != critter && other is not Amoeba)
                 {
                     int dist = Math.Max(Math.Abs(dx), Math.Abs(dy)); // Chebyshev distance
                     if (dist < nearestDist)
