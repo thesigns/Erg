@@ -1889,31 +1889,33 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void PlaceItems(Area area)
     {
-        // Collect all room floor tiles (only actual floors, not water/rocks)
-        var roomFloors = new List<(int x, int y)>();
-        foreach (var room in _rooms)
+        // Collect all valid floor tiles (Room, Corridor, or Cave)
+        var validFloors = new List<(int x, int y)>();
+        for (int y = 0; y < _height; y++)
         {
-            for (int y = room.Y; y < room.Y + room.Height; y++)
+            for (int x = 0; x < _width; x++)
             {
-                for (int x = room.X; x < room.X + room.Width; x++)
+                var tile = area.GetTile(x, y);
+                if (tile != null && tile.Type == TileType.Floor &&
+                    (tile.Structure == TileStructure.Room ||
+                     tile.Structure == TileStructure.Corridor ||
+                     tile.Structure == TileStructure.Cave))
                 {
-                    // Only add if it's still a floor tile
-                    if (_floorTiles.Contains((x, y)))
-                        roomFloors.Add((x, y));
+                    validFloors.Add((x, y));
                 }
             }
         }
 
-        if (roomFloors.Count == 0) return;
+        if (validFloors.Count == 0) return;
 
         // Place 2-10 items
         int itemCount = _random.Next(2, 11);
-        for (int i = 0; i < itemCount && roomFloors.Count > 0; i++)
+        for (int i = 0; i < itemCount && validFloors.Count > 0; i++)
         {
             // Pick random floor tile
-            int index = _random.Next(roomFloors.Count);
-            var (x, y) = roomFloors[index];
-            roomFloors.RemoveAt(index);  // Don't place multiple items on same tile
+            int index = _random.Next(validFloors.Count);
+            var (x, y) = validFloors[index];
+            validFloors.RemoveAt(index);  // Don't place multiple items on same tile
 
             // Create Gold Coin with random count 1-100
             int goldAmount = _random.Next(1, 101);
