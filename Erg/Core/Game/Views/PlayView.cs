@@ -11,6 +11,11 @@ public class PlayView : IGameView
     private bool _awaitingAttackConfirmation = false;
     private Critter? _pendingAttackTarget = null;
 
+    // Advanced examine mode
+    private bool _advancedExamineMode = false;
+    private int _examineX;
+    private int _examineY;
+
     public PlayView(Game game)
     {
         _game = game;
@@ -67,6 +72,44 @@ public class PlayView : IGameView
                 return;
             }
             return; // Block other input while waiting
+        }
+
+        // Advanced examine mode
+        if (_advancedExamineMode)
+        {
+            if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Escape))
+            {
+                _advancedExamineMode = false;
+                _session.Messages.Clear();
+                return;
+            }
+
+            if (TryReadDirection(input, out int edx, out int edy))
+            {
+                int newX = _examineX + edx;
+                int newY = _examineY + edy;
+
+                // Constrain to map bounds (80x20)
+                if (newX >= 0 && newX < 80 && newY >= 0 && newY < 20)
+                {
+                    _examineX = newX;
+                    _examineY = newY;
+                    UpdateExamineDescription();
+                }
+            }
+            return; // Block other input while in advanced examine mode
+        }
+
+        // Alt+X - advanced examine mode
+        bool altHeld = input.KeyHeld.GetValueOrDefault(KeyboardKey.LeftAlt) ||
+                       input.KeyHeld.GetValueOrDefault(KeyboardKey.RightAlt);
+        if (altHeld && input.KeyPulse.GetValueOrDefault(KeyboardKey.X))
+        {
+            _advancedExamineMode = true;
+            _examineX = _session.Player.X;
+            _examineY = _session.Player.Y;
+            UpdateExamineDescription();
+            return;
         }
 
         // X key - initiate examine
@@ -233,12 +276,56 @@ public class PlayView : IGameView
         return dx != 0 || dy != 0;
     }
 
+    private bool TryReadDirection(IInput input, out int dx, out int dy)
+    {
+        dx = dy = 0;
+
+        // Arrow keys
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Left) ||
+            input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp4)) dx = -1;
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Right) ||
+            input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp6)) dx = 1;
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Up) ||
+            input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp8)) dy = -1;
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Down) ||
+            input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp2)) dy = 1;
+
+        // Diagonals
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp7)) { dx = -1; dy = -1; }
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp9)) { dx = 1; dy = -1; }
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp1)) { dx = -1; dy = 1; }
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp3)) { dx = 1; dy = 1; }
+
+        return dx != 0 || dy != 0;
+    }
+
+    private void UpdateExamineDescription()
+    {
+        _session.Messages.Clear();
+
+        if (!_session.Fov.IsSeen(_examineX, _examineY))
+        {
+            _session.Messages.Add("You don't see this area.");
+            return;
+        }
+
+        _session.ExamineAt(_examineX, _examineY);
+    }
+
     public void Render(IOutput output)
     {
         RenderArea(output);
         RenderStatusLine(output);
         RenderMessages(output);
-        output.SetCursor(_session.Player.X, _session.Player.Y, true);
+
+        if (_advancedExamineMode)
+            output.SetCursor(_examineX, _examineY, true);
+        else
+            output.SetCursor(_session.Player.X, _session.Player.Y, true);
+
         output.Render();
     }
 

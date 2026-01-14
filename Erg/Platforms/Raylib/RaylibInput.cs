@@ -56,6 +56,9 @@ public class RaylibInput : IInput
         UpdateKey(KeyboardKey.Comma, Raylib_cs.KeyboardKey.Comma, now);
         UpdateKey(KeyboardKey.LeftShift, Raylib_cs.KeyboardKey.LeftShift, now);
         UpdateKey(KeyboardKey.RightShift, Raylib_cs.KeyboardKey.RightShift, now);
+        
+        UpdateKey(KeyboardKey.LeftAlt, Raylib_cs.KeyboardKey.LeftAlt, now);
+        UpdateKey(KeyboardKey.RightAlt, Raylib_cs.KeyboardKey.RightAlt, now);
     }
 
     private void UpdateKey(KeyboardKey key, Raylib_cs.KeyboardKey raylibKey, TimeSpan now)

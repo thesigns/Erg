@@ -184,18 +184,19 @@ public class Session
 
     public void Examine(int dx, int dy)
     {
-        int tx = Player.X + dx;
-        int ty = Player.Y + dy;
+        Messages.Clear();
+        ExamineAt(Player.X + dx, Player.Y + dy);
+    }
 
-        var tile = Area.GetTile(tx, ty);
+    public void ExamineAt(int x, int y)
+    {
+        var tile = Area.GetTile(x, y);
         if (tile == null)
         {
-            Messages.Clear();
             Messages.Add("There is nothing there.");
             return;
         }
 
-        Messages.Clear();
         Messages.Add(BuildExamineDescription(tile));
     }
 
