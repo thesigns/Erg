@@ -3,6 +3,7 @@ using System.Linq;
 using Erg.Core;
 using Erg.Core.Combat;
 using Erg.Core.Game;
+using Erg.Core.Messages;
 using Erg.Core.World;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Critters;

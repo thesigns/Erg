@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Erg.Core.Game;
+namespace Erg.Core.Messages;
 
 public class MessageBuffer
 {
