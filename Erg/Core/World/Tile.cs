@@ -8,6 +8,7 @@ public class Tile
     public Glyph Glyph { get; set; }
     public bool Walkable { get; set; }
     public bool Swimmable { get; set; }
+    public bool Flyable { get; set; }
     public bool Transparent { get; set; }
     public string Name { get; set; }
     public int RegionId { get; set; }
@@ -34,12 +35,13 @@ public class Tile
     }
 
     public Tile(char character, uint foreground, uint background, bool walkable, bool transparent, string name,
-        TileType type = TileType.Floor, TileStructure structure = TileStructure.None, bool swimmable = false,
-        string? inscription = null)
+        TileType type = TileType.Floor, TileStructure structure = TileStructure.None,
+        bool swimmable = false, bool flyable = true, string? inscription = null)
     {
         Glyph = new Glyph(character, foreground, background);
         Walkable = walkable;
         Swimmable = swimmable;
+        Flyable = flyable;
         Transparent = transparent;
         Name = name;
         Type = type;
@@ -55,23 +57,23 @@ public class Tile
 
     // Dungeon tiles
     public static Tile DungeonWall =>
-        new('#', 0x808080FF, 0x000000FF, false, false, "Wall", TileType.Wall);
+        new('#', 0x808080FF, 0x000000FF, false, false, "Wall", TileType.Wall, flyable: false);
 
     public static Tile OpenDoor =>
         new('□', 0x8B4513FF, 0x000000FF, true, true, "Open Door", TileType.OpenDoor, TileStructure.Entrance);
 
     public static Tile ClosedDoor =>
-        new('▣', 0x8B4513FF, 0x000000FF, false, false, "Closed Door", TileType.ClosedDoor, TileStructure.Entrance);
+        new('▣', 0x8B4513FF, 0x000000FF, false, false, "Closed Door", TileType.ClosedDoor, TileStructure.Entrance, flyable: false);
 
     public static Tile SecretDoor =>
-        new('#', 0x808080FF, 0x000000FF, false, false, "Secret Door", TileType.SecretDoor, TileStructure.Entrance);
+        new('#', 0x808080FF, 0x000000FF, false, false, "Secret Door", TileType.SecretDoor, TileStructure.Entrance, flyable: false);
 
     // Natural rocks
     public static Tile Rock =>
-        new('#', 0x505050FF, 0x000000FF, false, false, "Rock", TileType.Rock);
+        new('#', 0x505050FF, 0x000000FF, false, false, "Rock", TileType.Rock, flyable: false);
 
     public static Tile ImpenetrableRock =>
-        new('#', 0x505050FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock);
+        new('#', 0x505050FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock, flyable: false);
 
     // Stairs tiles
     public static Tile StairsUp =>
