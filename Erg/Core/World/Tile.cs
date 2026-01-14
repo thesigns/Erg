@@ -1,4 +1,5 @@
 using Erg.Core.Abstractions;
+using Erg.Core.World.Generators;
 
 namespace Erg.Core.World;
 
@@ -87,32 +88,7 @@ public class Tile
         new('≈', 0x1020AAFF, 0x000000FF, false, true, "Deep Water", TileType.DeepWater, TileStructure.None, true);
 
     // Grave tile
-    private static readonly string[] GraveInscriptions =
-    [
-        "This grave is nameless.",
-        "R.I.P.",
-        "Here lies a forgotten soul.",
-        "Unknown adventurer.",
-        "Here lies Aldric the Bold. He delved too deep.",
-        "Death is but a door. Time is but a window.",
-        "The shadows claimed another.",
-        "She heard the whispers. Then silence.",
-        "Some doors should remain closed.",
-        "The gold remains. The owner does not.",
-        "Gone to explore the final dungeon.",
-        "He died as he lived - running from goblins.",
-        "His torch went out at the worst moment.",
-        "She forgot to check for traps.",
-        "Should have brought more healing potions.",
-        "The treasure wasn't worth it.",
-        "Do not disturb. Seriously.",
-        "What lies beneath hungers still.",
-        "He found what he was looking for.",
-        "Three went down. None returned.",
-        "The dungeon always wins."
-    ];
-
     public static Tile Grave(Random random) =>
         new('±', 0x505050FF, 0x000000FF, true, true, "Grave", TileType.Grave, TileStructure.Room,
-            inscription: GraveInscriptions[random.Next(GraveInscriptions.Length)]);
+            inscription: new GraveInscriptionGenerator().Generate(random));
 }
