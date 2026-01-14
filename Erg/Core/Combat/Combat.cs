@@ -1,4 +1,5 @@
 using Erg.Core.World;
+using static Erg.Core.Messages.Perspective;
 
 namespace Erg.Core.Combat;
 
@@ -22,29 +23,29 @@ public static class Combat
         if (seeAttacker && seeDefender)
         {
             if (playerInvolved)
-                messages.Add($"{attacker.Name} hits {defender.Name} for {damage} damage.");
+                messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} {NameOf(defender, false)} for {damage} damage.");
             else
-                messages.Add($"{attacker.Name} hits {defender.Name}.");
+                messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} {NameOf(defender, false)}.");
         }
         else if (seeAttacker && !seeDefender)
         {
             // Attacker visible only - no damage info
-            messages.Add($"{attacker.Name} hits something.");
+            messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} something.");
         }
         else if (!seeAttacker && seeDefender)
         {
             // Defender visible only
             if (defender is Player)
-                messages.Add($"Something hits {defender.Name} for {damage} damage.");
+                messages.Add($"Something hits {NameOf(defender, false)} for {damage} damage.");
             else
-                messages.Add($"Something hits {defender.Name}.");
+                messages.Add($"Something hits {NameOf(defender, false)}.");
         }
         // Neither visible: no message (silent combat)
 
         // Death message (only if defender visible)
         if (!defender.IsAlive && seeDefender)
         {
-            messages.Add($"{defender.Name} dies!");
+            messages.Add($"{NameOf(defender)} {Verb(defender, "die", "dies")}!");
         }
     }
 }
