@@ -15,9 +15,11 @@ public struct MoveResult
     public bool Attacked;
     public bool NeedsConfirmation;
     public Critter? Target;
+    public int EnergyCost;
 
-    public static MoveResult Movement() => new() { Moved = true };
-    public static MoveResult Attack() => new() { Attacked = true };
+    public static MoveResult Movement(int energyCost = 1000) =>
+        new() { Moved = true, EnergyCost = energyCost };
+    public static MoveResult Attack() => new() { Attacked = true, EnergyCost = 1000 };
     public static MoveResult Blocked() => new();
     public static MoveResult ConfirmAttack(Critter target) =>
         new() { NeedsConfirmation = true, Target = target };
@@ -89,7 +91,7 @@ public class Session
         int ny = Player.Y + dy;
 
         var tile = Area.GetTile(nx, ny);
-        if (tile == null || !tile.Walkable)
+        if (tile == null || !Player.CanEnterTile(tile))
             return MoveResult.Blocked();
 
         var blocker = Area.GetBlockingCritter(nx, ny);
@@ -110,7 +112,11 @@ public class Session
 
         // Normal movement
         if (TryMove(Player, dx, dy))
-            return MoveResult.Movement();
+        {
+            var destTile = Area.GetTile(Player.X, Player.Y);
+            int cost = (int)(CritterAction.StandardCost * Player.GetMovementCostMultiplier(destTile!));
+            return MoveResult.Movement(cost);
+        }
 
         return MoveResult.Blocked();
     }
@@ -133,7 +139,7 @@ public class Session
         int ny = critter.Y + dy;
 
         var tile = Area.GetTile(nx, ny);
-        if (tile == null || !tile.Walkable)
+        if (tile == null || !critter.CanEnterTile(tile))
             return false;
 
         var blocker = Area.GetBlockingCritter(nx, ny);
@@ -148,6 +154,11 @@ public class Session
 
         // Wyczyść stare wiadomości z poprzedniej tury
         Messages.Clear();
+
+        // Locomotion message (e.g. "You swim.", "You wade knee-deep in water.")
+        var locoMessage = critter.GetLocomotionMessage(tile);
+        if (locoMessage != null)
+            Messages.Add(locoMessage);
 
         // Sprawdź czy wchodzimy na kafelek z innym SpecialEffect
         var newEffect = tile.SpecialEffect;
@@ -392,9 +403,9 @@ public class Session
         return (0, 0);
     }
 
-    public void ProcessCritterTurns()
+    public void ProcessCritterTurns(int playerActionCost = 1000)
     {
-        int segments = CritterAction.StandardCost / Player.Speed;
+        int segments = playerActionCost / Player.Speed;
         var critters = GetAllCritters().Where(c => c != Player).ToList();
 
         for (int seg = 0; seg < segments; seg++)

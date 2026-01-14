@@ -27,6 +27,58 @@ public abstract class Critter : Entity
     // Movement
     public Locomotion Locomotion { get; protected set; } = Locomotion.Terrestrial;
 
+    /// <summary>
+    /// Checks if this critter can enter the given tile based on Locomotion.
+    /// </summary>
+    public virtual bool CanEnterTile(Tile tile)
+    {
+        return Locomotion switch
+        {
+            Locomotion.Terrestrial => tile.Walkable && !tile.Swimmable,
+            Locomotion.Amphibious => tile.Walkable || tile.Swimmable,
+            Locomotion.Semiaquatic => tile.Walkable || tile.Swimmable,
+            Locomotion.Aquatic => tile.Swimmable,
+            Locomotion.Aerial => tile.Flyable,
+            _ => tile.Walkable
+        };
+    }
+
+    /// <summary>
+    /// Returns movement energy cost multiplier based on terrain.
+    /// 1.0 = normal, greater than 1.0 = slower
+    /// </summary>
+    public virtual float GetMovementCostMultiplier(Tile tile)
+    {
+        if (Locomotion == Locomotion.Amphibious)
+        {
+            if (tile.Type == TileType.DeepWater) return 2.0f;      // Speed 50
+            if (tile.Type == TileType.ShallowWater) return 1.25f;  // Speed 80
+        }
+        if (Locomotion == Locomotion.Semiaquatic)
+        {
+            // Penalty on land, comfortable in water
+            if (!tile.Swimmable) return 2.0f;
+        }
+        return 1.0f;
+    }
+
+    /// <summary>
+    /// Returns locomotion message for entering a tile, or null if none.
+    /// </summary>
+    public virtual string? GetLocomotionMessage(Tile tile)
+    {
+        if (Locomotion == Locomotion.Amphibious)
+        {
+            if (tile.Type == TileType.DeepWater) return "You swim.";
+            if (tile.Type == TileType.ShallowWater) return "You wade knee-deep in water.";
+        }
+        if (Locomotion == Locomotion.Semiaquatic)
+        {
+            if (!tile.Swimmable) return "You lumber across the dry ground.";
+        }
+        return null;
+    }
+
     // Stos wrogow - wrog na gorze to aktualny cel
     private readonly List<Critter> _enemies = new();
     public IReadOnlyList<Critter> Enemies => _enemies;

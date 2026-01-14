@@ -196,7 +196,7 @@ public class PlayView : IGameView
             if (result.Moved)
             {
                 _session.ComputeFov();
-                if (ProcessTurnAndCheckDeath()) return;
+                if (ProcessTurnAndCheckDeath(result.EnergyCost)) return;
             }
             else if (result.NeedsConfirmation && result.Target != null)
             {
@@ -210,10 +210,10 @@ public class PlayView : IGameView
         }
     }
 
-    private bool ProcessTurnAndCheckDeath()
+    private bool ProcessTurnAndCheckDeath(int energyCost = 1000)
     {
         _session.IncrementTurn();
-        _session.ProcessCritterTurns();
+        _session.ProcessCritterTurns(energyCost);
         if (!_session.Player.IsAlive)
         {
             _game.SwitchView(new GameSummaryView(_game, GameEndReason.Died));
