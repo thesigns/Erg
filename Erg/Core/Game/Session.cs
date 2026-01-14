@@ -103,7 +103,7 @@ public class Session
 
             // Non-hostile - ask for confirmation
             Messages.Clear();
-            Messages.Add($"{blocker.Name} isn't hostile. Do you want to attack him? [y/n]");
+            Messages.Add($"{blocker.Name} isn't hostile. Do you want to attack {blocker.Pronouns.Object}? [y/n]");
             return MoveResult.ConfirmAttack(blocker);
         }
 
@@ -220,13 +220,13 @@ public class Session
 
                 // Sprawdź relację do gracza
                 if (tile.Critter.Enemies.Contains(Player))
-                    parts.Add("He is hostile.");
+                    parts.Add($"{tile.Critter.Pronouns.Subject} is hostile.");
                 else
-                    parts.Add("He doesn't care about you.");
+                    parts.Add($"{tile.Critter.Pronouns.Subject} doesn't care about you.");
 
                 // Sprawdź zdrowie
                 if (tile.Critter.HitPoints < tile.Critter.MaxHitPoints)
-                    parts.Add("He is wounded.");
+                    parts.Add($"{tile.Critter.Pronouns.Subject} is wounded.");
             }
         }
 
