@@ -24,6 +24,9 @@ public abstract class Critter : Entity
     // Pronouns
     public PronounSet Pronouns { get; protected set; } = PronounSet.It;
 
+    // Movement
+    public Locomotion Locomotion { get; protected set; } = Locomotion.Terrestrial;
+
     // Stos wrogow - wrog na gorze to aktualny cel
     private readonly List<Critter> _enemies = new();
     public IReadOnlyList<Critter> Enemies => _enemies;

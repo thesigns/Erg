@@ -8,6 +8,7 @@ public class Player : Critter
         : base("Player", x, y, '@', 0xFFFFFFFF, 0x000000FF, speed: 100)
     {
         Pronouns = PronounSet.He;
+        Locomotion = Locomotion.Amphibious;
     }
 
     public override void OnDeath(Area area)
