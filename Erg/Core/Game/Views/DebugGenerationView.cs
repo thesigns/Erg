@@ -15,7 +15,7 @@ public class DebugGenerationView : IGameView
     private Area? _currentArea;
     private bool _finished;
 
-    private const int LogLines = 5;
+    private const int LogLines = 4;
     private const int MapHeight = 20;
 
     public DebugGenerationView(Game game) : this(game, Environment.TickCount) { }
@@ -136,7 +136,7 @@ public class DebugGenerationView : IGameView
             if (line.Length > 80)
                 line = line.Substring(0, 77) + "...";
 
-            writer.Write(line);
+            writer.Write(line.PadRight(79));
         }
 
         // Show seed on the left
