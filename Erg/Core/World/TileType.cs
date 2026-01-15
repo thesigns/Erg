@@ -13,5 +13,6 @@ public enum TileType
     DeepWater,
     StairsUp,
     StairsDown,
-    Grave
+    Grave,
+    RandomDoor
 }

@@ -7,6 +7,7 @@ public class Area
     public int Width { get; }
     public int Height { get; }
     public int Depth { get; }
+    public int TilesPerItem { get; set; } = 80;
 
     private Tile[,] _tiles;
     private bool[,] _explored;

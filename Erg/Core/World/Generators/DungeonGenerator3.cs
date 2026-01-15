@@ -623,7 +623,7 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void PlaceDoor(Area area, int x, int y)
     {
-        var door = Tile.ClosedDoor;
+        var door = Tile.RandomDoor;
         door.RegionId = _nextRegionId++;
         area.SetTile(x, y, door);
     }
@@ -661,7 +661,19 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void GenerateCaves(Area area)
     {
-        // Find the best spot for cave center using multi-source BFS from all floor tiles
+        var (bestX, bestY) = FindBestCaveOrMazeCenter(area);
+        if (bestX < 0 || bestY < 0) return;
+
+        // Cave or Maze
+        if (_random.Next(5) > 0)
+            GenerateCaveFromLocation(area, bestX, bestY);
+        else
+            GenerateMazeFromLocation(area, bestX, bestY);
+    }
+
+    private (int x, int y) FindBestCaveOrMazeCenter(Area area)
+    {
+        // Find the best spot for cave/maze center using multi-source BFS from all floor tiles
         // Combined with distance from map edges
 
         // Step 1: Calculate distance from floors using multi-source BFS
@@ -759,30 +771,26 @@ public class DungeonGenerator3 : IDungeonGenerator
         }
 
         // Step 2b: Pick point closest to centroid of all candidates
-        int bestX = -1, bestY = -1;
-        if (candidates.Count > 0)
-        {
-            double centroidX = candidates.Average(c => c.x);
-            double centroidY = candidates.Average(c => c.y);
+        if (candidates.Count == 0)
+            return (-1, -1);
 
-            double minDist = double.MaxValue;
-            foreach (var (cx, cy) in candidates)
+        double centroidX = candidates.Average(c => c.x);
+        double centroidY = candidates.Average(c => c.y);
+
+        int bestX = -1, bestY = -1;
+        double minDist = double.MaxValue;
+        foreach (var (cx, cy) in candidates)
+        {
+            double dist = (cx - centroidX) * (cx - centroidX) + (cy - centroidY) * (cy - centroidY);
+            if (dist < minDist)
             {
-                double dist = (cx - centroidX) * (cx - centroidX) + (cy - centroidY) * (cy - centroidY);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    bestX = cx;
-                    bestY = cy;
-                }
+                minDist = dist;
+                bestX = cx;
+                bestY = cy;
             }
         }
 
-        // Step 3: Generate cave from the center point
-        if (bestX >= 0 && bestY >= 0)
-        {
-            GenerateCaveFromLocation(area, bestX, bestY);
-        }
+        return (bestX, bestY);
     }
 
     private void GenerateCaveFromLocation(Area area, int centerX, int centerY)
@@ -1054,6 +1062,346 @@ public class DungeonGenerator3 : IDungeonGenerator
             }
         }
         return false;
+    }
+
+    #endregion
+
+    #region Phase 3c: Maze Generation
+
+    private readonly HashSet<(int x, int y)> _mazeTiles = new();
+
+    private void GenerateMazeFromLocation(Area area, int centerX, int centerY)
+    {
+        int mazeRegionId = _nextRegionId++;
+        var localMazeTiles = new HashSet<(int x, int y)>();
+        var breakthroughCandidates = new List<(int doorX, int doorY, int mazeX, int mazeY)>();
+
+        // 1. Create MazeRoom FIRST with one exit
+        var roomResult = CreateMazeRoomWithExit(area, centerX, centerY, localMazeTiles, mazeRegionId);
+        if (roomResult == null)
+            return;  // Failed to create room
+
+        var (exitX, exitY, dirX, dirY) = roomResult.Value;
+
+        // 2. Place SecretDoor at exit (between MazeRoom and maze corridors)
+        var secretDoor = Tile.SecretDoor;
+        secretDoor.RegionId = mazeRegionId;
+        area.SetTile(exitX, exitY, secretDoor);
+
+        // 3. Carve first corridor tile behind the door
+        int corridorStartX = exitX + dirX;
+        int corridorStartY = exitY + dirY;
+        CarveMazeTile(area, corridorStartX, corridorStartY, localMazeTiles, mazeRegionId);
+
+        // 4. Growing Tree algorithm from corridor start (not from door)
+        GrowMaze(area, localMazeTiles, breakthroughCandidates, mazeRegionId, corridorStartX, corridorStartY);
+
+        // 5. Connect to dungeon
+        ConnectMazeToDungeon(area, breakthroughCandidates, mazeRegionId);
+    }
+
+    private void CarveMazeTile(Area area, int x, int y, HashSet<(int x, int y)> mazeTiles, int regionId)
+    {
+        var mazeTile = Tile.Floor(TileStructure.Maze);
+        mazeTile.RegionId = regionId;
+        area.SetTile(x, y, mazeTile);
+        mazeTiles.Add((x, y));
+        _mazeTiles.Add((x, y));
+        _floorTiles.Add((x, y));
+    }
+
+    private void GrowMaze(Area area, HashSet<(int x, int y)> mazeTiles,
+                          List<(int doorX, int doorY, int mazeX, int mazeY)> breakthroughCandidates,
+                          int regionId,
+                          int startX, int startY)
+    {
+        var directions = new[] { (0, -1), (0, 1), (-1, 0), (1, 0) };
+        var frontier = new List<(int x, int y)> { (startX, startY) };
+
+        while (frontier.Count > 0)
+        {
+            // Growing Tree: 50% last (depth-first), 50% random
+            int index = _random.Next(2) == 0
+                ? frontier.Count - 1
+                : _random.Next(frontier.Count);
+
+            var (cx, cy) = frontier[index];
+
+            // Shuffle directions
+            var shuffledDirs = directions.OrderBy(_ => _random.Next()).ToArray();
+
+            bool carved = false;
+            foreach (var (dx, dy) in shuffledDirs)
+            {
+                // 2-tile step: intermediate and destination
+                int midX = cx + dx;
+                int midY = cy + dy;
+                int destX = cx + dx * 2;
+                int destY = cy + dy * 2;
+
+                // Check for breakthrough candidate: [Maze] → [Rock] → [Non-Maze walkable]
+                CheckBreakthroughCandidate(area, cx, cy, dx, dy, mazeTiles, breakthroughCandidates);
+
+                // Try to carve 2-tile path
+                if (CanCarveMazePath(area, midX, midY, destX, destY, mazeTiles, cx, cy))
+                {
+                    // Carve both tiles
+                    CarveMazeTile(area, midX, midY, mazeTiles, regionId);
+                    CarveMazeTile(area, destX, destY, mazeTiles, regionId);
+                    frontier.Add((destX, destY));  // Only destination goes to frontier
+                    carved = true;
+                    break;
+                }
+            }
+
+            if (!carved)
+            {
+                frontier.RemoveAt(index);
+            }
+        }
+    }
+
+    private bool CanCarveMazePath(Area area, int midX, int midY, int destX, int destY,
+                                   HashSet<(int x, int y)> mazeTiles, int sourceX, int sourceY)
+    {
+        // Check bounds for both positions
+        if (midX < 2 || midX >= _width - 2 || midY < 2 || midY >= _height - 2)
+            return false;
+        if (destX < 2 || destX >= _width - 2 || destY < 2 || destY >= _height - 2)
+            return false;
+
+        // Both must be Rock
+        var midTile = area.GetTile(midX, midY);
+        var destTile = area.GetTile(destX, destY);
+        if (midTile == null || midTile.Type != TileType.Rock)
+            return false;
+        if (destTile == null || destTile.Type != TileType.Rock)
+            return false;
+
+        // Mid cannot be adjacent to walkable non-maze tiles (except source)
+        // This prevents maze from breaking through to dungeon without a door
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = midX + dx;
+                int ny = midY + dy;
+
+                // Allow source tile (that's where we came from)
+                if (nx == sourceX && ny == sourceY)
+                    continue;
+
+                var neighborTile = area.GetTile(nx, ny);
+                if (neighborTile != null && neighborTile.Walkable &&
+                    neighborTile.Structure != TileStructure.Maze &&
+                    neighborTile.Structure != TileStructure.MazeRoom)
+                    return false;  // Mid would be adjacent to dungeon!
+            }
+        }
+
+        // Destination cannot be adjacent to:
+        // 1. Maze tiles (except through mid) - prevents loops
+        // 2. Walkable non-maze tiles - prevents breakthrough to dungeon!
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = destX + dx;
+                int ny = destY + dy;
+
+                // Allow mid tile (that's our path)
+                if (nx == midX && ny == midY)
+                    continue;
+
+                // Check for maze loops
+                if (mazeTiles.Contains((nx, ny)))
+                    return false;
+
+                // Check for dungeon adjacency (same as mid check)
+                var destNeighborTile = area.GetTile(nx, ny);
+                if (destNeighborTile != null && destNeighborTile.Walkable &&
+                    destNeighborTile.Structure != TileStructure.Maze &&
+                    destNeighborTile.Structure != TileStructure.MazeRoom)
+                    return false;  // Dest would be adjacent to dungeon!
+            }
+        }
+
+        return true;
+    }
+
+    private void CheckBreakthroughCandidate(Area area, int mazeX, int mazeY, int dx, int dy,
+                                             HashSet<(int x, int y)> mazeTiles,
+                                             List<(int doorX, int doorY, int mazeX, int mazeY)> candidates)
+    {
+        // Pattern: [Maze tile at (mazeX,mazeY)] → [Rock at (doorX,doorY)] → [Non-Maze walkable at (targetX,targetY)]
+        int doorX = mazeX + dx;
+        int doorY = mazeY + dy;
+        int targetX = mazeX + dx * 2;
+        int targetY = mazeY + dy * 2;
+
+        // Check bounds
+        if (doorX < 1 || doorX >= _width - 1 || doorY < 1 || doorY >= _height - 1)
+            return;
+        if (targetX < 0 || targetX >= _width || targetY < 0 || targetY >= _height)
+            return;
+
+        // Door position must be Rock
+        var doorTile = area.GetTile(doorX, doorY);
+        if (doorTile == null || doorTile.Type != TileType.Rock)
+            return;
+
+        // Target position must be walkable and NOT Maze
+        var targetTile = area.GetTile(targetX, targetY);
+        if (targetTile == null || !targetTile.Walkable)
+            return;
+        if (targetTile.Structure == TileStructure.Maze || targetTile.Structure == TileStructure.MazeRoom)
+            return;
+
+        // Don't add duplicates
+        if (candidates.Any(c => c.doorX == doorX && c.doorY == doorY))
+            return;
+
+        candidates.Add((doorX, doorY, mazeX, mazeY));
+    }
+
+    private bool IsValidMazeExit(Area area, int exitX, int exitY,
+                                  int roomStartX, int roomStartY, int roomEndX, int roomEndY)
+    {
+        // Exit must be Rock
+        var exitTile = area.GetTile(exitX, exitY);
+        if (exitTile == null || exitTile.Type != TileType.Rock)
+            return false;
+
+        // Check all 8 neighbors of exit tile
+        for (int dy = -1; dy <= 1; dy++)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = exitX + dx;
+                int ny = exitY + dy;
+
+                // Skip tiles inside the room (they will be walkable after carving)
+                if (nx >= roomStartX && nx <= roomEndX && ny >= roomStartY && ny <= roomEndY)
+                    continue;
+
+                var neighbor = area.GetTile(nx, ny);
+                if (neighbor != null && neighbor.Walkable)
+                    return false;  // Neighbor is walkable (part of dungeon) - invalid exit
+            }
+        }
+
+        return true;
+    }
+
+    private (int exitX, int exitY, int dirX, int dirY)? CreateMazeRoomWithExit(Area area, int centerX, int centerY,
+                                                            HashSet<(int x, int y)> mazeTiles, int regionId)
+    {
+        // Try sizes: 5, 3
+        foreach (int size in new[] { 5, 3 })
+        {
+            var result = TryCreateMazeRoomWithExit(area, centerX, centerY, size, mazeTiles, regionId);
+            if (result != null)
+                return result;
+        }
+        return null;
+    }
+
+    private (int exitX, int exitY, int dirX, int dirY)? TryCreateMazeRoomWithExit(Area area, int centerX, int centerY, int size,
+                                                               HashSet<(int x, int y)> mazeTiles, int regionId)
+    {
+        int half = size / 2;
+        int startX = centerX - half;
+        int startY = centerY - half;
+        int endX = centerX + half;
+        int endY = centerY + half;
+
+        // Check bounds - need extra space for exit (2 tiles outside room)
+        if (startX < 4 || startY < 4 || endX >= _width - 4 || endY >= _height - 4)
+            return null;
+
+        // Check all tiles in the room area - must be Rock (room created before corridors)
+        for (int y = startY; y <= endY; y++)
+        {
+            for (int x = startX; x <= endX; x++)
+            {
+                var tile = area.GetTile(x, y);
+                if (tile == null || tile.Type != TileType.Rock)
+                    return null;
+            }
+        }
+
+        // Find all valid exits BEFORE carving the room (with direction)
+        var validExits = new List<(int exitX, int exitY, int dirX, int dirY)>();
+
+        // Check each wall
+        // North wall - direction (0, -1)
+        for (int x = startX; x <= endX; x++)
+        {
+            if (IsValidMazeExit(area, x, startY - 1, startX, startY, endX, endY))
+                validExits.Add((x, startY - 1, 0, -1));
+        }
+        // South wall - direction (0, 1)
+        for (int x = startX; x <= endX; x++)
+        {
+            if (IsValidMazeExit(area, x, endY + 1, startX, startY, endX, endY))
+                validExits.Add((x, endY + 1, 0, 1));
+        }
+        // West wall - direction (-1, 0)
+        for (int y = startY; y <= endY; y++)
+        {
+            if (IsValidMazeExit(area, startX - 1, y, startX, startY, endX, endY))
+                validExits.Add((startX - 1, y, -1, 0));
+        }
+        // East wall - direction (1, 0)
+        for (int y = startY; y <= endY; y++)
+        {
+            if (IsValidMazeExit(area, endX + 1, y, startX, startY, endX, endY))
+                validExits.Add((endX + 1, y, 1, 0));
+        }
+
+        // No valid exits - don't create the room
+        if (validExits.Count == 0)
+            return null;
+
+        // Pick random valid exit
+        var chosenExit = validExits[_random.Next(validExits.Count)];
+
+        // NOW carve the room (after validation)
+        for (int y = startY; y <= endY; y++)
+        {
+            for (int x = startX; x <= endX; x++)
+            {
+                var roomTile = Tile.Floor(TileStructure.MazeRoom);
+                roomTile.RegionId = regionId;
+                area.SetTile(x, y, roomTile);
+                mazeTiles.Add((x, y));
+                _mazeTiles.Add((x, y));
+                _floorTiles.Add((x, y));
+            }
+        }
+
+        return chosenExit;
+    }
+
+    private void ConnectMazeToDungeon(Area area,
+                                       List<(int doorX, int doorY, int mazeX, int mazeY)> candidates,
+                                       int regionId)
+    {
+        if (candidates.Count == 0) return;
+
+        // Pick random candidate
+        var candidate = candidates[_random.Next(candidates.Count)];
+
+        // Place ClosedDoor at the Rock position
+        var door = Tile.ClosedDoor;
+        door.RegionId = regionId;
+        area.SetTile(candidate.doorX, candidate.doorY, door);
     }
 
     #endregion
@@ -1720,7 +2068,7 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private bool IsDoorTile(Tile tile)
     {
-        return tile.Type is TileType.OpenDoor or TileType.ClosedDoor;
+        return tile.Type == TileType.RandomDoor;
     }
 
     #endregion
@@ -1742,6 +2090,7 @@ public class DungeonGenerator3 : IDungeonGenerator
                 if (HasNonRockNeighbor(area, x, y))
                 {
                     // Nie zamieniaj na DungeonWall jeśli sąsiaduje z Cave (naturalne skały)
+                    // Maze używa DungeonWall jak reszta dungeonu
                     if (HasCaveNeighbor(area, x, y))
                         continue;
 
@@ -1834,7 +2183,9 @@ public class DungeonGenerator3 : IDungeonGenerator
             for (int x = 0; x < _width; x++)
             {
                 var tile = area.GetTile(x, y);
-                if (tile != null && tile.Type == TileType.Floor)
+                if (tile != null && tile.Type == TileType.Floor &&
+                    tile.Structure != TileStructure.Maze &&
+                    tile.Structure != TileStructure.MazeRoom)
                 {
                     roomFloors.Add((x, y));
                 }
@@ -1896,10 +2247,13 @@ public class DungeonGenerator3 : IDungeonGenerator
             for (int x = 0; x < _width; x++)
             {
                 var tile = area.GetTile(x, y);
-                if (tile != null && tile.Type == TileType.Floor &&
-                    (tile.Structure == TileStructure.Room ||
-                     tile.Structure == TileStructure.Corridor ||
-                     tile.Structure == TileStructure.Cave))
+                if (tile != null &&
+                    ((tile.Type == TileType.Floor &&
+                      (tile.Structure == TileStructure.Room ||
+                       tile.Structure == TileStructure.Corridor ||
+                       tile.Structure == TileStructure.Cave)) ||
+                     tile.Type == TileType.ShallowWater ||
+                     tile.Type == TileType.DeepWater))
                 {
                     validFloors.Add((x, y));
                 }
@@ -1908,19 +2262,36 @@ public class DungeonGenerator3 : IDungeonGenerator
 
         if (validFloors.Count == 0) return;
 
-        // Place 2-10 items
-        int itemCount = _random.Next(2, 11);
-        for (int i = 0; i < itemCount && validFloors.Count > 0; i++)
+        // Place items based on floor count (at least 1)
+        int itemCount = Math.Max(1, validFloors.Count / area.TilesPerItem);
+        for (int i = 0; i < itemCount; i++)
         {
-            // Pick random floor tile
+            // Pick random floor tile (allow multiple items on same tile)
             int index = _random.Next(validFloors.Count);
             var (x, y) = validFloors[index];
-            validFloors.RemoveAt(index);  // Don't place multiple items on same tile
 
             // Create Gold Coin with random count 1-100
             int goldAmount = _random.Next(1, 101);
             var coin = new GoldCoin(x, y, goldAmount);
             area.AddItem(coin);
+        }
+
+        // Place treasure in MazeRoom (70% chance per tile, 50-200 gold)
+        for (int y = 0; y < _height; y++)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                var tile = area.GetTile(x, y);
+                if (tile != null && tile.Structure == TileStructure.MazeRoom)
+                {
+                    if (_random.Next(100) < 70)  // 70% chance
+                    {
+                        int treasureAmount = _random.Next(50, 201);  // 50-200
+                        var treasure = new GoldCoin(x, y, treasureAmount);
+                        area.AddItem(treasure);
+                    }
+                }
+            }
         }
     }
 
