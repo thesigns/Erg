@@ -34,7 +34,7 @@ The game uses abstraction interfaces (`IInput`, `IOutput`) to decouple core game
 - `SessionConfig` configures session parameters including seed for deterministic generation
 
 ### World Model
-- `Area` - 2D grid of tiles (80x20) containing entities; handles critter movement and item stacking
+- `Area` - 2D grid of tiles (80x20) containing entities; has `Depth` property for dungeon level
 - `Entity` - Base class for all game objects with position, glyph, and blocking properties
 - `Critter` - Mobile entities with speed/energy system for turn scheduling; has Inventory
 - `Player` - The player character (extends Critter)
@@ -62,7 +62,18 @@ Critters use a speed/energy system for fair turn scheduling:
 - `Combat.MeleeAttack(attacker, defender, session)` handles damage calculation
 - Damage uses `Dice` class (e.g., "1d6+2") from `Core/Types/Dice.cs`
 - Death triggers `Critter.OnDeath()`, NPCs drop inventory items
+- Killing grants XP to attacker equal to defender's `Value`
 - Combat messages vary based on player visibility of combatants
+
+### Experience System
+- `ExperienceLevel` - starts at 1, increases on level up
+- `ExperiencePoints` - current XP, accumulates from kills
+- `ExperienceToNextLevel` - calculated via `ExperienceConfig.CalculateXPForLevel(level)` using formula `BaseXP * level^Exponent`
+- `ExperienceMultiplier` - modifies XP gain (100 = x1.0)
+- `BaseValue` / `Value` - critter worth; `Value = BaseValue * ExperienceLevel`
+- `GainExperience(baseAmount, session?)` - adds XP with auto level-up; shows messages if session provided
+- `OnLevelUp(newLevel)` - grants +4 MaxHitPoints and HitPoints
+- Config in `Core/Types/ExperienceConfig.cs` (BaseXP=100, Exponent=2.0)
 
 ### Message System
 - `MessageBuffer` - Handles game messages with word-wrapping and pagination
@@ -97,6 +108,7 @@ Debug support: `GenerateStepByStep()` yields generation steps; `DebugGenerationV
 - `Glyph` - Character + foreground/background colors (RGBA as uint, format: 0xRRGGBBAA)
 - `Writer` - Helper for text output with cursor positioning and color management
 - Entities only rendered when in player's FOV (Seen tiles)
+- Screen layout (80x25): Messages (rows 0-1), Area (rows 2-21), StatusLine (rows 22-24)
 
 ### Input System
 - `KeyPulse` - Single press detection with key repeat support
