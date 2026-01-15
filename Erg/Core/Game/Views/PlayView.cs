@@ -322,44 +322,45 @@ public class PlayView : IGameView
         RenderMessages(output);
 
         if (_advancedExamineMode)
-            output.SetCursor(_examineX, _examineY, true);
+            output.SetCursor(_examineX, _examineY + 2, true);
         else
-            output.SetCursor(_session.Player.X, _session.Player.Y, true);
+            output.SetCursor(_session.Player.X, _session.Player.Y + 2, true);
 
         output.Render();
     }
 
     private void RenderStatusLine(IOutput output)
     {
-        // Wyczyść linie 20-21
+        // Wyczyść linie 22-24
         for (int x = 0; x < 80; x++)
         {
-            output.PutGlyph(x, 20, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
-            output.PutGlyph(x, 21, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 22, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 23, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 24, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
         }
 
         string levelText = $"Level: {_session.Area.Level}";
-        RenderTextLine(output, 20, levelText);
+        RenderTextLine(output, 22, levelText);
 
         var player = _session.Player;
         string statsText = $"HP: {player.HitPoints}/{player.MaxHitPoints}  Speed: {player.Speed}";
-        RenderTextLine(output, 21, statsText);
+        RenderTextLine(output, 23, statsText);
     }
 
     private void RenderMessages(IOutput output)
     {
         var (line1, line2, showMore) = _session.Messages.GetDisplayLines();
 
-        // Wyczyść linie 23-24
+        // Wyczyść linie 0-1
         for (int x = 0; x < 80; x++)
         {
-            output.PutGlyph(x, 23, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
-            output.PutGlyph(x, 24, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 0, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
+            output.PutGlyph(x, 1, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
         }
 
         // Renderuj tekst
-        RenderTextLine(output, 23, line1);
-        RenderTextLine(output, 24, showMore ? line2 + " (more)" : line2);
+        RenderTextLine(output, 0, line1);
+        RenderTextLine(output, 1, showMore ? line2 + " (more)" : line2);
     }
 
     private void RenderTextLine(IOutput output, int row, string text)
@@ -386,17 +387,17 @@ public class PlayView : IGameView
                 if (!explored)
                 {
                     // Don't show unexplored tiles
-                    output.PutGlyph(x, y, new Glyph(' ', 0x505050FF, 0x000000FF));
+                    output.PutGlyph(x, y + 2, new Glyph(' ', 0x505050FF, 0x000000FF));
                 }
                 else if (!seen)
                 {
                     // Show explored but not seen tiles dimmed
-                    output.PutGlyph(x, y, DimGlyph(tile.Glyph));
+                    output.PutGlyph(x, y + 2, DimGlyph(tile.Glyph));
                 }
                 else
                 {
                     // Show seen tiles - tile decides what to display
-                    output.PutGlyph(x, y, tile.GetDisplayGlyph());
+                    output.PutGlyph(x, y + 2, tile.GetDisplayGlyph());
                 }
             }
         }
