@@ -16,6 +16,7 @@ public class SpinningDummy : Critter
             speed: 200,
             behavior: new SpinAttackBehavior())
     {
+        BaseValue = 20;
     }
 
     public override void OnDeath(Area area)

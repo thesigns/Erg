@@ -28,10 +28,14 @@ public abstract class Critter : Entity
     public Locomotion Locomotion { get; protected set; } = Locomotion.Terrestrial;
 
     // Experience
-    public int ExperienceLevel { get; protected set; } = 0;
+    public int ExperienceLevel { get; protected set; } = 1;
     public int ExperiencePoints { get; protected set; } = 0;
     public int ExperienceToNextLevel => ExperienceConfig.CalculateXPForLevel(ExperienceLevel);
     public int ExperienceMultiplier { get; protected set; } = 100; // 100 = x1.0
+
+    // Value
+    public int BaseValue { get; protected set; } = 10;
+    public int Value => BaseValue * ExperienceLevel;
 
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.
@@ -169,7 +173,7 @@ public abstract class Critter : Entity
     }
 
     // Experience
-    public void GainExperience(int baseAmount)
+    public void GainExperience(int baseAmount, Session? session = null)
     {
         int gained = baseAmount * ExperienceMultiplier / 100;
         ExperiencePoints += gained;
@@ -181,6 +185,15 @@ public abstract class Critter : Entity
             ExperiencePoints -= ExperienceToNextLevel;
             ExperienceLevel++;
             OnLevelUp(ExperienceLevel);
+
+            // Level up message (if session provided)
+            if (session != null)
+            {
+                if (this is Player)
+                    session.Messages.Add("You gained a level!");
+                else if (session.CanPlayerSee(this))
+                    session.Messages.Add($"The {Name} suddenly seems more powerful.");
+            }
         }
     }
 
@@ -191,6 +204,8 @@ public abstract class Critter : Entity
 
     protected virtual void OnLevelUp(int newLevel)
     {
-        // Override in subclasses for level-up effects (HP boost, message, etc.)
+        // +4 HP on level up
+        MaxHitPoints += 4;
+        HitPoints += 4;
     }
 }

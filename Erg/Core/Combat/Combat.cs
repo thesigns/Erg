@@ -42,10 +42,17 @@ public static class Combat
         }
         // Neither visible: no message (silent combat)
 
-        // Death message (only if defender visible)
-        if (!defender.IsAlive && seeDefender)
+        // Death handling
+        if (!defender.IsAlive)
         {
-            messages.Add($"{NameOf(defender)} {Verb(defender, "die", "dies")}!");
+            // Grant XP to attacker (level up messages handled inside)
+            attacker.GainExperience(defender.Value, session);
+
+            // Death message (only if defender visible)
+            if (seeDefender)
+            {
+                messages.Add($"{NameOf(defender)} {Verb(defender, "die", "dies")}!");
+            }
         }
     }
 }

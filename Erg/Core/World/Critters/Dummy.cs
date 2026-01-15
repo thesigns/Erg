@@ -16,6 +16,7 @@ public class Dummy : Critter
             speed: 100,
             behavior: PassiveBehavior.Instance)
     {
+        BaseValue = 12;
     }
 
     public override void OnDeath(Area area)

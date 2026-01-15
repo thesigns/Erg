@@ -9,6 +9,7 @@ public static class ExperienceConfig
 
     public static int CalculateXPForLevel(int level)
     {
-        return (int)(BaseXP * Math.Pow(level + 1, Exponent));
+        // level 1→2: 100, level 2→3: 400, level 3→4: 900, etc.
+        return (int)(BaseXP * Math.Pow(level, Exponent));
     }
 }

@@ -10,6 +10,7 @@ public class Amoeba : Critter
                speed: 90, maxHitPoints: 10, behavior: AmoebaBehavior.Instance)
     {
         Locomotion = Locomotion.Semiaquatic;
+        BaseValue = 40;
     }
 
     public override void OnDeath(Area area)
