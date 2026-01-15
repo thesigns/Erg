@@ -386,7 +386,7 @@ public class PlayView : IGameView
                 if (!explored)
                 {
                     // Don't show unexplored tiles
-                    output.PutGlyph(x, y, new Glyph(' ', 0x000000FF, 0x000000FF));
+                    output.PutGlyph(x, y, new Glyph(' ', 0x505050FF, 0x000000FF));
                 }
                 else if (!seen)
                 {
