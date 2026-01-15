@@ -27,6 +27,12 @@ public abstract class Critter : Entity
     // Movement
     public Locomotion Locomotion { get; protected set; } = Locomotion.Terrestrial;
 
+    // Experience
+    public int ExperienceLevel { get; protected set; } = 0;
+    public int ExperiencePoints { get; protected set; } = 0;
+    public int ExperienceToNextLevel => ExperienceConfig.CalculateXPForLevel(ExperienceLevel);
+    public int ExperienceMultiplier { get; protected set; } = 100; // 100 = x1.0
+
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.
     /// </summary>
@@ -160,5 +166,31 @@ public abstract class Critter : Entity
             area.AddItem(item);
         }
         Inventory.Clear();
+    }
+
+    // Experience
+    public void GainExperience(int baseAmount)
+    {
+        int gained = baseAmount * ExperienceMultiplier / 100;
+        ExperiencePoints += gained;
+        OnGainExperience(gained);
+
+        // Auto level-up with overflow (handles multiple level-ups)
+        while (ExperiencePoints >= ExperienceToNextLevel)
+        {
+            ExperiencePoints -= ExperienceToNextLevel;
+            ExperienceLevel++;
+            OnLevelUp(ExperienceLevel);
+        }
+    }
+
+    protected virtual void OnGainExperience(int amount)
+    {
+        // Override in subclasses for XP gain reactions
+    }
+
+    protected virtual void OnLevelUp(int newLevel)
+    {
+        // Override in subclasses for level-up effects (HP boost, message, etc.)
     }
 }

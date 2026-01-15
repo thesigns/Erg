@@ -53,7 +53,7 @@ public class GameSummaryView : IGameView
         writer.SetForegroundColor(180, 180, 180);
 
         writer.Locate(20, row);
-        writer.Write($"You explored down to dungeon level {_session.DeepestLevel}.");
+        writer.Write($"You explored down to dungeon depth {_session.DeepestDepth}.");
         row += 2;
 
         writer.Locate(20, row);

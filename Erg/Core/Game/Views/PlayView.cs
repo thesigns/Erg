@@ -141,7 +141,7 @@ public class PlayView : IGameView
         {
             if (_session.IsPlayerOnStairsUp())
             {
-                if (_session.CurrentLevel == 1)
+                if (_session.CurrentDepth == 1)
                 {
                     _game.SwitchView(new GameSummaryView(_game, GameEndReason.Escaped));
                     return;
@@ -339,12 +339,15 @@ public class PlayView : IGameView
             output.PutGlyph(x, 24, new Glyph(' ', 0xFFFFFFFF, 0x000000FF));
         }
 
-        string levelText = $"Level: {_session.Area.Level}";
-        RenderTextLine(output, 22, levelText);
+        string depthText = $"Depth: {_session.Area.Depth}";
+        RenderTextLine(output, 22, depthText);
 
         var player = _session.Player;
-        string statsText = $"HP: {player.HitPoints}/{player.MaxHitPoints}  Speed: {player.Speed}";
+        string statsText = $"XPL: {player.ExperienceLevel}  HP: {player.HitPoints}/{player.MaxHitPoints}";
         RenderTextLine(output, 23, statsText);
+
+        string speedText = $"Sp: {player.Speed}";
+        RenderTextLine(output, 24, speedText);
     }
 
     private void RenderMessages(IOutput output)

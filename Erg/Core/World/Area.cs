@@ -6,16 +6,16 @@ public class Area
 {
     public int Width { get; }
     public int Height { get; }
-    public int Level { get; }
+    public int Depth { get; }
 
     private Tile[,] _tiles;
     private bool[,] _explored;
 
-    public Area(int width, int height, int level = 1)
+    public Area(int width, int height, int depth = 1)
     {
         Width = width;
         Height = height;
-        Level = level;
+        Depth = depth;
         _tiles = new Tile[width, height];
         _explored = new bool[width, height];
         

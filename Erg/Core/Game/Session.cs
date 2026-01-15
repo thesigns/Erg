@@ -32,9 +32,9 @@ public class Session
     public Player Player { get; }
     public FieldOfView Fov { get; private set; }
     public MessageBuffer Messages { get; } = new();
-    public int CurrentLevel => Area.Level;
+    public int CurrentDepth => Area.Depth;
     public int TurnCount { get; private set; }
-    public int DeepestLevel { get; private set; } = 1;
+    public int DeepestDepth { get; private set; } = 1;
 
     private const int ViewRadius = 10;
 
@@ -359,21 +359,21 @@ public class Session
 
     public void GoDownStairs()
     {
-        int newLevel = Area.Level + 1;
-        if (newLevel > DeepestLevel)
-            DeepestLevel = newLevel;
-        RegenerateArea(newLevel, startOnStairsUp: true);
+        int newDepth = Area.Depth + 1;
+        if (newDepth > DeepestDepth)
+            DeepestDepth = newDepth;
+        RegenerateArea(newDepth, startOnStairsUp: true);
     }
 
     public void GoUpStairs()
     {
-        int newLevel = Area.Level - 1;
-        RegenerateArea(newLevel, startOnStairsUp: false);
+        int newDepth = Area.Depth - 1;
+        RegenerateArea(newDepth, startOnStairsUp: false);
     }
 
-    private void RegenerateArea(int newLevel, bool startOnStairsUp)
+    private void RegenerateArea(int newDepth, bool startOnStairsUp)
     {
-        var generator = new DungeonGenerator3(80, 20, Random.Next(), level: newLevel);
+        var generator = new DungeonGenerator3(80, 20, Random.Next(), level: newDepth);
         Area = generator.Generate();
 
         var startPos = startOnStairsUp
