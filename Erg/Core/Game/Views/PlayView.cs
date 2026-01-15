@@ -346,7 +346,7 @@ public class PlayView : IGameView
         RenderTextLine(output, 22, depthText);
 
         var player = _session.Player;
-        string statsText = $"XPL: {player.ExperienceLevel}  HP: {player.HitPoints}/{player.MaxHitPoints}";
+        string statsText = $"Lvl: {player.ExperienceLevel}  HP: {player.HitPoints}/{player.MaxHitPoints}";
         RenderTextLine(output, 23, statsText);
 
         string speedText = $"Sp: {player.Speed}";
