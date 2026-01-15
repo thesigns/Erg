@@ -17,6 +17,7 @@ public class Dummy : Critter
             behavior: PassiveBehavior.Instance)
     {
         BaseValue = 12;
+        RegenChancePerSegment = 0;
     }
 
     public override void OnDeath(Area area)

@@ -9,6 +9,8 @@ public class Player : Critter
     {
         Pronouns = PronounSet.He;
         Locomotion = Locomotion.Amphibious;
+        RegenChancePerSegment = 0.002f;
+        RegenDice = new Dice(1, 2);
     }
 
     public override void OnDeath(Area area)

@@ -33,6 +33,9 @@ public class PlayView : IGameView
             return; // Blokuj ruch dopóki nie przewinie wszystkich
         }
 
+        // Apply pending regen at start of player's turn
+        _session.Player.ApplyPendingRegen();
+
         // Examine direction selection
         if (_awaitingExamineDirection)
         {

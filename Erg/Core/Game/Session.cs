@@ -410,12 +410,18 @@ public class Session
 
         for (int seg = 0; seg < segments; seg++)
         {
+            // Player regeneration (accumulates during NPC turns)
+            Player.TryAccumulateRegen(Random);
+
             foreach (var critter in critters)
             {
                 critter.GainEnergy();
+                critter.TryAccumulateRegen(Random);
 
                 while (critter.CanAct())
                 {
+                    critter.ApplyPendingRegen();
+
                     if (critter.Behavior == null)
                     {
                         critter.SpendEnergy(CritterAction.StandardCost);

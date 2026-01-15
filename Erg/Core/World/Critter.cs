@@ -37,6 +37,11 @@ public abstract class Critter : Entity
     public int BaseValue { get; protected set; } = 10;
     public int Value => BaseValue * ExperienceLevel;
 
+    // Passive regeneration
+    public float RegenChancePerSegment { get; protected set; } = 0.001f;
+    public Dice RegenDice { get; protected set; } = new Dice(1, 1);
+    public int PendingRegen { get; protected set; } = 0;
+
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.
     /// </summary>
@@ -159,6 +164,28 @@ public abstract class Critter : Entity
     public void Heal(int amount)
     {
         HitPoints = Math.Min(MaxHitPoints, HitPoints + amount);
+    }
+
+    // Passive regeneration - called each segment
+    public void TryAccumulateRegen(Random random)
+    {
+        if (HitPoints >= MaxHitPoints) return;
+        if (RegenChancePerSegment <= 0) return;
+
+        if (random.NextDouble() < RegenChancePerSegment)
+        {
+            PendingRegen += RegenDice.Roll(random);
+        }
+    }
+
+    // Apply accumulated regen before action
+    public void ApplyPendingRegen()
+    {
+        if (PendingRegen > 0)
+        {
+            Heal(PendingRegen);
+            PendingRegen = 0;
+        }
     }
 
     // Wywoływane przy śmierci - upuszcza inventory

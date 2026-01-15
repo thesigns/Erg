@@ -1,3 +1,4 @@
+using Erg.Core.Types;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Items;
 
@@ -11,6 +12,8 @@ public class Amoeba : Critter
     {
         Locomotion = Locomotion.Semiaquatic;
         BaseValue = 40;
+        RegenChancePerSegment = 0.02f;
+        RegenDice = new Dice(1, 3);
     }
 
     public override void OnDeath(Area area)

@@ -17,6 +17,7 @@ public class SpinningDummy : Critter
             behavior: new SpinAttackBehavior())
     {
         BaseValue = 20;
+        RegenChancePerSegment = 0;
     }
 
     public override void OnDeath(Area area)
