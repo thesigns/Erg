@@ -36,8 +36,6 @@ public class Session
     public int TurnCount { get; private set; }
     public int DeepestDepth { get; private set; } = 1;
 
-    private const int ViewRadius = 10;
-
     public Session(SessionConfig config)
     {
         Random = new Random(config.Seed);
@@ -61,7 +59,7 @@ public class Session
 
     public void ComputeFov()
     {
-        Fov.Compute(Player.X, Player.Y, ViewRadius);
+        Fov.Compute(Player.X, Player.Y, Player.SightRange);
     }
 
     public bool CanPlayerSee(Critter critter)

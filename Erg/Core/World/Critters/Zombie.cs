@@ -5,6 +5,8 @@ namespace Erg.Core.World.Critters;
 
 public class Zombie : Critter
 {
+    public override int SightRange => 6;
+
     public Zombie(int x, int y)
         : base("zombie", x, y, 'z', 0x8B4513FF, 0x000000FF,
                speed: 80, maxHitPoints: 25,

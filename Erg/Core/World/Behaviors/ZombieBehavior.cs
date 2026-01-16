@@ -6,7 +6,6 @@ namespace Erg.Core.World.Behaviors;
 public class ZombieBehavior : IBehavior
 {
     public static readonly ZombieBehavior Instance = new();
-    private const int VisionRange = 6;
 
     public CritterAction DecideAction(Critter critter, Session session)
     {
@@ -35,7 +34,7 @@ public class ZombieBehavior : IBehavior
         }
 
         // Skanuj otoczenie
-        for (int dist = 1; dist <= VisionRange; dist++)
+        for (int dist = 1; dist <= critter.SightRange; dist++)
         {
             var targets = GetTargetsAtDistance(critter, dist, session);
             if (targets.Count == 0) continue;
@@ -73,8 +72,8 @@ public class ZombieBehavior : IBehavior
                 if (target == null || !target.IsAlive) continue;
                 if (target is Zombie) continue;
 
-                // Dla dist > 1 sprawdź LOS
-                if (dist > 1 && !LineOfSight.CanSee(area, critter.X, critter.Y, x, y))
+                // Dla dist > 1 sprawdź czy widzi cel
+                if (dist > 1 && !critter.CanSeeCritter(area, target))
                     continue;
 
                 targets.Add(target);

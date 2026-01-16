@@ -4,6 +4,7 @@ using System.Linq;
 using Erg.Core.Types;
 using Erg.Core.World;
 using Erg.Core.World.Behaviors;
+using Erg.Core.World.Pathfinding;
 
 public abstract class Critter : Entity
 {
@@ -29,6 +30,33 @@ public abstract class Critter : Entity
 
     // Abilities
     public virtual bool CanOpenDoor => false;
+
+    // Vision
+    public virtual int SightRange => 8;
+
+    /// <summary>
+    /// Checks if this critter can see the given tile (within range and has line of sight).
+    /// </summary>
+    public bool CanSeeTile(Area area, int x, int y)
+    {
+        int dx = Math.Abs(x - X);
+        int dy = Math.Abs(y - Y);
+        if (Math.Max(dx, dy) > SightRange) return false;
+        return LineOfSight.CanSee(area, X, Y, x, y);
+    }
+
+    /// <summary>
+    /// Checks if this critter can see another critter.
+    /// Future: will also check for blindness, invisibility, stealth, etc.
+    /// </summary>
+    public bool CanSeeCritter(Area area, Critter target)
+    {
+        // Future considerations:
+        // - if (this.IsBlind) return false;
+        // - if (target.IsInvisible) return false;
+        // - if (target.IsSneaking && !this.CanDetectStealth) return false;
+        return CanSeeTile(area, target.X, target.Y);
+    }
 
     // Experience
     public int ExperienceLevel { get; protected set; } = 1;
