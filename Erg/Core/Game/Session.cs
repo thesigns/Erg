@@ -122,7 +122,7 @@ public class Session
     public void PlayerAttack(Critter target)
     {
         Messages.Clear();
-        Combat.MeleeAttack(Player, target, this);
+        Combat.UnarmedAttack(Player, target, this);
 
         if (!target.IsAlive)
         {

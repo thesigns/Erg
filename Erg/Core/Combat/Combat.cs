@@ -5,12 +5,12 @@ namespace Erg.Core.Combat;
 
 public static class Combat
 {
-    public static void MeleeAttack(Critter attacker, Critter defender, Session session)
+    public static void UnarmedAttack(Critter attacker, Critter defender, Session session)
     {
         var random = session.Random;
         var messages = session.Messages;
 
-        int damage = attacker.MeleeDamage.Roll(random);
+        int damage = attacker.UnarmedDamage.Roll(random);
         defender.TakeDamage(damage, attacker);
 
         bool seeAttacker = session.CanPlayerSee(attacker);

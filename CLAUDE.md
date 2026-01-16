@@ -63,7 +63,7 @@ Critters use a speed/energy system for fair turn scheduling:
 - Located in `Core/World/Behaviors/`
 
 ### Combat System
-- `Combat.MeleeAttack(attacker, defender, session)` handles damage calculation
+- `Combat.UnarmedAttack(attacker, defender, session)` handles unarmed damage calculation
 - Damage uses `Dice` class (e.g., "1d6+2") from `Core/Types/Dice.cs`
 - Death triggers `Critter.OnDeath()`, NPCs drop inventory items
 - Killing grants XP to attacker equal to defender's `Value`

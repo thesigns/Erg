@@ -26,7 +26,7 @@ public class ZombieBehavior : IBehavior
         {
             // Sąsiaduje? Atakuj
             if (IsAdjacent(critter, enemy))
-                return new MeleeAttackAction(enemy);
+                return new UnarmedAttackAction(enemy);
 
             // Podejdź A*
             var move = GetMoveToward(critter, enemy, session);
@@ -43,7 +43,7 @@ public class ZombieBehavior : IBehavior
             critter.AddEnemy(target);
 
             if (dist == 1)
-                return new MeleeAttackAction(target);
+                return new UnarmedAttackAction(target);
 
             var moveToTarget = GetMoveToward(critter, target, session);
             return moveToTarget != null ? moveToTarget : WaitAction.Instance;

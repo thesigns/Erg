@@ -25,7 +25,7 @@ public class SpinAttackAction : CritterAction
 
         if (target != null && target.IsAlive)
         {
-            Combat.Combat.MeleeAttack(critter, target, session);
+            Combat.Combat.UnarmedAttack(critter, target, session);
 
             if (!target.IsAlive)
             {

@@ -19,7 +19,7 @@ public abstract class Critter : Entity
     public bool IsAlive => HitPoints > 0;
 
     // Combat
-    public Dice MeleeDamage { get; protected set; }
+    public Dice UnarmedDamage { get; protected set; }
     public Critter? KilledBy { get; private set; }
 
     // Pronouns
@@ -139,7 +139,7 @@ public abstract class Critter : Entity
         uint bg,
         int speed,
         int maxHitPoints = 10,
-        Dice? meleeDamage = null,
+        Dice? unarmedDamage = null,
         IBehavior? behavior = null)
         : base(name, x, y, character, fg, bg)
     {
@@ -147,7 +147,7 @@ public abstract class Critter : Entity
         Energy = 0;
         MaxHitPoints = maxHitPoints;
         HitPoints = maxHitPoints;
-        MeleeDamage = meleeDamage ?? new Dice(1, 4);
+        UnarmedDamage = unarmedDamage ?? new Dice(1, 4);
         Behavior = behavior;
     }
 

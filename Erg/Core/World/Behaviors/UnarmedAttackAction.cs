@@ -2,11 +2,11 @@ using Erg.Core.Combat;
 
 namespace Erg.Core.World.Behaviors;
 
-public class MeleeAttackAction : CritterAction
+public class UnarmedAttackAction : CritterAction
 {
     public Critter Target { get; }
 
-    public MeleeAttackAction(Critter target)
+    public UnarmedAttackAction(Critter target)
     {
         Target = target;
     }
@@ -15,7 +15,7 @@ public class MeleeAttackAction : CritterAction
 
     public override bool Execute(Critter critter, Session session)
     {
-        Combat.Combat.MeleeAttack(critter, Target, session);
+        Combat.Combat.UnarmedAttack(critter, Target, session);
 
         if (!Target.IsAlive)
         {

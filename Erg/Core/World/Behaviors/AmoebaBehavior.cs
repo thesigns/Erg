@@ -22,7 +22,7 @@ public class AmoebaBehavior : IBehavior
 
         // 2. If adjacent to enemy, attack
         if (enemy != null && IsAdjacent(critter, enemy))
-            return new MeleeAttackAction(enemy);
+            return new UnarmedAttackAction(enemy);
 
         // 3. If enemy exists, move toward it (even onto land)
         if (enemy != null)
