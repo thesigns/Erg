@@ -76,8 +76,8 @@ Przykłady:
 
 ## LISTA ZAKRESÓW GATUNKOWYCH ZDOLNOŚCI
 
-MinToHit, MaxToHit — zakres prawdopodobieństwa trafienia w walce przeciwnika, przed sprawdzeniem uniku/obrony
-MinReading, MaxReading — zakres umiejętność czytania ze zrozumieniem tekstów
+- MinToHit, MaxToHit — zakres prawdopodobieństwa trafienia w walce przeciwnika, przed sprawdzeniem uniku/obrony
+- MinReading, MaxReading — zakres umiejętność czytania ze zrozumieniem tekstów
 
 ## PUNKTY PRZEZNACZENIA
 
