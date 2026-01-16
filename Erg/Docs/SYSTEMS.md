@@ -71,7 +71,7 @@ Sytuacje w grze oraz ekwipunek mogą tymczasowo lub trwale modyfikować zakresy 
 
 Przykłady:
 - **Oślepienie:** Zakres gatunkowy zdolności Czytanie (MinReading, MaxReading) spada do 0 dla obu wartości — ślepy nie czyta.
-- **Magiczny Pierścień Czytelnictwa:** Podwaja MaxReading — uczony człowiek z pierścieniem czyta jeszcze lepiej.
+- **Magiczny Pierścień Czytelnictwa:** Podwaja MinReading — pierścień pomaga zwłaszcza słabszym czytelnikom.
 - **Kombinacja:** Oślepiony z pierścieniem nadal nie czyta (0 × 2 = 0). Modyfikatory stosują się logicznie.
 
 ## LISTA ZAKRESÓW GATUNKOWYCH ZDOLNOŚCI
