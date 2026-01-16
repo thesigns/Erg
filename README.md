@@ -1,30 +1,57 @@
 # Erg
 
-A classic roguelike game written in C# with Raylib.
+*A roguelike where things want to eat you.*
 
-## About
+```
+  ###·####·###
+  #·········+#
+  #··z··@····#
+  +···········
+  #··z·····j·#
+  ###·########
+```
 
-Erg is a traditional roguelike featuring procedurally generated dungeons, turn-based gameplay, and text-based graphics (Unicode) rendered through Raylib. Explore deeper levels, collect items, and discover what lies beneath.
+## What is this?
 
-**Work in progress** - core mechanics are being developed.
+Erg is a traditional roguelike in the spirit of the classics. Procedurally generated dungeons, permadeath (eventually), turn-based tactical combat, and everything rendered in glorious Unicode.
+
+You descend into the depths. Zombies shamble through crypts. Amoebas lurk in underground pools...
 
 ## Features
 
-- Procedurally generated multi-level dungeons with rooms, corridors, and caves
-- Turn-based combat with multiple enemy types (Dummy, SpinningDummy, Amoeba)
-- Field of view with shadowcasting algorithm
-- Locomotion system: land, water, and flying creatures with terrain-based movement costs
-- Multiple tile types: doors (open/closed/secret), water (shallow/deep), graves, stairs
-- Item system with stacking support
-- Message log with pagination
+**Dungeon Generation**
+- Multi-level procedural dungeons with rooms, corridors, dead ends, and natural caves
+- Special rooms: flooded chambers, crypts with graves, columned halls
+- Secret doors hiding treasures
 
-## Requirements
+**Creatures**
+- Zombies with actual AI - they scan their surroundings, track you with A* pathfinding, and occasionally forget what they were doing
+- Amoebas dwelling in water, preferring the depths
+- More to come...
 
-- .NET 9.0
-- Raylib (via raylib-cs NuGet package)
+**Combat & Mechanics**
+- Turn-based with speed/energy system (faster creatures act more often)
+- Field of view with proper shadowcasting
+- Terrain matters: water slows land creatures, some can swim, some can't
+- Health bars so you know who's winning
 
-## Build & Run
+**The Little Things**
+- Examine mode to inspect your surroundings
+- Message log that doesn't overwhelm you
+- Items you can pick up (gold and corpses, for now)
 
+## Getting Started
+
+You'll need .NET 9.0.
+
+```bash
+# Clone and run
+git clone <repo-url>
+cd Erg
+dotnet run --project Erg/Erg.csproj
+```
+
+Or build first if you prefer:
 ```bash
 dotnet build Erg/Erg.csproj
 dotnet run --project Erg/Erg.csproj
@@ -32,20 +59,31 @@ dotnet run --project Erg/Erg.csproj
 
 ## Controls
 
-| Key                 | Action                    |
-|---------------------|---------------------------|
-| Arrow keys / Numpad | Move (8 directions)       |
-| `>`                 | Descend stairs            |
-| `<`                 | Ascend stairs             |
-| `g`                 | Pick up items             |
-| `i`                 | Inventory                 |
-| `o`                 | Open door                 |
-| `c`                 | Close door                |
-| `x`                 | Examine adjacent          |
-| `Alt+x`             | Advanced examine (cursor) |
-| `Numpad 5`          | Wait                      |
-| `Space`             | Continue messages         |
-| `F5`                | Toggle cheat mode (debug) |
+| Key | Action |
+|-----|--------|
+| Arrow keys / Numpad | Move (8 directions) |
+| `>` | Descend stairs |
+| `<` | Ascend stairs |
+| `g` | Pick up items |
+| `i` | Inventory |
+| `o` / `c` | Open / Close doors |
+| `x` | Examine adjacent tile |
+| `Alt+x` | Free-look examine mode |
+| `Numpad 5` | Wait a turn |
+| `Space` | Continue messages |
+
+## Current State
+
+This is an active work in progress. The dungeon generates, creatures roam, combat works, and you can die. Many features are still being added - inventory use, more enemy types, items with effects, and whatever else seems fun.
+
+Feel free to poke around.
+
+## Tech
+
+- C# / .NET 9.0
+- Raylib via raylib-cs for rendering
+- Custom A* pathfinding and line-of-sight algorithms
+- No external game frameworks - just the basics
 
 ## License
 
