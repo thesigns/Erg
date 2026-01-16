@@ -2336,9 +2336,19 @@ public class DungeonGenerator3 : IDungeonGenerator
             var tile = area.GetTile(x, y);
             if (tile?.Critter != null) continue;
 
-            Critter critter = isWater
-                ? new Amoeba(x, y)
-                : _random.Next(2) == 0 ? new Dummy(x, y) : new SpinningDummy(x, y);
+            Critter critter;
+            if (tile?.SpecialEffect == SpecialEffect.UndeadAura)
+            {
+                critter = new Zombie(x, y);
+            }
+            else if (isWater)
+            {
+                critter = new Amoeba(x, y);
+            }
+            else
+            {
+                critter = _random.Next(2) == 0 ? new Dummy(x, y) : new SpinningDummy(x, y);
+            }
 
             area.SetCritter(critter);
         }
