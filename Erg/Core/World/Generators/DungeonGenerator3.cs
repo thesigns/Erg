@@ -2347,7 +2347,13 @@ public class DungeonGenerator3 : IDungeonGenerator
             }
             else
             {
-                critter = _random.Next(2) == 0 ? new Dummy(x, y) : new SpinningDummy(x, y);
+                int roll = _random.Next(100);
+                if (roll < 40)
+                    critter = new Dummy(x, y);
+                else if (roll < 80)
+                    critter = new SpinningDummy(x, y);
+                else
+                    critter = new Zombie(x, y);
             }
 
             area.SetCritter(critter);
