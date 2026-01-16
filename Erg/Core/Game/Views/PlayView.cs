@@ -324,12 +324,40 @@ public class PlayView : IGameView
         RenderStatusLine(output);
         RenderMessages(output);
 
+        if (output is IOverlayRenderer overlay)
+        {
+            QueueHealthBars(overlay);
+        }
+
         if (_advancedExamineMode)
             output.SetCursor(_examineX, _examineY + 2, true);
         else
             output.SetCursor(_session.Player.X, _session.Player.Y + 2, true);
 
         output.Render();
+    }
+
+    private void QueueHealthBars(IOverlayRenderer overlay)
+    {
+        var area = _session.Area;
+        var fov = _session.Fov;
+
+        // Player is always visible
+        var player = _session.Player;
+        overlay.QueueHealthBar(player.X, player.Y + 2, (float)player.HitPoints / player.MaxHitPoints);
+
+        // Visible critters
+        for (int y = 0; y < area.Height; y++)
+        {
+            for (int x = 0; x < area.Width; x++)
+            {
+                if (!fov.IsSeen(x, y)) continue;
+                var critter = area.GetCritter(x, y);
+                if (critter == null || critter == player) continue;
+
+                overlay.QueueHealthBar(x, y + 2, (float)critter.HitPoints / critter.MaxHitPoints);
+            }
+        }
     }
 
     private void RenderStatusLine(IOutput output)

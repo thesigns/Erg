@@ -27,6 +27,9 @@ public abstract class Critter : Entity
     // Movement
     public Locomotion Locomotion { get; protected set; } = Locomotion.Terrestrial;
 
+    // Abilities
+    public virtual bool CanOpenDoor => false;
+
     // Experience
     public int ExperienceLevel { get; protected set; } = 1;
     public int ExperiencePoints { get; protected set; } = 0;

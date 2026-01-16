@@ -5,21 +5,24 @@ using static Raylib_cs.Raylib;
 
 namespace Erg.Platforms.Raylib;
 
-public class RaylibOutput : IOutput
+public class RaylibOutput : IOutput, IOverlayRenderer
 {
     public int Cols { get; }
     public int Rows { get; }
     public bool ShouldClose => WindowShouldClose();
-    
+
     private Font Font { get; set; }
     private Vector2 FontSize { get; set; }
-    
+
     private int Width => Cols * (int)FontSize.X;
     private int Height => Rows * (int)FontSize.Y;
-    
+
     private Cell[,] Cells { get; set; }
 
     private Cursor _cursor = new();
+
+    private readonly record struct HealthBarOverlay(int Col, int Row, float HealthPercent);
+    private readonly List<HealthBarOverlay> _healthBars = new();
 
     public RaylibOutput(int cols, int rows, string title, string fontPath, int fontSize)
     {
@@ -96,8 +99,15 @@ public class RaylibOutput : IOutput
             {
                 DrawRectangleV(new Vector2(x * FontSize.X, y * FontSize.Y), new Vector2(FontSize.X, FontSize.Y), Cells[x, y].BackgroundColor);
                 DrawTextEx(Font, Cells[x, y].Character, new Vector2(x * FontSize.X, y * FontSize.Y), FontSize.Y, 0, Cells[x, y].ForegroundColor);
-            }            
+            }
         }
+
+        // Draw health bars
+        foreach (var bar in _healthBars)
+        {
+            DrawHealthBar(bar.Col, bar.Row, bar.HealthPercent);
+        }
+        _healthBars.Clear();
 
         if (_cursor.Visible && _cursor.IsCurrentlyVisible && _cursor.Size > 0)
         {
@@ -123,6 +133,49 @@ public class RaylibOutput : IOutput
         _cursor.Col = col;
         _cursor.Row = row;
         _cursor.Visible = visible;
+    }
+
+    public void QueueHealthBar(int col, int row, float healthPercent)
+    {
+        _healthBars.Add(new HealthBarOverlay(col, row, healthPercent));
+    }
+
+    public void ClearOverlays()
+    {
+        _healthBars.Clear();
+    }
+
+    private void DrawHealthBar(int col, int row, float healthPercent)
+    {
+        const int margin = 2;
+        const int barHeight = 1;
+        const int yOffset = 1;
+
+        float cellX = col * FontSize.X;
+        float cellY = row * FontSize.Y;
+        float barWidth = FontSize.X - (margin * 2);
+
+        // Red background
+        DrawRectangle(
+            (int)(cellX + margin),
+            (int)(cellY + yOffset),
+            (int)barWidth,
+            barHeight,
+            new Color(180, 0, 0, 255)
+        );
+
+        // Green HP bar
+        float greenWidth = barWidth * Math.Clamp(healthPercent, 0f, 1f);
+        if (greenWidth > 0)
+        {
+            DrawRectangle(
+                (int)(cellX + margin),
+                (int)(cellY + yOffset),
+                (int)greenWidth,
+                barHeight,
+                new Color(0, 200, 0, 255)
+            );
+        }
     }
 
     public void Dispose()
