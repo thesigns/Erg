@@ -36,8 +36,8 @@ The game uses abstraction interfaces (`IInput`, `IOutput`) to decouple core game
 ### World Model
 - `Area` - 2D grid of tiles (80x20) containing entities; has `Depth` property for dungeon level
 - `Entity` - Base class for all game objects with position, glyph, and blocking properties
-- `Critter` - Mobile entities with speed/energy system for turn scheduling; has Inventory
-- `Player` - The player character (extends Critter)
+- `Critter` - Mobile entities with speed/energy system for turn scheduling; has Inventory, `CanOpenDoor` (virtual, default false)
+- `Player` - The player character (extends Critter); `CanOpenDoor = true`
 - `Item` - Collectible objects with stacking support (`CanStackWith`, `StackWith`)
 - `Inventory` - Collection of items with automatic stacking on add
 - `Tile` - Static map elements with walkability and transparency; can contain one Critter and multiple Items
@@ -55,7 +55,11 @@ Critters use a speed/energy system for fair turn scheduling:
 ### Behavior/AI System
 - `IBehavior` interface: `DecideAction(Critter, Session)` returns a `CritterAction`
 - `CritterAction` abstract class: defines `EnergyCost` and `Execute()` method
-- Implementations: `PassiveBehavior` (do nothing), `SpinAttackBehavior` (special attack)
+- Implementations:
+  - `PassiveBehavior` - do nothing (Dummy)
+  - `SpinAttackBehavior` - special spinning attack (SpinningDummy)
+  - `AmoebaBehavior` - greedy movement toward enemies, prefers water
+  - `ZombieBehavior` - scans area in expanding squares (1-6), uses LOS and A* pathfinding, attacks non-zombies
 - Located in `Core/World/Behaviors/`
 
 ### Combat System
@@ -104,11 +108,38 @@ Debug support: `GenerateStepByStep()` yields generation steps; `DebugGenerationV
 - Respects tile transparency (walls and closed doors block light)
 - Rendering: Unknown=black, Known=dimmed (1/3 brightness), Seen=normal
 
+### Pathfinding
+Located in `Core/World/Pathfinding/`:
+- `Pathfinder.FindPath(area, critter, goalX, goalY)` - A* algorithm for finding paths
+  - Respects `Critter.CanEnterTile()` based on Locomotion type
+  - Uses `GetMovementCostMultiplier()` for terrain costs
+  - Returns list of (x, y) steps or empty if no path
+  - `maxNodes` parameter prevents infinite search (default 200)
+- `LineOfSight.CanSee(area, x1, y1, x2, y2)` - Bresenham line algorithm
+  - Checks both directions to handle tile-based asymmetry
+  - Returns true if either direction has clear line of sight
+
 ### Rendering System
 - `Glyph` - Character + foreground/background colors (RGBA as uint, format: 0xRRGGBBAA)
 - `Writer` - Helper for text output with cursor positioning and color management
 - Entities only rendered when in player's FOV (Seen tiles)
 - Screen layout (80x25): Messages (rows 0-1), Area (rows 2-21), StatusLine (rows 22-24)
+- `IOverlayRenderer` interface for sub-pixel rendering (health bars)
+  - `QueueHealthBar(col, row, healthPercent)` - queues health bar for critter
+  - Health bars: red background, green foreground proportional to HP%
+  - Cleared automatically each frame in `Render()`
+
+### Critters
+Located in `Core/World/Critters/`:
+- `Dummy` - stationary target, 'd', PassiveBehavior
+- `SpinningDummy` - attacks adjacent, 'd' red, SpinAttackBehavior
+- `Amoeba` - semiaquatic, 'j' teal, AmoebaBehavior, speed 90
+- `Zombie` - slow undead, 'z' brown, ZombieBehavior, speed 80, 25 HP, 1d6 damage
+
+Spawn ratios in dungeon generator:
+- `SpecialEffect.UndeadAura` tiles (cemeteries): 100% Zombie
+- Water tiles: 100% Amoeba
+- Normal tiles: 40% Dummy, 40% SpinningDummy, 20% Zombie
 
 ### Input System
 - `KeyPulse` - Single press detection with key repeat support
