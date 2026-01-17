@@ -35,12 +35,21 @@ Vitality = 0.2 * Strength + 0.5 * Endurance + 0.2 * Agility + 0.1 * Willpower
 
 Vitality przyjmuje wartość w zakresie 0.0 – 1.0 i służy jako parametr wejściowy do obliczania wielu właściwości dodatkowych, takich jak maksymalne punkty życia czy tempo regeneracji.
 
+Przykład: Speed
+
+Speed reprezentuje eksplozywną szybkość — zdolność do dynamicznego działania i szybkich reakcji.
+Jest atrybutem pochodnym wyliczanym z kilku atrybutów podstawowych:
+
+Speed = 0.4 * Strength + 0.4 * Agility + 0.1 * Endurance + 0.1 * Willpower
+
+Speed przyjmuje wartość w zakresie 0.0 – 1.0 i służy jako parametr wejściowy do obliczania właściwości EnergyRegenRate.
+
 ## WŁAŚCIWOŚCI DODATKOWE
 
 Właściwości dodatkowe postaci opisują konkretne, mierzalne parametry postaci. Mogą mieć dowolny typ liczbowy (int, float) oraz **zakres zależny od Genusa**, definiowany przez wartości Min / Max.
 
 Przykładowe właściwości dodatkowe:
-- Speed – tempo regeneracji energii (co segment czasu)
+- EnergyRegenRate – tempo regeneracji energii (co segment czasu)
 - MaxHitPoints – maksymalna liczba punktów życia.
 
 Przykład: Właściwość MaxHitPoints
@@ -54,6 +63,15 @@ Obliczenie wykorzystuje interpolację liniową (LERP), gdzie Vitality określa p
 
 Efektem jest wartość typu int, mieszcząca się zawsze w zakresie określonym przez Genus.
 Dzięki temu różne rodzaje organizmów mogą mieć skrajnie odmienne limity — np. Troll może dysponować wielokrotnie wyższym zakresem punktów życia niż Szczur, mimo identycznej wartości Vitality.
+
+Przykład: Właściwość EnergyRegenRate
+
+Wartość EnergyRegenRate jest obliczana na podstawie:
+- Genus.MinEnergyRegenRate
+- Genus.MaxEnergyRegenRate
+- atrybutu pochodnego Speed
+
+Obliczenie wykorzystuje interpolację liniową (LERP), gdzie Speed określa pozycję pomiędzy wartościami minimalną i maksymalną dla danego Genusa.
 
 ## UMIEJĘTNOŚCI PODSTAWOWE
 
