@@ -41,6 +41,12 @@ public abstract class Critter : Entity
     // Vision
     public virtual int SightRange => 8;
 
+    // Depth-based spawning
+    /// <summary>
+    /// Minimum dungeon depth at which this critter type can spawn.
+    /// </summary>
+    public virtual int MinDepth => 1;
+
     /// <summary>
     /// Checks if this critter can see the given tile (within range and has line of sight).
     /// </summary>
@@ -104,6 +110,36 @@ public abstract class Critter : Entity
 
     public void TrainCharisma(double amount, Session session)
         => Attributes.Charisma.Train(amount, Genus.CharismaTraining, session.TrainingSpeed);
+
+    // ========== Depth-Based Training ==========
+
+    /// <summary>
+    /// Trains attributes based on dungeon depth. Uses Genus TrainingFunctions.
+    /// At MinDepth: no training. Each level deeper adds 0.01-0.03 training per attribute.
+    /// Override in subclasses for custom behavior (e.g., Player with professions).
+    /// </summary>
+    public virtual void DepthTraining(int depth, Random random)
+    {
+        int depthDelta = Math.Max(0, depth - MinDepth);
+        if (depthDelta == 0) return;
+
+        double minAmount = depthDelta * 0.01;
+        double maxAmount = minAmount + 0.02;
+
+        TrainAttrForDepth(Attributes.Strength, Genus.StrengthTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Endurance, Genus.EnduranceTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Agility, Genus.AgilityTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Perception, Genus.PerceptionTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Intelligence, Genus.IntelligenceTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Willpower, Genus.WillpowerTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Charisma, Genus.CharismaTraining, minAmount, maxAmount, random);
+    }
+
+    private void TrainAttrForDepth(Erg.Core.Systems.Attribute attr, TrainingFunction func, double min, double max, Random random)
+    {
+        double amount = min + random.NextDouble() * (max - min);
+        attr.Train(amount, func, 1.0);
+    }
 
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.
