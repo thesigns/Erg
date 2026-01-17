@@ -30,7 +30,7 @@ public class Attributes
     /// <summary>
     /// Creates attributes with all values set to the same default.
     /// </summary>
-    public Attributes(double defaultValue = 0.5)
+    public Attributes(double defaultValue = 0.0)
     {
         Strength = new Attribute(defaultValue);
         Endurance = new Attribute(defaultValue);

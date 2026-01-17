@@ -119,16 +119,22 @@ public abstract class Critter : Entity
 
     /// <summary>
     /// Trains attributes based on dungeon depth. Uses Genus TrainingFunctions.
-    /// At MinDepth: no training. Each level deeper adds 0.01-0.03 training per attribute.
+    /// Base training: 0.2-0.5, plus depth bonus: 0.02-0.05 per level above MinDepth.
     /// Override in subclasses for custom behavior (e.g., Player with professions).
     /// </summary>
     public virtual void DepthTraining(int depth, Random random)
     {
         int depthDelta = Math.Max(0, depth - MinDepth);
-        if (depthDelta == 0) return;
 
-        double minAmount = depthDelta * 0.01;
-        double maxAmount = minAmount + 0.02;
+        // Bazowy trening: 0.2-0.5 (losowo)
+        // Plus depth bonus: 0.02-0.05 per depth level
+        double baseMin = 0.2;
+        double baseMax = 0.5;
+        double depthMin = depthDelta * 0.02;
+        double depthMax = depthDelta * 0.05;
+
+        double minAmount = baseMin + depthMin;
+        double maxAmount = baseMax + depthMax;
 
         TrainAttrForDepth(Attributes.Strength, Genus.StrengthTraining, minAmount, maxAmount, random);
         TrainAttrForDepth(Attributes.Endurance, Genus.EnduranceTraining, minAmount, maxAmount, random);

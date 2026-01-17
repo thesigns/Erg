@@ -10,15 +10,6 @@ public class Player : Critter
     public Player(int x, int y)
         : base("Player", x, y, '@', 0xFFFFFFFF, 0x000000FF)
     {
-        // Reset attributes to 0.0 - DepthTraining will set them
-        Attributes.Strength.SetBaseValue(0.0);
-        Attributes.Endurance.SetBaseValue(0.0);
-        Attributes.Agility.SetBaseValue(0.0);
-        Attributes.Perception.SetBaseValue(0.0);
-        Attributes.Intelligence.SetBaseValue(0.0);
-        Attributes.Willpower.SetBaseValue(0.0);
-        Attributes.Charisma.SetBaseValue(0.0);
-
         Pronouns = PronounSet.He;
         Locomotion = Locomotion.Amphibious;
         RegenChancePerSegment = 0.002f;
