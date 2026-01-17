@@ -62,11 +62,11 @@ public class Tile
 
     // Floor factory with structure parameter
     public static Tile Floor(TileStructure structure) =>
-        new('·', 0x505050FF, 0x000000FF, true, true, "Floor", TileType.Floor, structure);
+        new('·', 0x606060FF, 0x000000FF, true, true, "Floor", TileType.Floor, structure);
 
     // Dungeon tiles
     public static Tile DungeonWall =>
-        new('#', 0x808080FF, 0x000000FF, false, false, "Wall", TileType.Wall, flyable: false);
+        new('#', 0xA0A0A0FF, 0x000000FF, false, false, "Wall", TileType.Wall, flyable: false);
 
     public static Tile OpenDoor =>
         new('□', 0x8B4513FF, 0x000000FF, true, true, "Open Door", TileType.OpenDoor, TileStructure.Entrance);
@@ -82,10 +82,10 @@ public class Tile
 
     // Natural rocks
     public static Tile Rock =>
-        new('#', 0x505050FF, 0x000000FF, false, false, "Rock", TileType.Rock, flyable: false);
+        new('#', 0x606060FF, 0x000000FF, false, false, "Rock", TileType.Rock, flyable: false);
 
     public static Tile ImpenetrableRock =>
-        new('#', 0x505050FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock, flyable: false);
+        new('#', 0x606060FF, 0x000000FF, false, false, "Impenetrable Rock", TileType.ImpenetrableRock, flyable: false);
 
     // Stairs tiles
     public static Tile StairsUp =>
