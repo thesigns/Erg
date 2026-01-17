@@ -51,6 +51,8 @@ public class Session
 
         var (startX, startY) = generator.GetPlayerStartPosition();
         Player = new Player(startX, startY);
+        Player.DepthTraining(Area.Depth, Random);
+        Player.FullHeal();
         Area.SetCritter(Player);
 
         Fov = new FieldOfView(Area);
