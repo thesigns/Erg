@@ -47,32 +47,22 @@ public class Attribute
 
     /// <summary>
     /// Trains the attribute using a specific training function.
-    /// Actual gain is: amount * function.Calculate(BaseValue) * trainingSpeed
+    /// Positive amount = training (increase), negative = atrophy (decrease).
+    /// Change is: amount * function.Calculate(BaseValue) * trainingSpeed
     /// </summary>
     public void Train(double amount, TrainingFunction function, double trainingSpeed = 1.0)
     {
-        if (amount <= 0) return;
         double factor = function.Calculate(BaseValue);
         BaseValue += amount * factor * trainingSpeed;
     }
 
     /// <summary>
     /// Trains the attribute using the default linear function.
-    /// Actual gain is: amount * (1 - BaseValue) * trainingSpeed
+    /// Positive amount = training, negative = atrophy.
     /// </summary>
     public void Train(double amount, double trainingSpeed = 1.0)
     {
         Train(amount, TrainingFunction.Linear(), trainingSpeed);
-    }
-
-    /// <summary>
-    /// Decreases the base value (skill atrophy from disuse).
-    /// Actual loss is: amount * (1 - TrainingFactor) = amount * BaseValue
-    /// </summary>
-    public void Atrophy(double amount)
-    {
-        if (amount <= 0) return;
-        BaseValue -= amount * BaseValue;
     }
 
     /// <summary>
