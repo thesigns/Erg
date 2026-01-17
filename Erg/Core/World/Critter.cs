@@ -81,32 +81,32 @@ public abstract class Critter : Entity
     /// <summary>
     /// Trains an attribute using the species-specific training function.
     /// </summary>
-    public void TrainAttribute(Erg.Core.Systems.Attribute attr, double amount, double trainingSpeed = 1.0)
+    public void TrainAttribute(Erg.Core.Systems.Attribute attr, double amount, Session session)
     {
         var function = Species.GetTrainingFunction(attr, Attributes);
-        attr.Train(amount, function, trainingSpeed);
+        attr.Train(amount, function, session.TrainingSpeed);
     }
 
-    public void TrainStrength(double amount, double trainingSpeed = 1.0)
-        => Attributes.Strength.Train(amount, Species.StrengthTraining, trainingSpeed);
+    public void TrainStrength(double amount, Session session)
+        => Attributes.Strength.Train(amount, Species.StrengthTraining, session.TrainingSpeed);
 
-    public void TrainEndurance(double amount, double trainingSpeed = 1.0)
-        => Attributes.Endurance.Train(amount, Species.EnduranceTraining, trainingSpeed);
+    public void TrainEndurance(double amount, Session session)
+        => Attributes.Endurance.Train(amount, Species.EnduranceTraining, session.TrainingSpeed);
 
-    public void TrainAgility(double amount, double trainingSpeed = 1.0)
-        => Attributes.Agility.Train(amount, Species.AgilityTraining, trainingSpeed);
+    public void TrainAgility(double amount, Session session)
+        => Attributes.Agility.Train(amount, Species.AgilityTraining, session.TrainingSpeed);
 
-    public void TrainPerception(double amount, double trainingSpeed = 1.0)
-        => Attributes.Perception.Train(amount, Species.PerceptionTraining, trainingSpeed);
+    public void TrainPerception(double amount, Session session)
+        => Attributes.Perception.Train(amount, Species.PerceptionTraining, session.TrainingSpeed);
 
-    public void TrainIntelligence(double amount, double trainingSpeed = 1.0)
-        => Attributes.Intelligence.Train(amount, Species.IntelligenceTraining, trainingSpeed);
+    public void TrainIntelligence(double amount, Session session)
+        => Attributes.Intelligence.Train(amount, Species.IntelligenceTraining, session.TrainingSpeed);
 
-    public void TrainWillpower(double amount, double trainingSpeed = 1.0)
-        => Attributes.Willpower.Train(amount, Species.WillpowerTraining, trainingSpeed);
+    public void TrainWillpower(double amount, Session session)
+        => Attributes.Willpower.Train(amount, Species.WillpowerTraining, session.TrainingSpeed);
 
-    public void TrainCharisma(double amount, double trainingSpeed = 1.0)
-        => Attributes.Charisma.Train(amount, Species.CharismaTraining, trainingSpeed);
+    public void TrainCharisma(double amount, Session session)
+        => Attributes.Charisma.Train(amount, Species.CharismaTraining, session.TrainingSpeed);
 
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.

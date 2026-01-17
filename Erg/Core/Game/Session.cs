@@ -36,6 +36,12 @@ public class Session
     public int TurnCount { get; private set; }
     public int DeepestDepth { get; private set; } = 1;
 
+    /// <summary>
+    /// Globalny mnożnik szybkości treningu atrybutów.
+    /// 1.0 = normalna szybkość, 0.5 = dwukrotnie wolniej, 2.0 = dwukrotnie szybciej.
+    /// </summary>
+    public double TrainingSpeed { get; set; } = 1.0;
+
     public Session(SessionConfig config)
     {
         Random = new Random(config.Seed);
