@@ -45,9 +45,6 @@ public static class Combat
         // Death handling
         if (!defender.IsAlive)
         {
-            // Grant XP to attacker (level up messages handled inside)
-            attacker.GainExperience(defender.Value, session);
-
             // Death message (only if defender visible)
             if (seeDefender)
             {

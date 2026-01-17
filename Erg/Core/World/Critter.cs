@@ -61,15 +61,8 @@ public abstract class Critter : Entity
         return CanSeeTile(area, target.X, target.Y);
     }
 
-    // Experience
-    public int ExperienceLevel { get; protected set; } = 1;
-    public int ExperiencePoints { get; protected set; } = 0;
-    public int ExperienceToNextLevel => ExperienceConfig.CalculateXPForLevel(ExperienceLevel);
-    public int ExperienceMultiplier { get; protected set; } = 100; // 100 = x1.0
-
-    // Value
+    // Value (used for determining creature toughness/worth)
     public int BaseValue { get; protected set; } = 10;
-    public int Value => BaseValue * ExperienceLevel;
 
     // Passive regeneration
     public float RegenChancePerSegment { get; protected set; } = 0.001f;
@@ -264,42 +257,5 @@ public abstract class Critter : Entity
             area.AddItem(item);
         }
         Inventory.Clear();
-    }
-
-    // Experience
-    public void GainExperience(int baseAmount, Session? session = null)
-    {
-        int gained = baseAmount * ExperienceMultiplier / 100;
-        ExperiencePoints += gained;
-        OnGainExperience(gained);
-
-        // Auto level-up with overflow (handles multiple level-ups)
-        while (ExperiencePoints >= ExperienceToNextLevel)
-        {
-            ExperiencePoints -= ExperienceToNextLevel;
-            ExperienceLevel++;
-            OnLevelUp(ExperienceLevel);
-
-            // Level up message (if session provided)
-            if (session != null)
-            {
-                if (this is Player)
-                    session.Messages.Add("You gained a level!");
-                else if (session.CanPlayerSee(this))
-                    session.Messages.Add($"The {Name} suddenly seems more powerful.");
-            }
-        }
-    }
-
-    protected virtual void OnGainExperience(int amount)
-    {
-        // Override in subclasses for XP gain reactions
-    }
-
-    protected virtual void OnLevelUp(int newLevel)
-    {
-        // +4 HP on level up
-        MaxHitPoints += 4;
-        HitPoints += 4;
     }
 }
