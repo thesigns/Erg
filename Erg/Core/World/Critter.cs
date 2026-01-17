@@ -17,15 +17,16 @@ public abstract class Critter : Entity
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
+    public DerivedAttributes DerivedAttributes { get; }
     public Genus Genus { get; protected set; } = Genus.Human;
     public IBehavior? Behavior { get; protected set; }
 
     // Hit Points
     /// <summary>
-    /// Max HP interpolated from Genus.MinHitPoints to Genus.MaxHitPoints based on Endurance.
-    /// Formula: Lerp(MinHitPoints, MaxHitPoints, Endurance)
+    /// Max HP interpolated from Genus.MinHitPoints to Genus.MaxHitPoints based on Vitality.
+    /// Formula: Lerp(MinHitPoints, MaxHitPoints, Vitality)
     /// </summary>
-    public int MaxHitPoints => Lerp(Genus.MinHitPoints, Genus.MaxHitPoints, Attributes.Endurance.CurrentValue);
+    public int MaxHitPoints => Lerp(Genus.MinHitPoints, Genus.MaxHitPoints, DerivedAttributes.Vitality);
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
 
@@ -226,6 +227,7 @@ public abstract class Critter : Entity
     {
         Energy = 0;
         Attributes = new Attributes();
+        DerivedAttributes = new DerivedAttributes(Attributes);
         HitPoints = MaxHitPoints;
         UnarmedDamage = unarmedDamage ?? new Dice(1, 4);
         Behavior = behavior;
