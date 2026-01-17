@@ -374,11 +374,15 @@ public class PlayView : IGameView
         RenderTextLine(output, 22, depthText);
 
         var player = _session.Player;
-        string statsText = $"HP: {player.HitPoints}/{player.MaxHitPoints}";
-        RenderTextLine(output, 23, statsText);
+        var attrs = player.Attributes;
+        string attrText = $"St:{attrs.Strength.DisplayValue}  En:{attrs.Endurance.DisplayValue}  " +
+                          $"Ag:{attrs.Agility.DisplayValue}  Pe:{attrs.Perception.DisplayValue}  " +
+                          $"In:{attrs.Intelligence.DisplayValue}  Wi:{attrs.Willpower.DisplayValue}  " +
+                          $"Ch:{attrs.Charisma.DisplayValue}";
+        RenderTextLine(output, 23, attrText);
 
-        string speedText = $"Sp: {player.Speed}";
-        RenderTextLine(output, 24, speedText);
+        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  Sp:{player.Speed}";
+        RenderTextLine(output, 24, statsText);
     }
 
     private void RenderMessages(IOutput output)
