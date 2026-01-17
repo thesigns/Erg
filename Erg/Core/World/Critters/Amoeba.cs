@@ -9,7 +9,7 @@ public class Amoeba : Critter
 {
     public Amoeba(int x, int y)
         : base("Amoeba", x, y, 'j', 0x20B2AAFF, 0x000000FF,
-               speed: 90, maxHitPoints: 10, behavior: AmoebaBehavior.Instance)
+               maxHitPoints: 10, behavior: AmoebaBehavior.Instance)
     {
         Species = Species.Jelly;
         Locomotion = Locomotion.Semiaquatic;

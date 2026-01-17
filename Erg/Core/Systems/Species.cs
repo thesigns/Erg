@@ -7,6 +7,12 @@ public class Species
 {
     public string Name { get; }
 
+    /// <summary>
+    /// Base speed for the species. Actual speed is calculated as:
+    /// Speed = BaseSpeed * (0.5 + Agility)
+    /// </summary>
+    public int BaseSpeed { get; init; } = 100;
+
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction EnduranceTraining { get; init; } = TrainingFunction.Linear();
@@ -50,6 +56,7 @@ public class Species
     /// </summary>
     public static Species Troll { get; } = new("Troll")
     {
+        BaseSpeed = 80,
         StrengthTraining = TrainingFunction.Capped(0.2),      // Siła łatwa do trenowania
         EnduranceTraining = TrainingFunction.Capped(0.15),    // Wytrzymałość też
         IntelligenceTraining = TrainingFunction.Quadratic(),  // Inteligencja bardzo trudna
@@ -61,6 +68,7 @@ public class Species
     /// </summary>
     public static Species Jelly { get; } = new("Jelly")
     {
+        BaseSpeed = 90,
         AgilityTraining = TrainingFunction.Quadratic(),   // mniej zwinne
         EnduranceTraining = TrainingFunction.Capped(0.2)  // wytrzymałe
     };
@@ -70,6 +78,7 @@ public class Species
     /// </summary>
     public static Species Construct { get; } = new("Construct")
     {
+        BaseSpeed = 80,
         StrengthTraining = TrainingFunction.Constant(0),
         EnduranceTraining = TrainingFunction.Constant(0),
         AgilityTraining = TrainingFunction.Constant(0),
@@ -84,6 +93,7 @@ public class Species
     /// </summary>
     public static Species Risen { get; } = new("Risen")
     {
+        BaseSpeed = 80,
         StrengthTraining = TrainingFunction.Capped(0.15),
         IntelligenceTraining = TrainingFunction.Quadratic(),
         CharismaTraining = TrainingFunction.Constant(0)  // brak charyzmy

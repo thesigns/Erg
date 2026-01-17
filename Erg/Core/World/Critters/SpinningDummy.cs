@@ -14,10 +14,10 @@ public class SpinningDummy : Critter
             character: 't',
             fg: 0xFF4444FF,  // Czerwony (jasny)
             bg: 0x000000FF,
-            speed: 200,
             behavior: new SpinAttackBehavior())
     {
         Species = Species.Construct;
+        Attributes.Agility.SetBaseValue(0.9);  // Speed = 80 * 1.4 = 112
         BaseValue = 20;
         RegenChancePerSegment = 0;
     }

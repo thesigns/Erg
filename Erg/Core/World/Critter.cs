@@ -9,7 +9,11 @@ using Erg.Core.Systems;
 
 public abstract class Critter : Entity
 {
-    public int Speed { get; protected set; }   // np. 100 = normal
+    /// <summary>
+    /// Speed calculated from Species.BaseSpeed and Agility.
+    /// Formula: BaseSpeed * (0.5 + Agility)
+    /// </summary>
+    public int Speed => (int)(Species.BaseSpeed * (0.5 + Attributes.Agility.CurrentValue));
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
@@ -165,13 +169,11 @@ public abstract class Critter : Entity
         char character,
         uint fg,
         uint bg,
-        int speed,
         int maxHitPoints = 10,
         Dice? unarmedDamage = null,
         IBehavior? behavior = null)
         : base(name, x, y, character, fg, bg)
     {
-        Speed = speed;
         Energy = 0;
         MaxHitPoints = maxHitPoints;
         HitPoints = maxHitPoints;

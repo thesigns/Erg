@@ -46,6 +46,14 @@ public class Attribute
     }
 
     /// <summary>
+    /// Sets the base value directly. Use for creature initialization.
+    /// </summary>
+    public void SetBaseValue(double value)
+    {
+        BaseValue = value;
+    }
+
+    /// <summary>
     /// Trains the attribute using a specific training function.
     /// Positive amount = training (increase), negative = atrophy (decrease).
     /// Change is: amount * function.Calculate(BaseValue) * trainingSpeed

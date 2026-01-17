@@ -14,10 +14,10 @@ public class Dummy : Critter
             character: 't',
             fg: 0xD2B48CFF,
             bg: 0x000000FF,
-            speed: 100,
             behavior: PassiveBehavior.Instance)
     {
         Species = Species.Construct;
+        Attributes.Agility.SetBaseValue(0.0);  // Speed = 80 * 0.5 = 40
         BaseValue = 12;
         RegenChancePerSegment = 0;
     }
