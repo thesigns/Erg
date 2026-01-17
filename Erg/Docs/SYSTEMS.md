@@ -1,83 +1,96 @@
 ﻿# WSTĘP
 
-Gra opiera się o system podstawowych atrybutów, podstawowych umiejętności, wartości pochodnych zdolności i zakresów zdolności zależnych od gatunku.
+Gra opiera się na systemie atrybutów podstawowych, umiejętności podstawowych, umiejętności pochodnych oraz zakresów zdolności zależnych od gatunku.
 
-## PODSTAWOWE ATRYBUTY
+## ATRYBUTY PODSTAWOWE
 
-Podstawowe atrybuty określają wrodzone podstawowe cechy fizyczne i psychiczne postaci. Mieszczą się zawsze w zakresie od 0 do 1 (liczba zmiennoprzecinkowa) - spektrum w ramach funkcjonującej jednostki gatunku. Przykładowo człowiek z siłą 0 to skrajny słabeusz a człowiek z siłą 1 siłacz nad siłacze.
+Atrybuty podstawowe opisują wrodzone, fundamentalne cechy fizyczne i psychiczne postaci. Każdy atrybut mieści się w zakresie od 0 do 1 (liczba zmiennoprzecinkowa), reprezentując spektrum możliwości w ramach danego gatunku.
 
-W grze dostępne są następujące podstawowe atrybuty: Siła, Wytrzymałość, Zręczność, Percepcja, Inteligencja, Siła woli, Charyzma, Uroda.
+Przykładowo: człowiek z wartością Strength = 0 jest skrajnie słabą jednostką, natomiast człowiek z wartością Strength = 1 to osobnik o maksymalnej, niemal granicznej sile fizycznej.
 
-Podnoszenie podstawowych atrybutów jest bardzo trudne i odbywa się powoli.
+W grze występują następujące atrybuty podstawowe: Strength, Endurance, Agility, Perception, Intelligence, Willpower, Charisma.
 
-## PODSTAWOWE UMIEJĘTNOŚCI
+Zmiany bazowych atrybutów zachodzą bardzo powoli i są wynikiem długotrwałych działań postaci. Przykładowo regularne dźwiganie dużych ciężarów stopniowo zwiększa atrybut Strength. Początkowe wartości atrybutów zależą od wybranej profesji, która odzwierciedla dotychczasową drogę życiową postaci.
 
-Podstawowe umiejętności określają wyuczone podstawowe zdolności przydatne w świecie gry. Mieszczą się zawsze w zakresie od 0 do 1 (liczba zmiennoprzecinkowa) - spektrum w ramach możliwości danej postaci. Przykładowo troll z umiejętnością Pływanie == 0 nie posiada żadnego treningu w tym zakresie, a troll z umiejętnością Pływanie == 1 to mistrz pływacki swojego gatunku.
+Każdy atrybut posiada:
 
-Podobnie jak atrybuty, umiejętności są względne do gatunku — określają biegłość w ramach tego, czego dany gatunek jest w stanie się nauczyć. Troll-mistrz pływania (1.0) może wciąż pływać gorzej niż przeciętny człowiek, ponieważ trolle jako gatunek nie są predysponowane do pływania. Faktyczna efektywność wynika z wartości pochodnych, które są ograniczone zakresami gatunkowymi.
+* **wartość bazową** – trwałą, rozwijaną w czasie,
+* **wartość aktualną** – modyfikowaną tymczasowo, np. przez przedmioty, efekty magiczne lub stany.
 
-Podnoszenie podstawowych umiejętności jest łatwiejsze niż podnoszenie atrybutów.
+## UMIEJĘTNOŚCI PODSTAWOWE
 
-## WARTOŚCI POCHODNE ZDOLNOŚCI
+Umiejętności podstawowe określają wyuczone, podstawowe zdolności przydatne w świecie gry, które można bezpośrednio trenować. Zawsze mieszczą się w zakresie od 0 do 1 (liczba zmiennoprzecinkowa), reprezentując spektrum biegłości w ramach możliwości danej postaci.
 
-Czasem atrybuty i umiejętności, a nawet inne czynniki łączą się w wartość pochodną zdolności, z różnymi wagami. Wartości pochodne zdolności mieszczą się zawsze w zakresie od 0 do 1 (liczba zmiennoprzecinkowa). Przykładowo wartością pochodną jest Szansa trafienia przeciwnika, który nie wykonuje aktywnej obrony przed atakiem, w skrócie ToHitDerived. Przykładowy wzór na ToHitDerived to 0.3 * Zręczność + 0.7 * Skill_Noże (jeśli postać posługuje się aktualnie nożem). Widać więc, że bardziej liczy się wytrenowanie w nożach niż wrodzona zręczność postaci.
+Przykładowo: troll z umiejętnością Pływanie = 0 nie posiada żadnego treningu w tym zakresie, natomiast troll z umiejętnością Pływanie = 1 jest mistrzem pływania w ramach możliwości swojego gatunku.
 
-## ZAKRESY GATUNKOWE ZDOLNOŚCI
+Podobnie jak atrybuty, umiejętności są względne względem gatunku i określają poziom opanowania danej zdolności w granicach tego, czego dany gatunek jest w stanie się nauczyć. Troll‑mistrz pływania (1.0) może wciąż pływać gorzej niż przeciętny człowiek, ponieważ trolle jako gatunek nie są predysponowane do pływania. Faktyczna efektywność wynika z zakresów zdolności gatunkowych.
 
-Każdy gatunek posiada zdefiniowane zakresy (minimum i maksimum) dla każdej zdolności, które określają faktyczną efektywność działań. Wartość pochodna zdolności (0-1) jest interpolowana w ramach zakresu gatunkowego, dając rzeczywisty wynik.
+Trenowanie umiejętności podstawowych odbywa się szybciej niż trenowanie atrybutów podstawowych i może następować poprzez czytanie podręczników, trening u nauczycieli NPC oraz praktykę (np. pływanie zwiększa umiejętność Pływanie). Nieużywane umiejętności tracą wartość, jednak proces ten zachodzi bardzo powoli.
 
-Wzór: `Efektywność = Lerp(Min_gatunku, Max_gatunku, Wartość_pochodna)`
+## WSPÓŁCZYNNIKI TRENINGU
 
-Przykładowo, dla szansy trafienia (ToHitDerived), zakres MinToHit i MaxToHit jest:
+Każdemu atrybutowi oraz każdej umiejętności podstawowej przypisany jest współczynnik treningu, określany funkcją zależną od jego wartości bazowej. Domyślnie współczynnik ten definiowany jest jako:
 
-| Gatunek  | MinToHit | MaxToHit | Interpretacja                                       |
-|----------|----------|----------|-----------------------------------------------------|
-| Człowiek | 0.10     | 0.95     | Pełne spektrum — od nieudacznika do mistrza         |
-| Elf      | 0.20     | 0.98     | Wrodzona gracja, wyższy sufit                       |
-| Goblin   | 0.05     | 0.60     | Może się nauczyć, ale nigdy nie dorówna człowiekowi |
-| Troll    | 0.05     | 0.40     | Nieporadny, siła nie zastąpi precyzji               |
+`TrainingFactor = 1 - WartośćBazowa`
 
-Przykład obliczenia:
-- Goblin z ToHitDerived = 0.8 → Lerp(0.05, 0.60, 0.8) = 0.49
-- Człowiek z ToHitDerived = 0.5 → Lerp(0.10, 0.95, 0.5) = 0.525
+Przykładowo:
 
-Goblin wytrenowany niemal do perfekcji (0.8) wciąż trafia rzadziej niż przeciętny człowiek (0.5). Gatunek definiuje biologiczne granice, jednostka wypełnia przestrzeń między nimi swoim wysiłkiem.
+`StrengthTrainingFactor = 1 - BaseStrength`
 
-## NIELINIOWE KRZYWE INTERPOLACJI
+Wzrost oraz spadek bazowych atrybutów i umiejętności podstawowych jest mnożony przez odpowiadający im współczynnik treningu oraz globalną wartość gry **TrainingSpeed**. Przy zastosowaniu domyślnej funkcji szybkość rozwoju maleje liniowo wraz ze wzrostem wartości bazowej, aż do osiągnięcia zera przy wartości maksymalnej.
 
-Domyślnie interpolacja jest liniowa, ale niektóre zdolności mogą używać nieliniowych krzywych, które lepiej oddają naturę ich rozwoju.
+## UMIEJĘTNOŚCI POCHODNE
 
-Wzór: `Efektywność = Lerp(Min_gatunku, Max_gatunku, Krzywa(Wartość_pochodna))`
+Umiejętności pochodne powstają poprzez połączenie atrybutów, umiejętności podstawowych oraz innych czynników, z różnymi wagami wpływu. Podobnie jak pozostałe, zawsze mieszczą się w zakresie od 0 do 1 (liczba zmiennoprzecinkowa).
 
-| Krzywa   | Formuła           | Charakterystyka                                |
-|----------|-------------------|------------------------------------------------|
-| Linear   | `t`               | Domyślna, neutralna                            |
-| EaseOut  | `1 - (1-t)²`      | Łatwo być OK, trudno być mistrzem              |
-| EaseIn   | `t²`              | Trudny start, potem szybki wzrost              |
-| SCurve   | `t² × (3 - 2t)`   | Trudny start, plateau, potem mistrzostwo       |
+Przykładem umiejętności pochodnej jest umiejętność ataku maczugą, określana jako **SkillDerivedMace**. Przykładowy wzór obliczania tej umiejętności może wyglądać następująco:
 
-Przykłady zastosowań:
-- **Walka wręcz → EaseOut:** Każdy szybko nauczy się podstaw, ale mistrzostwo wymaga lat praktyki.
-- **Czytanie → EaseIn:** Nauka liter i słów trwa długo, ale gdy "zaskoczy", postęp jest szybki.
-- **Magia → SCurve:** Trudno w ogóle zacząć, potem plateau nauki podstaw, wreszcie mistrzostwo.
+`SkillDerivedMace = 0.3 * Strength + 0.1 * Agility + 0.6 * SkillMace`
 
-Przykład dla walki (EaseOut):
-- derived 0.5 → Krzywa(0.5) = 0.75 → szybko osiągasz 75% potencjału
-- derived 0.9 → Krzywa(0.9) = 0.99 → ostatnie 10% wymaga ogromnego wysiłku
+W przedstawionym przypadku największy wpływ na umiejętność ataku maczugą ma ogólne wytrenowanie w posługiwaniu się maczugami, następnie siła, a w najmniejszym stopniu zręczność.
+
+## ZDOLNOŚCI I ICH ZAKRESY GATUNKOWE
+
+Każdy gatunek posiada ten sam zestaw zdolności (**Abilities**), zdefiniowanych przez zakresy minimalne i maksymalne dla każdej zdolności. Zakresy te określają faktyczną efektywność działań, zależną od gatunku. Atrybuty, umiejętności podstawowe lub umiejętności pochodne są używane do interpolacji wartości zdolności, dając rzeczywisty wynik.
+
+Wzór:
+
+`Zdolność = Lerp(MinGatunku, MaxGatunku, WartośćWejściowa)`
+
+Przykładowo, dla zdolności trafienia maczugą (**AbilityMaceHit**) zakres **AbilityMaceHitMin** oraz **AbilityMaceHitMax** zależy od gatunku:
+
+| Gatunek  | Min  | Max  | Interpretacja                                   |
+|----------|------|------|-------------------------------------------------|
+| Człowiek | 0.10 | 0.90 | Pełne spektrum — od nieudacznika do mistrza.    |
+| Troll    | 0.35 | 0.98 | Wrodzona zdolność posługiwania się maczugami.   |
+| Elf      | 0.03 | 0.50 | Wrodzony brak predyspozycji do używania maczug. |
+| Szczur   | 0.00 | 0.00 | Nigdy nie nauczy się używać maczugi.            |
+
+W efekcie elf wytrenowany w posługiwaniu się maczugą niemal do perfekcji wciąż trafia nią rzadziej niż przeciętny troll.
 
 ## MODYFIKATORY SYTUACYJNE I EKWIPUNKU
 
 Sytuacje w grze oraz ekwipunek mogą tymczasowo lub trwale modyfikować zakresy gatunkowe zdolności.
 
 Przykłady:
-- **Oślepienie:** Zakres gatunkowy zdolności Czytanie (MinReading, MaxReading) spada do 0 dla obu wartości — ślepy nie czyta.
-- **Magiczny Pierścień Czytelnictwa:** Podwaja MinReading — pierścień pomaga zwłaszcza słabszym czytelnikom.
-- **Kombinacja:** Oślepiony z pierścieniem nadal nie czyta (0 × 2 = 0). Modyfikatory stosują się logicznie.
 
-## LISTA ZAKRESÓW GATUNKOWYCH ZDOLNOŚCI
+* **Oślepienie:** Zakres gatunkowy zdolności Czytanie (AbilityReadingMin, AbilityReadingMax) zostaje zredukowany do 0 dla obu wartości — postać niewidoma nie jest w stanie czytać.
+* **Magiczny Pierścień Czytelnictwa:** Podwaja wartość AbilityReadingMin — przedmiot wspiera przede wszystkim słabszych czytelników.
+* **Kombinacja:** Oślepiona postać wyposażona w pierścień nadal nie czyta (0 × 2 = 0). Modyfikatory są stosowane w sposób logiczny i hierarchiczny.
 
-- MinToHit, MaxToHit — zakres prawdopodobieństwa trafienia w walce przeciwnika, przed sprawdzeniem uniku/obrony
-- MinReading, MaxReading — zakres umiejętność czytania ze zrozumieniem tekstów
+## LISTA ZDOLNOŚCI
+
+- AbilityHitUnarmed — zdolność trafienia przeciwnika bez użycia broni
+- AbilityHitKnife — zdolność trafienia przeciwnika nożem lub podobną bronią krótką
+- AbilityHitMace — zdolność trafienia przeciwnika maczugą
+- AbilityDefenceUnarmed — zdolność bronienia się bez użycia broni
+- AbilityDefenceKnife — zdolność bronienia się nożem lub podobną bronią krótką
+- AbilityDefenceMace — zdolność bronienia się maczugą
+- AbilityDefenceShield — zdolność obrony tarczą
+- AbilityDodge — zdolność robienia uników
+- AbilitySwimming — zdolność pływania
+- AbilityReading — zdolność czytania
+- AbilityCarrying — zdolność dźwigania przedmiotów (w gramach)
 
 ## PUNKTY PRZEZNACZENIA
 
@@ -88,3 +101,39 @@ Postać gracza jako bohater ma niewielką (1-3) liczbę Punktów Przeznaczenia, 
 - Trucizna: postać wymiotuje całość, zanim wchłonie ostatnią śmiertelną dawkę
 - Upadek: postać łapie się krawędzi lub przeskakuje nad otchłanią
 - Magia: zaklęcie, które raziłoby śmiertelnie, rykoszetem wraca do rzucającego
+
+---
+
+## Uwagi od Claude Code
+
+### Ogólna ocena
+
+System jest dobrze przemyślany i elegancki. Normalizacja wszystkich wartości do zakresu 0-1 upraszcza obliczenia i porównania między różnymi mechanikami. Separacja między wrodzonymi zdolnościami gatunkowymi a indywidualnym treningiem tworzy interesującą przestrzeń projektową.
+
+### Zalety systemu
+
+1. **Spójność matematyczna** — jednolity zakres 0-1 dla atrybutów, umiejętności i zdolności pochodnych ułatwia bilansowanie i przewidywanie interakcji między mechanikami.
+
+2. **Gatunek ma znaczenie** — zakresy gatunkowe (Min/Max) elegancko rozwiązują problem różnic między rasami bez tworzenia sztywnych blokad. Szczur nigdy nie użyje maczugi, ale elf z determinacją może się nauczyć — choć nigdy nie dorówna trollowi.
+
+3. **Naturalne spowolnienie progresu** — współczynnik treningu `1 - WartośćBazowa` sprawia, że początkowy rozwój jest szybki, a osiągnięcie mistrzostwa wymaga znacznego nakładu czasu. To intuicyjne i zgodne z rzeczywistością.
+
+4. **Punkty Przeznaczenia** — mechanika ratunkowa dodaje dramatyzmu i zmniejsza frustrację z przypadkowych śmierci, zachowując jednocześnie poczucie zagrożenia.
+
+### Pytania i sugestie do rozważenia
+
+1. **Degradacja umiejętności** — wspomniano, że nieużywane umiejętności tracą wartość. Warto rozważyć, czy degradacja powinna być asymetryczna (wolniejsza niż trening) i czy powinna istnieć minimalna wartość "pamięci mięśniowej".
+
+2. **Interakcje modyfikatorów** — przy wielu modyfikatorach sytuacyjnych i ekwipunku pojawia się pytanie o kolejność ich stosowania. Czy modyfikatory addytywne (+0.1) są stosowane przed multiplikatywnymi (×2)? Czy istnieje hierarchia źródeł modyfikatorów?
+
+3. **Wartości graniczne** — co dzieje się, gdy modyfikatory wypychają wartość poza zakres 0-1? Czy są clampowane, czy mogą przekraczać naturalne limity (np. magicznie wzmocniony troll z AbilityMaceHit > 1.0)?
+
+4. **Atrybuty a umiejętności pochodne** — w przykładzie `SkillDerivedMace` wagi sumują się do 1.0 (0.3+0.1+0.6). Czy to wymagane? Jeśli suma < 1.0, maksymalna wartość pochodna byłaby nieosiągalna; jeśli > 1.0, teoretycznie możliwe wartości > 1.0.
+
+5. **Regeneracja Punktów Przeznaczenia** — wspomniano, że byłoby to trudne. Rozważenia warte są: osiągnięcia fabularne, odpoczynek w świątyniach, poświęcenie cennych przedmiotów, lub całkowity brak regeneracji (punkty jako skończony zasób na całą grę).
+
+6. **Brakujące zdolności** — lista zdolności skupia się na walce i paru innych. Warto rozważyć dodanie: AbilityPersuasion (przekonywanie), AbilityLockpicking (otwieranie zamków), AbilityStealth (skradanie), AbilityCrafting (rzemiosło) — zależnie od planowanego zakresu gry.
+
+### Uwaga implementacyjna
+
+Przy implementacji w C# warto rozważyć użycie struktury `readonly record struct` dla zakresów gatunkowych oraz atrybutów z wartościami bazowymi i aktualnymi — zapewni to niezmienność i czytelność kodu.
