@@ -10,16 +10,18 @@ public class Genus
     public string Name { get; }
 
     /// <summary>
-    /// Base speed for the genus. Actual speed is calculated as:
-    /// Speed = BaseSpeed * (0.5 + Agility)
+    /// Speed range for the genus. Actual speed is calculated as:
+    /// Speed = Lerp(MinSpeed, MaxSpeed, Agility)
     /// </summary>
-    public int BaseSpeed { get; init; } = 100;
+    public int MinSpeed { get; init; } = 50;
+    public int MaxSpeed { get; init; } = 150;
 
     /// <summary>
-    /// Base max hit points for the genus. Actual MaxHitPoints is calculated as:
-    /// MaxHitPoints = BaseMaxHitPoints * (0.5 + Endurance)
+    /// Hit points range for the genus. Actual MaxHitPoints is calculated as:
+    /// MaxHitPoints = Lerp(MinHitPoints, MaxHitPoints, Endurance)
     /// </summary>
-    public int BaseMaxHitPoints { get; init; } = 20;
+    public int MinHitPoints { get; init; } = 10;
+    public int MaxHitPoints { get; init; } = 30;
 
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
@@ -64,8 +66,8 @@ public class Genus
     /// </summary>
     public static Genus Troll { get; } = new("Troll")
     {
-        BaseSpeed = 80,
-        BaseMaxHitPoints = 40,
+        MinSpeed = 40, MaxSpeed = 100,
+        MinHitPoints = 25, MaxHitPoints = 60,
         StrengthTraining = TrainingFunction.Capped(0.2),      // Siła łatwa do trenowania
         EnduranceTraining = TrainingFunction.Capped(0.15),    // Wytrzymałość też
         IntelligenceTraining = TrainingFunction.Quadratic(),  // Inteligencja bardzo trudna
@@ -77,8 +79,8 @@ public class Genus
     /// </summary>
     public static Genus Jelly { get; } = new("Jelly")
     {
-        BaseSpeed = 90,
-        BaseMaxHitPoints = 15,
+        MinSpeed = 30, MaxSpeed = 90,
+        MinHitPoints = 8, MaxHitPoints = 20,
         AgilityTraining = TrainingFunction.Quadratic(),   // mniej zwinne
         EnduranceTraining = TrainingFunction.Capped(0.2)  // wytrzymałe
     };
@@ -88,8 +90,8 @@ public class Genus
     /// </summary>
     public static Genus Construct { get; } = new("Construct")
     {
-        BaseSpeed = 80,
-        BaseMaxHitPoints = 30,
+        MinSpeed = 60, MaxSpeed = 100,
+        MinHitPoints = 20, MaxHitPoints = 40,
         StrengthTraining = TrainingFunction.Constant(0),
         EnduranceTraining = TrainingFunction.Constant(0),
         AgilityTraining = TrainingFunction.Constant(0),
@@ -104,8 +106,8 @@ public class Genus
     /// </summary>
     public static Genus Risen { get; } = new("Risen")
     {
-        BaseSpeed = 80,
-        BaseMaxHitPoints = 25,
+        MinSpeed = 40, MaxSpeed = 100,
+        MinHitPoints = 15, MaxHitPoints = 35,
         StrengthTraining = TrainingFunction.Capped(0.15),
         IntelligenceTraining = TrainingFunction.Quadratic(),
         CharismaTraining = TrainingFunction.Constant(0)  // brak charyzmy

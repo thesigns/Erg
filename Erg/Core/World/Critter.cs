@@ -10,10 +10,10 @@ using Erg.Core.Systems;
 public abstract class Critter : Entity
 {
     /// <summary>
-    /// Speed calculated from Genus.BaseSpeed and Agility.
-    /// Formula: BaseSpeed * (0.5 + Agility)
+    /// Speed interpolated from Genus.MinSpeed to Genus.MaxSpeed based on Agility.
+    /// Formula: Lerp(MinSpeed, MaxSpeed, Agility)
     /// </summary>
-    public int Speed => (int)(Genus.BaseSpeed * (0.5 + Attributes.Agility.CurrentValue));
+    public int Speed => Lerp(Genus.MinSpeed, Genus.MaxSpeed, Attributes.Agility.CurrentValue);
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
@@ -22,12 +22,17 @@ public abstract class Critter : Entity
 
     // Hit Points
     /// <summary>
-    /// Max HP calculated from Genus.BaseMaxHitPoints and Endurance.
-    /// Formula: BaseMaxHitPoints * (0.5 + Endurance)
+    /// Max HP interpolated from Genus.MinHitPoints to Genus.MaxHitPoints based on Endurance.
+    /// Formula: Lerp(MinHitPoints, MaxHitPoints, Endurance)
     /// </summary>
-    public int MaxHitPoints => (int)(Genus.BaseMaxHitPoints * (0.5 + Attributes.Endurance.CurrentValue));
+    public int MaxHitPoints => Lerp(Genus.MinHitPoints, Genus.MaxHitPoints, Attributes.Endurance.CurrentValue);
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
+
+    private static int Lerp(int min, int max, double t)
+    {
+        return min + (int)((max - min) * t);
+    }
 
     // Combat
     public Dice UnarmedDamage { get; protected set; }
