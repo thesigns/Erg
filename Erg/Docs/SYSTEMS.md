@@ -1,31 +1,69 @@
 ﻿# WSTĘP
 
-Gra opiera się na systemie atrybutów podstawowych, umiejętności podstawowych, umiejętności pochodnych oraz zakresów zdolności zależnych od gatunku.
+Gra opiera się na systemie atrybutów podstawowych i pochodnych, właściwości dodatkowych, umiejętności podstawowych i pochodnych oraz zdolności, których zakresy zależne są od Genus (Rodzaju) postaci.
+Genus definiuje biologiczne i fizjologiczne ograniczenia organizmu, w ramach których rozwijają się wszystkie cechy postaci.
 
 ## ATRYBUTY PODSTAWOWE
 
-Atrybuty podstawowe opisują wrodzone, fundamentalne cechy fizyczne i psychiczne postaci. Każdy atrybut mieści się w zakresie od 0 do 1 (liczba zmiennoprzecinkowa), reprezentując spektrum możliwości w ramach danego gatunku.
+Atrybuty podstawowe opisują wrodzone, fundamentalne cechy fizyczne i psychiczne postaci. Każdy atrybut przyjmuje wartość z zakresu 0.0 – 1.0 (liczba typu double), reprezentując pozycję postaci w obrębie pełnego spektrum możliwości danego Genusa.
 
-Przykładowo: człowiek z wartością Strength = 0 jest skrajnie słabą jednostką, natomiast człowiek z wartością Strength = 1 to osobnik o maksymalnej, niemal granicznej sile fizycznej.
+Przykładowo: człowiek z Strength = 0.0 jest skrajnie słabą jednostką, natomiast Strength = 1.0 odpowiada maksymalnej, biologicznie granicznej sile fizycznej dla Genusa Human.
 
 W grze występują następujące atrybuty podstawowe: Strength, Endurance, Agility, Perception, Intelligence, Willpower, Charisma.
 
-Zmiany bazowych atrybutów zachodzą bardzo powoli i są wynikiem długotrwałych działań postaci. Przykładowo regularne dźwiganie dużych ciężarów stopniowo zwiększa atrybut Strength. Początkowe wartości atrybutów zależą od wybranej profesji, która odzwierciedla dotychczasową drogę życiową postaci.
+Zmiany atrybutów podstawowych zachodzą bardzo powoli i są efektem długotrwałych, powtarzalnych działań postaci.
 
-Każdy atrybut posiada:
+Przykładowo: regularne dźwiganie dużych ciężarów stopniowo zwiększa Strength, natomiast długotrwały stres psychiczny może wpływać na Willpower.
+
+Początkowe wartości atrybutów wynikają z wybranej profesji, która odzwierciedla dotychczasową drogę życiową postaci, a nie chwilowe decyzje rozgrywkowe oraz z miejsca, w którym została stworzona w grze (przykładowo głębokości lochu, na której nastąpiło stworzenie postaci).
+
+Każdy atrybut podstawowy posiada:
 
 * **wartość bazową** – trwałą, rozwijaną w czasie,
-* **wartość aktualną** – modyfikowaną tymczasowo, np. przez przedmioty, efekty magiczne lub stany.
+* **wartość aktualną** – chwilowo modyfikowaną przez przedmioty, efekty, stany lub zdolności.
+
+## ATRYBUTY POCHODNE
+
+Atrybuty pochodne są wartościami obliczanymi na podstawie atrybutów podstawowych, często z uwzględnieniem modyfikatorów wynikających z Genusa, profesji lub stanu postaci. Nie są rozwijane bezpośrednio – ich zmiany wynikają wyłącznie ze zmian danych wejściowych.
+
+Przykład: Vitality
+
+Vitality reprezentuje ogólną kondycję organizmu, odporność biologiczną oraz zdolność do regeneracji.
+Jest atrybutem pochodnym wyliczanym kilku atrybutów podstawowych:
+
+Vitality = 0.2 * Strength + 0.5 * Endurance + 0.2 * Agility + 0.1 * Willpower
+
+Vitality przyjmuje wartość w zakresie 0.0 – 1.0 i służy jako parametr wejściowy do obliczania wielu właściwości dodatkowych, takich jak maksymalne punkty życia czy tempo regeneracji.
+
+## WŁAŚCIWOŚCI DODATKOWE
+
+Właściwości dodatkowe postaci opisują konkretne, mierzalne parametry postaci. Mogą mieć dowolny typ liczbowy (int, float) oraz **zakres zależny od Genusa**, definiowany przez wartości Min / Max.
+
+Przykładowe właściwości dodatkowe:
+- Speed – tempo regeneracji energii (co segment czasu)
+- MaxHitPoints – maksymalna liczba punktów życia.
+
+Przykład: Właściwość MaxHitPoints
+
+Wartość MaxHitPoints jest obliczana na podstawie:
+- Genus.MinHitPoints
+- Genus.MaxHitPoints
+- atrybutu pochodnego Vitality
+
+Obliczenie wykorzystuje interpolację liniową (LERP), gdzie Vitality określa pozycję pomiędzy wartościami minimalną i maksymalną dla danego Genusa.
+
+Efektem jest wartość typu int, mieszcząca się zawsze w zakresie określonym przez Genus.
+Dzięki temu różne rodzaje organizmów mogą mieć skrajnie odmienne limity — np. Troll może dysponować wielokrotnie wyższym zakresem punktów życia niż Szczur, mimo identycznej wartości Vitality.
 
 ## UMIEJĘTNOŚCI PODSTAWOWE
 
 Umiejętności podstawowe określają wyuczone, podstawowe zdolności przydatne w świecie gry, które można bezpośrednio trenować. Zawsze mieszczą się w zakresie od 0 do 1 (liczba zmiennoprzecinkowa), reprezentując spektrum biegłości w ramach możliwości danej postaci.
 
-Przykładowo: troll z umiejętnością Pływanie = 0 nie posiada żadnego treningu w tym zakresie, natomiast troll z umiejętnością Pływanie = 1 jest mistrzem pływania w ramach możliwości swojego gatunku.
+Przykładowo: troll z umiejętnością Pływanie = 0 nie posiada żadnego treningu w tym zakresie, natomiast troll z umiejętnością Pływanie = 1 jest mistrzem pływania w ramach możliwości swojego Genus.
 
-Podobnie jak atrybuty, umiejętności są względne względem gatunku i określają poziom opanowania danej zdolności w granicach tego, czego dany gatunek jest w stanie się nauczyć. Troll‑mistrz pływania (1.0) może wciąż pływać gorzej niż przeciętny człowiek, ponieważ trolle jako gatunek nie są predysponowane do pływania. Faktyczna efektywność wynika z zakresów zdolności gatunkowych.
+Podobnie jak atrybuty, umiejętności są względne względem Genus i określają poziom opanowania danej zdolności w granicach tego, czego dany Genus jest w stanie się nauczyć. Troll‑mistrz pływania (1.0) może wciąż pływać gorzej niż przeciętny człowiek, ponieważ trolle jako Genus nie są predysponowane do pływania. Faktyczna efektywność wynika z zakresów zdolności Genus.
 
-Trenowanie umiejętności podstawowych odbywa się szybciej niż trenowanie atrybutów podstawowych i może następować poprzez czytanie podręczników, trening u nauczycieli NPC oraz praktykę (np. pływanie zwiększa umiejętność Pływanie). Nieużywane umiejętności tracą wartość, jednak proces ten zachodzi bardzo powoli.
+Trenowanie umiejętności podstawowych odbywa się szybciej niż trenowanie atrybutów podstawowych i może następować poprzez czytanie podręczników, trening u nauczycieli NPC oraz praktykę (np. pływanie zwiększa umiejętność Pływanie). Nieużywane umiejętności mogą ulegać degradacji (ujemnemu treningowi), jednak proces ten zachodzi bardzo powoli.
 
 ## WSPÓŁCZYNNIKI TRENINGU
 
@@ -49,9 +87,9 @@ Przykładem umiejętności pochodnej jest umiejętność ataku maczugą, określ
 
 W przedstawionym przypadku największy wpływ na umiejętność ataku maczugą ma ogólne wytrenowanie w posługiwaniu się maczugami, następnie siła, a w najmniejszym stopniu zręczność.
 
-## ZDOLNOŚCI I ICH ZAKRESY GATUNKOWE
+## ZDOLNOŚCI I ICH ZAKRESY GENUS
 
-Każdy gatunek posiada ten sam zestaw zdolności (**Abilities**), zdefiniowanych przez zakresy minimalne i maksymalne dla każdej zdolności. Zakresy te określają faktyczną efektywność działań, zależną od gatunku. Atrybuty, umiejętności podstawowe lub umiejętności pochodne są używane do interpolacji wartości zdolności, dając rzeczywisty wynik.
+Każdy Genus posiada ten sam zestaw zdolności (**Abilities**), zdefiniowanych przez zakresy minimalne i maksymalne dla każdej zdolności. Zakresy te określają faktyczną efektywność działań, zależną od gatunku. Atrybuty, umiejętności podstawowe lub umiejętności pochodne są używane do interpolacji wartości zdolności, dając rzeczywisty wynik.
 
 Wzór:
 
