@@ -1,3 +1,4 @@
+using Erg.Core.Systems;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Items;
 
@@ -16,6 +17,7 @@ public class SpinningDummy : Critter
             speed: 200,
             behavior: new SpinAttackBehavior())
     {
+        Species = Species.Construct;
         BaseValue = 20;
         RegenChancePerSegment = 0;
     }

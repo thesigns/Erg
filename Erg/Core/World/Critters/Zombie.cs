@@ -1,3 +1,4 @@
+using Erg.Core.Systems;
 using Erg.Core.Types;
 using Erg.Core.World.Behaviors;
 
@@ -13,6 +14,7 @@ public class Zombie : Critter
                unarmedDamage: new Dice(1, 6),
                behavior: ZombieBehavior.Instance)
     {
+        Species = Species.Risen;
         Locomotion = Locomotion.Terrestrial;
     }
 }

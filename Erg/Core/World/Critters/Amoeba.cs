@@ -1,3 +1,4 @@
+using Erg.Core.Systems;
 using Erg.Core.Types;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Items;
@@ -10,6 +11,7 @@ public class Amoeba : Critter
         : base("Amoeba", x, y, 'j', 0x20B2AAFF, 0x000000FF,
                speed: 90, maxHitPoints: 10, behavior: AmoebaBehavior.Instance)
     {
+        Species = Species.Jelly;
         Locomotion = Locomotion.Semiaquatic;
         BaseValue = 40;
         RegenChancePerSegment = 0.02f;

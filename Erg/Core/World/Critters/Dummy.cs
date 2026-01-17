@@ -1,3 +1,4 @@
+using Erg.Core.Systems;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Items;
 
@@ -16,6 +17,7 @@ public class Dummy : Critter
             speed: 100,
             behavior: PassiveBehavior.Instance)
     {
+        Species = Species.Construct;
         BaseValue = 12;
         RegenChancePerSegment = 0;
     }

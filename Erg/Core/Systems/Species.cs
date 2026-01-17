@@ -55,4 +55,37 @@ public class Species
         IntelligenceTraining = TrainingFunction.Quadratic(),  // Inteligencja bardzo trudna
         CharismaTraining = TrainingFunction.Quadratic()       // Charyzma też trudna
     };
+
+    /// <summary>
+    /// Jelly — galaretowate stworzenia, wolniejsze, preferują wodę.
+    /// </summary>
+    public static Species Jelly { get; } = new("Jelly")
+    {
+        AgilityTraining = TrainingFunction.Quadratic(),   // mniej zwinne
+        EnduranceTraining = TrainingFunction.Capped(0.2)  // wytrzymałe
+    };
+
+    /// <summary>
+    /// Construct — sztuczne konstrukty, nie trenują w tradycyjny sposób.
+    /// </summary>
+    public static Species Construct { get; } = new("Construct")
+    {
+        StrengthTraining = TrainingFunction.Constant(0),
+        EnduranceTraining = TrainingFunction.Constant(0),
+        AgilityTraining = TrainingFunction.Constant(0),
+        PerceptionTraining = TrainingFunction.Constant(0),
+        IntelligenceTraining = TrainingFunction.Constant(0),
+        WillpowerTraining = TrainingFunction.Constant(0),
+        CharismaTraining = TrainingFunction.Constant(0)
+    };
+
+    /// <summary>
+    /// Risen — ożywieńcy, nieumarli, powolny ale pewny progres.
+    /// </summary>
+    public static Species Risen { get; } = new("Risen")
+    {
+        StrengthTraining = TrainingFunction.Capped(0.15),
+        IntelligenceTraining = TrainingFunction.Quadratic(),
+        CharismaTraining = TrainingFunction.Constant(0)  // brak charyzmy
+    };
 }
