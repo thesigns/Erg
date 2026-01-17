@@ -50,7 +50,7 @@ public class Attribute
     /// Positive amount = training (increase), negative = atrophy (decrease).
     /// Change is: amount * function.Calculate(BaseValue) * trainingSpeed
     /// </summary>
-    public void Train(double amount, TrainingFunction function, double trainingSpeed = 1.0)
+    public void Train(double amount, TrainingFunction function, double trainingSpeed)
     {
         double factor = function.Calculate(BaseValue);
         BaseValue += amount * factor * trainingSpeed;
@@ -60,7 +60,7 @@ public class Attribute
     /// Trains the attribute using the default linear function.
     /// Positive amount = training, negative = atrophy.
     /// </summary>
-    public void Train(double amount, double trainingSpeed = 1.0)
+    public void Train(double amount, double trainingSpeed)
     {
         Train(amount, TrainingFunction.Linear(), trainingSpeed);
     }
