@@ -10,7 +10,6 @@ public class Zombie : Critter
 
     public Zombie(int x, int y)
         : base("zombie", x, y, 'z', 0x8B4513FF, 0x000000FF,
-               maxHitPoints: 25,
                unarmedDamage: new Dice(1, 6),
                behavior: ZombieBehavior.Instance)
     {

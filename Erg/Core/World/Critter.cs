@@ -21,7 +21,11 @@ public abstract class Critter : Entity
     public IBehavior? Behavior { get; protected set; }
 
     // Hit Points
-    public int MaxHitPoints { get; protected set; }
+    /// <summary>
+    /// Max HP calculated from Genus.BaseMaxHitPoints and Endurance.
+    /// Formula: BaseMaxHitPoints * (0.5 + Endurance)
+    /// </summary>
+    public int MaxHitPoints => (int)(Genus.BaseMaxHitPoints * (0.5 + Attributes.Endurance.CurrentValue));
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
 
@@ -205,17 +209,15 @@ public abstract class Critter : Entity
         char character,
         uint fg,
         uint bg,
-        int maxHitPoints = 10,
         Dice? unarmedDamage = null,
         IBehavior? behavior = null)
         : base(name, x, y, character, fg, bg)
     {
         Energy = 0;
-        MaxHitPoints = maxHitPoints;
-        HitPoints = maxHitPoints;
+        Attributes = new Attributes();
+        HitPoints = MaxHitPoints;
         UnarmedDamage = unarmedDamage ?? new Dice(1, 4);
         Behavior = behavior;
-        Attributes = new Attributes();
     }
 
     public void GainEnergy()
@@ -262,6 +264,12 @@ public abstract class Critter : Entity
     public void Heal(int amount)
     {
         HitPoints = Math.Min(MaxHitPoints, HitPoints + amount);
+    }
+
+    // Pełne uleczenie
+    public void FullHeal()
+    {
+        HitPoints = MaxHitPoints;
     }
 
     // Passive regeneration - called each segment

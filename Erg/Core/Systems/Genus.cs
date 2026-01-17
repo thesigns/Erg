@@ -15,6 +15,12 @@ public class Genus
     /// </summary>
     public int BaseSpeed { get; init; } = 100;
 
+    /// <summary>
+    /// Base max hit points for the genus. Actual MaxHitPoints is calculated as:
+    /// MaxHitPoints = BaseMaxHitPoints * (0.5 + Endurance)
+    /// </summary>
+    public int BaseMaxHitPoints { get; init; } = 20;
+
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction EnduranceTraining { get; init; } = TrainingFunction.Linear();
@@ -59,6 +65,7 @@ public class Genus
     public static Genus Troll { get; } = new("Troll")
     {
         BaseSpeed = 80,
+        BaseMaxHitPoints = 40,
         StrengthTraining = TrainingFunction.Capped(0.2),      // Siła łatwa do trenowania
         EnduranceTraining = TrainingFunction.Capped(0.15),    // Wytrzymałość też
         IntelligenceTraining = TrainingFunction.Quadratic(),  // Inteligencja bardzo trudna
@@ -71,6 +78,7 @@ public class Genus
     public static Genus Jelly { get; } = new("Jelly")
     {
         BaseSpeed = 90,
+        BaseMaxHitPoints = 15,
         AgilityTraining = TrainingFunction.Quadratic(),   // mniej zwinne
         EnduranceTraining = TrainingFunction.Capped(0.2)  // wytrzymałe
     };
@@ -81,6 +89,7 @@ public class Genus
     public static Genus Construct { get; } = new("Construct")
     {
         BaseSpeed = 80,
+        BaseMaxHitPoints = 30,
         StrengthTraining = TrainingFunction.Constant(0),
         EnduranceTraining = TrainingFunction.Constant(0),
         AgilityTraining = TrainingFunction.Constant(0),
@@ -96,6 +105,7 @@ public class Genus
     public static Genus Risen { get; } = new("Risen")
     {
         BaseSpeed = 80,
+        BaseMaxHitPoints = 25,
         StrengthTraining = TrainingFunction.Capped(0.15),
         IntelligenceTraining = TrainingFunction.Quadratic(),
         CharismaTraining = TrainingFunction.Constant(0)  // brak charyzmy

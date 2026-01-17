@@ -76,6 +76,7 @@ public class AreaPopulator
 
         var critter = CreateCritterForTile(x, y, tile, isWater);
         critter.DepthTraining(_area.Depth, _random);
+        critter.FullHeal();
         _area.SetCritter(critter);
     }
 
