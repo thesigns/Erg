@@ -57,59 +57,47 @@ public class Genus
     // ========== Predefiniowane rodzaje ==========
 
     /// <summary>
-    /// Człowiek — zbalansowane, standardowe krzywe treningowe.
+    /// Człowiek — przeciętniak w każdym calu.
     /// </summary>
-    public static Genus Human { get; } = new("Human");
+    public static Genus Human { get; } = new("Human")
+    {
+        MinSpeed = 80, MaxSpeed = 120,
+        MinHitPoints = 60, MaxHitPoints = 100
+    };
 
     /// <summary>
-    /// Troll — silny fizycznie, słabszy intelektualnie.
+    /// Troll — silny fizycznie, powolny.
     /// </summary>
     public static Genus Troll { get; } = new("Troll")
     {
-        MinSpeed = 40, MaxSpeed = 100,
-        MinHitPoints = 25, MaxHitPoints = 60,
-        StrengthTraining = TrainingFunction.Capped(0.2),      // Siła łatwa do trenowania
-        EnduranceTraining = TrainingFunction.Capped(0.15),    // Wytrzymałość też
-        IntelligenceTraining = TrainingFunction.Quadratic(),  // Inteligencja bardzo trudna
-        CharismaTraining = TrainingFunction.Quadratic()       // Charyzma też trudna
+        MinSpeed = 60, MaxSpeed = 90,
+        MinHitPoints = 130, MaxHitPoints = 240
     };
 
     /// <summary>
-    /// Jelly — galaretowate stworzenia, wolniejsze, preferują wodę.
+    /// Jelly — galaretowate stworzenia, bardzo wolne i wrażliwe na ciosy, preferują wodę.
     /// </summary>
     public static Genus Jelly { get; } = new("Jelly")
     {
-        MinSpeed = 30, MaxSpeed = 90,
-        MinHitPoints = 8, MaxHitPoints = 20,
-        AgilityTraining = TrainingFunction.Quadratic(),   // mniej zwinne
-        EnduranceTraining = TrainingFunction.Capped(0.2)  // wytrzymałe
+        MinSpeed = 30, MaxSpeed = 70,
+        MinHitPoints = 10, MaxHitPoints = 35
     };
 
     /// <summary>
-    /// Construct — sztuczne konstrukty, nie trenują w tradycyjny sposób.
+    /// Construct — sztuczne konstrukty. Żywotne, trochę wolniejsze od człowieka.
     /// </summary>
     public static Genus Construct { get; } = new("Construct")
     {
-        MinSpeed = 60, MaxSpeed = 100,
-        MinHitPoints = 20, MaxHitPoints = 40,
-        StrengthTraining = TrainingFunction.Constant(0),
-        EnduranceTraining = TrainingFunction.Constant(0),
-        AgilityTraining = TrainingFunction.Constant(0),
-        PerceptionTraining = TrainingFunction.Constant(0),
-        IntelligenceTraining = TrainingFunction.Constant(0),
-        WillpowerTraining = TrainingFunction.Constant(0),
-        CharismaTraining = TrainingFunction.Constant(0)
+        MinSpeed = 70, MaxSpeed = 110,
+        MinHitPoints = 90, MaxHitPoints = 130
     };
 
     /// <summary>
-    /// Risen — ożywieńcy, nieumarli, powolny ale pewny progres.
+    /// Risen — ożywieńcy (zombie). Powolne, ale trudniejsze do zabicia.
     /// </summary>
     public static Genus Risen { get; } = new("Risen")
     {
-        MinSpeed = 40, MaxSpeed = 100,
-        MinHitPoints = 15, MaxHitPoints = 35,
-        StrengthTraining = TrainingFunction.Capped(0.15),
-        IntelligenceTraining = TrainingFunction.Quadratic(),
-        CharismaTraining = TrainingFunction.Constant(0)  // brak charyzmy
+        MinSpeed = 70, MaxSpeed = 90,
+        MinHitPoints = 90, MaxHitPoints = 120
     };
 }
