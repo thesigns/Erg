@@ -12,8 +12,8 @@ public class Player : Critter
     {
         Pronouns = PronounSet.He;
         Locomotion = Locomotion.Amphibious;
-        RegenChancePerSegment = 0.002f;
-        RegenDice = new Dice(1, 2);
+        RegenChancePerSegment = 0.01f;
+        RegenDice = new Dice(1, 3);
     }
 
     public override void DepthTraining(int depth, Random random)

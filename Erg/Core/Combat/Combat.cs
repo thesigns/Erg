@@ -10,7 +10,7 @@ public static class Combat
         var random = session.Random;
         var messages = session.Messages;
 
-        int damage = attacker.UnarmedDamage.Roll(random);
+        int damage = attacker.UnarmedDamage.Roll(random) + attacker.DamageBonus;
         defender.TakeDamage(damage, attacker);
 
         bool seeAttacker = session.CanPlayerSee(attacker);

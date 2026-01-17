@@ -23,6 +23,14 @@ public class Genus
     public int MinHitPoints { get; init; } = 10;
     public int MaxHitPoints { get; init; } = 30;
 
+    /// <summary>
+    /// Damage bonus range for the genus. Actual DamageBonus is calculated as:
+    /// DamageBonus = Lerp(MinDamageBonus, MaxDamageBonus, Speed)
+    /// Represents kinetic energy of strikes - faster creatures hit harder.
+    /// </summary>
+    public int MinDamageBonus { get; init; } = 0;
+    public int MaxDamageBonus { get; init; } = 5;
+
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction EnduranceTraining { get; init; } = TrainingFunction.Linear();
@@ -62,7 +70,8 @@ public class Genus
     public static Genus Human { get; } = new("Human")
     {
         MinEnergyRegenRate = 80, MaxEnergyRegenRate = 120,
-        MinHitPoints = 60, MaxHitPoints = 100
+        MinHitPoints = 60, MaxHitPoints = 100,
+        MinDamageBonus = 2, MaxDamageBonus = 12
     };
 
     /// <summary>
@@ -71,7 +80,8 @@ public class Genus
     public static Genus Troll { get; } = new("Troll")
     {
         MinEnergyRegenRate = 60, MaxEnergyRegenRate = 90,
-        MinHitPoints = 130, MaxHitPoints = 240
+        MinHitPoints = 130, MaxHitPoints = 240,
+        MinDamageBonus = 6, MaxDamageBonus = 18
     };
 
     /// <summary>
@@ -80,7 +90,8 @@ public class Genus
     public static Genus Jelly { get; } = new("Jelly")
     {
         MinEnergyRegenRate = 30, MaxEnergyRegenRate = 70,
-        MinHitPoints = 10, MaxHitPoints = 35
+        MinHitPoints = 10, MaxHitPoints = 35,
+        MinDamageBonus = 0, MaxDamageBonus = 3
     };
 
     /// <summary>
@@ -89,15 +100,17 @@ public class Genus
     public static Genus Construct { get; } = new("Construct")
     {
         MinEnergyRegenRate = 70, MaxEnergyRegenRate = 110,
-        MinHitPoints = 90, MaxHitPoints = 130
+        MinHitPoints = 90, MaxHitPoints = 130,
+        MinDamageBonus = 2, MaxDamageBonus = 16
     };
 
     /// <summary>
-    /// Risen — ożywieńcy (zombie). Powolne, ale trudniejsze do zabicia.
+    /// Risen — ożywieńcy. Powolne, duży rozrzut HitPoints
     /// </summary>
     public static Genus Risen { get; } = new("Risen")
     {
         MinEnergyRegenRate = 70, MaxEnergyRegenRate = 90,
-        MinHitPoints = 90, MaxHitPoints = 120
+        MinHitPoints = 20, MaxHitPoints = 120,
+        MinDamageBonus = 1, MaxDamageBonus = 6
     };
 }

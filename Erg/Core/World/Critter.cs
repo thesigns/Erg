@@ -37,6 +37,11 @@ public abstract class Critter : Entity
 
     // Combat
     public Dice UnarmedDamage { get; protected set; }
+    /// <summary>
+    /// Bonus damage based on Speed. Represents kinetic energy of strikes.
+    /// Formula: Lerp(MinDamageBonus, MaxDamageBonus, Speed)
+    /// </summary>
+    public int DamageBonus => Lerp(Genus.MinDamageBonus, Genus.MaxDamageBonus, DerivedAttributes.Speed);
     public Critter? KilledBy { get; private set; }
 
     // Pronouns
