@@ -1,6 +1,7 @@
 using Erg.Core.Systems;
 using Erg.Core.Types;
 using Erg.Core.World.Behaviors;
+using Erg.Core.World.Items;
 
 namespace Erg.Core.World.Critters;
 
@@ -15,5 +16,11 @@ public class Zombie : Critter
     {
         Genus = Genus.Risen;
         Locomotion = Locomotion.Terrestrial;
+    }
+
+    public override void OnDeath(Area area)
+    {
+        base.OnDeath(area);
+        area.AddItem(new ZombieCorpse(X, Y));
     }
 }
