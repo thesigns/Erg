@@ -1,14 +1,16 @@
 namespace Erg.Core.Systems;
 
 /// <summary>
-/// Defines species-specific characteristics including training functions for each attribute.
+/// Defines genus-level characteristics including training functions for each attribute.
+/// Genus is a broad category (e.g., Human, Troll, Risen) while Critter subclasses
+/// represent specific species (e.g., Zombie, Amoeba).
 /// </summary>
-public class Species
+public class Genus
 {
     public string Name { get; }
 
     /// <summary>
-    /// Base speed for the species. Actual speed is calculated as:
+    /// Base speed for the genus. Actual speed is calculated as:
     /// Speed = BaseSpeed * (0.5 + Agility)
     /// </summary>
     public int BaseSpeed { get; init; } = 100;
@@ -22,7 +24,7 @@ public class Species
     public TrainingFunction WillpowerTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction CharismaTraining { get; init; } = TrainingFunction.Linear();
 
-    public Species(string name)
+    public Genus(string name)
     {
         Name = name;
     }
@@ -44,17 +46,17 @@ public class Species
         return TrainingFunction.Linear();
     }
 
-    // ========== Predefiniowane gatunki ==========
+    // ========== Predefiniowane rodzaje ==========
 
     /// <summary>
     /// Człowiek — zbalansowane, standardowe krzywe treningowe.
     /// </summary>
-    public static Species Human { get; } = new("Human");
+    public static Genus Human { get; } = new("Human");
 
     /// <summary>
     /// Troll — silny fizycznie, słabszy intelektualnie.
     /// </summary>
-    public static Species Troll { get; } = new("Troll")
+    public static Genus Troll { get; } = new("Troll")
     {
         BaseSpeed = 80,
         StrengthTraining = TrainingFunction.Capped(0.2),      // Siła łatwa do trenowania
@@ -66,7 +68,7 @@ public class Species
     /// <summary>
     /// Jelly — galaretowate stworzenia, wolniejsze, preferują wodę.
     /// </summary>
-    public static Species Jelly { get; } = new("Jelly")
+    public static Genus Jelly { get; } = new("Jelly")
     {
         BaseSpeed = 90,
         AgilityTraining = TrainingFunction.Quadratic(),   // mniej zwinne
@@ -76,7 +78,7 @@ public class Species
     /// <summary>
     /// Construct — sztuczne konstrukty, nie trenują w tradycyjny sposób.
     /// </summary>
-    public static Species Construct { get; } = new("Construct")
+    public static Genus Construct { get; } = new("Construct")
     {
         BaseSpeed = 80,
         StrengthTraining = TrainingFunction.Constant(0),
@@ -91,7 +93,7 @@ public class Species
     /// <summary>
     /// Risen — ożywieńcy, nieumarli, powolny ale pewny progres.
     /// </summary>
-    public static Species Risen { get; } = new("Risen")
+    public static Genus Risen { get; } = new("Risen")
     {
         BaseSpeed = 80,
         StrengthTraining = TrainingFunction.Capped(0.15),

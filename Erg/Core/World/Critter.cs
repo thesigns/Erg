@@ -10,14 +10,14 @@ using Erg.Core.Systems;
 public abstract class Critter : Entity
 {
     /// <summary>
-    /// Speed calculated from Species.BaseSpeed and Agility.
+    /// Speed calculated from Genus.BaseSpeed and Agility.
     /// Formula: BaseSpeed * (0.5 + Agility)
     /// </summary>
-    public int Speed => (int)(Species.BaseSpeed * (0.5 + Attributes.Agility.CurrentValue));
+    public int Speed => (int)(Genus.BaseSpeed * (0.5 + Attributes.Agility.CurrentValue));
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
-    public Species Species { get; protected set; } = Species.Human;
+    public Genus Genus { get; protected set; } = Genus.Human;
     public IBehavior? Behavior { get; protected set; }
 
     // Hit Points
@@ -80,30 +80,30 @@ public abstract class Critter : Entity
     /// </summary>
     public void TrainAttribute(Erg.Core.Systems.Attribute attr, double amount, Session session)
     {
-        var function = Species.GetTrainingFunction(attr, Attributes);
+        var function = Genus.GetTrainingFunction(attr, Attributes);
         attr.Train(amount, function, session.TrainingSpeed);
     }
 
     public void TrainStrength(double amount, Session session)
-        => Attributes.Strength.Train(amount, Species.StrengthTraining, session.TrainingSpeed);
+        => Attributes.Strength.Train(amount, Genus.StrengthTraining, session.TrainingSpeed);
 
     public void TrainEndurance(double amount, Session session)
-        => Attributes.Endurance.Train(amount, Species.EnduranceTraining, session.TrainingSpeed);
+        => Attributes.Endurance.Train(amount, Genus.EnduranceTraining, session.TrainingSpeed);
 
     public void TrainAgility(double amount, Session session)
-        => Attributes.Agility.Train(amount, Species.AgilityTraining, session.TrainingSpeed);
+        => Attributes.Agility.Train(amount, Genus.AgilityTraining, session.TrainingSpeed);
 
     public void TrainPerception(double amount, Session session)
-        => Attributes.Perception.Train(amount, Species.PerceptionTraining, session.TrainingSpeed);
+        => Attributes.Perception.Train(amount, Genus.PerceptionTraining, session.TrainingSpeed);
 
     public void TrainIntelligence(double amount, Session session)
-        => Attributes.Intelligence.Train(amount, Species.IntelligenceTraining, session.TrainingSpeed);
+        => Attributes.Intelligence.Train(amount, Genus.IntelligenceTraining, session.TrainingSpeed);
 
     public void TrainWillpower(double amount, Session session)
-        => Attributes.Willpower.Train(amount, Species.WillpowerTraining, session.TrainingSpeed);
+        => Attributes.Willpower.Train(amount, Genus.WillpowerTraining, session.TrainingSpeed);
 
     public void TrainCharisma(double amount, Session session)
-        => Attributes.Charisma.Train(amount, Species.CharismaTraining, session.TrainingSpeed);
+        => Attributes.Charisma.Train(amount, Genus.CharismaTraining, session.TrainingSpeed);
 
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.

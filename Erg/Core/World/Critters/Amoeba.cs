@@ -11,7 +11,7 @@ public class Amoeba : Critter
         : base("Amoeba", x, y, 'j', 0x20B2AAFF, 0x000000FF,
                maxHitPoints: 10, behavior: AmoebaBehavior.Instance)
     {
-        Species = Species.Jelly;
+        Genus = Genus.Jelly;
         Locomotion = Locomotion.Semiaquatic;
         BaseValue = 40;
         RegenChancePerSegment = 0.02f;

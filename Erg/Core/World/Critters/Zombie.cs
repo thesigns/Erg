@@ -14,7 +14,7 @@ public class Zombie : Critter
                unarmedDamage: new Dice(1, 6),
                behavior: ZombieBehavior.Instance)
     {
-        Species = Species.Risen;
+        Genus = Genus.Risen;
         Locomotion = Locomotion.Terrestrial;
     }
 }

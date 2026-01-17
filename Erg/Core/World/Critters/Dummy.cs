@@ -16,7 +16,7 @@ public class Dummy : Critter
             bg: 0x000000FF,
             behavior: PassiveBehavior.Instance)
     {
-        Species = Species.Construct;
+        Genus = Genus.Construct;
         Attributes.Agility.SetBaseValue(0.0);  // Speed = 80 * 0.5 = 40
         BaseValue = 12;
         RegenChancePerSegment = 0;

@@ -16,7 +16,7 @@ public class SpinningDummy : Critter
             bg: 0x000000FF,
             behavior: new SpinAttackBehavior())
     {
-        Species = Species.Construct;
+        Genus = Genus.Construct;
         Attributes.Agility.SetBaseValue(0.9);  // Speed = 80 * 1.4 = 112
         BaseValue = 20;
         RegenChancePerSegment = 0;
