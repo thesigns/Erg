@@ -381,7 +381,7 @@ public class PlayView : IGameView
                           $"Ch:{attrs.Charisma.DisplayValue}";
         RenderTextLine(output, 23, attrText);
 
-        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  Sp:{player.Speed}";
+        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  ERR:{player.EnergyRegenRate}";
         RenderTextLine(output, 24, statsText);
     }
 

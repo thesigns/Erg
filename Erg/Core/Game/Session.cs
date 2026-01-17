@@ -411,7 +411,7 @@ public class Session
 
     public void ProcessCritterTurns(int playerActionCost = 1000)
     {
-        int segments = playerActionCost / Player.Speed;
+        int segments = playerActionCost / Player.EnergyRegenRate;
         var critters = GetAllCritters().Where(c => c != Player).ToList();
 
         for (int seg = 0; seg < segments; seg++)

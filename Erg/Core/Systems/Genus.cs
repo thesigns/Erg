@@ -11,10 +11,10 @@ public class Genus
 
     /// <summary>
     /// Speed range for the genus. Actual speed is calculated as:
-    /// Speed = Lerp(MinSpeed, MaxSpeed, Agility)
+    /// Speed = Lerp(MinEnergyRegenRate, MaxEnergyRegenRate, Agility)
     /// </summary>
-    public int MinSpeed { get; init; } = 50;
-    public int MaxSpeed { get; init; } = 150;
+    public int MinEnergyRegenRate { get; init; } = 50;
+    public int MaxEnergyRegenRate { get; init; } = 150;
 
     /// <summary>
     /// Hit points range for the genus. Actual MaxHitPoints is calculated as:
@@ -61,7 +61,7 @@ public class Genus
     /// </summary>
     public static Genus Human { get; } = new("Human")
     {
-        MinSpeed = 80, MaxSpeed = 120,
+        MinEnergyRegenRate = 80, MaxEnergyRegenRate = 120,
         MinHitPoints = 60, MaxHitPoints = 100
     };
 
@@ -70,7 +70,7 @@ public class Genus
     /// </summary>
     public static Genus Troll { get; } = new("Troll")
     {
-        MinSpeed = 60, MaxSpeed = 90,
+        MinEnergyRegenRate = 60, MaxEnergyRegenRate = 90,
         MinHitPoints = 130, MaxHitPoints = 240
     };
 
@@ -79,7 +79,7 @@ public class Genus
     /// </summary>
     public static Genus Jelly { get; } = new("Jelly")
     {
-        MinSpeed = 30, MaxSpeed = 70,
+        MinEnergyRegenRate = 30, MaxEnergyRegenRate = 70,
         MinHitPoints = 10, MaxHitPoints = 35
     };
 
@@ -88,7 +88,7 @@ public class Genus
     /// </summary>
     public static Genus Construct { get; } = new("Construct")
     {
-        MinSpeed = 70, MaxSpeed = 110,
+        MinEnergyRegenRate = 70, MaxEnergyRegenRate = 110,
         MinHitPoints = 90, MaxHitPoints = 130
     };
 
@@ -97,7 +97,7 @@ public class Genus
     /// </summary>
     public static Genus Risen { get; } = new("Risen")
     {
-        MinSpeed = 70, MaxSpeed = 90,
+        MinEnergyRegenRate = 70, MaxEnergyRegenRate = 90,
         MinHitPoints = 90, MaxHitPoints = 120
     };
 }

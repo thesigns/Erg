@@ -10,10 +10,10 @@ using Erg.Core.Systems;
 public abstract class Critter : Entity
 {
     /// <summary>
-    /// Speed interpolated from Genus.MinSpeed to Genus.MaxSpeed based on Agility.
-    /// Formula: Lerp(MinSpeed, MaxSpeed, Agility)
+    /// Energy regeneration rate interpolated from Genus min/max based on Speed.
+    /// Formula: Lerp(MinEnergyRegenRate, MaxEnergyRegenRate, DerivedAttributes.Speed)
     /// </summary>
-    public int Speed => Lerp(Genus.MinSpeed, Genus.MaxSpeed, Attributes.Agility.CurrentValue);
+    public int EnergyRegenRate => Lerp(Genus.MinEnergyRegenRate, Genus.MaxEnergyRegenRate, DerivedAttributes.Speed);
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
@@ -235,7 +235,7 @@ public abstract class Critter : Entity
 
     public void GainEnergy()
     {
-        Energy += Speed;
+        Energy += EnergyRegenRate;
     }
 
     public bool CanAct()
