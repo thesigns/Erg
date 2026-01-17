@@ -2301,63 +2301,8 @@ public class DungeonGenerator3 : IDungeonGenerator
 
     private void PlaceCritters(Area area)
     {
-        // Collect spawn positions: floor tiles + water tiles (water added 2x for higher chance)
-        var availablePositions = new List<(int x, int y, bool isWater)>();
-
-        foreach (var (x, y) in _floorTiles)
-            availablePositions.Add((x, y, false));
-
-        // Add water tiles twice for higher spawn chance
-        for (int y = 0; y < _height; y++)
-        {
-            for (int x = 0; x < _width; x++)
-            {
-                var tile = area.GetTile(x, y);
-                if (tile?.Type == TileType.ShallowWater || tile?.Type == TileType.DeepWater)
-                {
-                    availablePositions.Add((x, y, true));
-                    availablePositions.Add((x, y, true)); // 2x for higher chance
-                }
-            }
-        }
-
-        if (availablePositions.Count == 0) return;
-
-        int critterCount = _random.Next(4, 9); // 4-8 przeciwników
-        for (int i = 0; i < critterCount && availablePositions.Count > 0; i++)
-        {
-            int index = _random.Next(availablePositions.Count);
-            var (x, y, isWater) = availablePositions[index];
-
-            // Remove all entries for this position
-            availablePositions.RemoveAll(p => p.x == x && p.y == y);
-
-            // Skip if tile already has a critter
-            var tile = area.GetTile(x, y);
-            if (tile?.Critter != null) continue;
-
-            Critter critter;
-            if (tile?.SpecialEffect == SpecialEffect.UndeadAura)
-            {
-                critter = new Zombie(x, y);
-            }
-            else if (isWater)
-            {
-                critter = new Amoeba(x, y);
-            }
-            else
-            {
-                int roll = _random.Next(100);
-                if (roll < 40)
-                    critter = new Dummy(x, y);
-                else if (roll < 80)
-                    critter = new SpinningDummy(x, y);
-                else
-                    critter = new Zombie(x, y);
-            }
-
-            area.SetCritter(critter);
-        }
+        var populator = new AreaPopulator(area, _random);
+        populator.Populate();
     }
 
     #endregion
