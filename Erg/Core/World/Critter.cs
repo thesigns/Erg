@@ -5,12 +5,15 @@ using Erg.Core.Types;
 using Erg.Core.World;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Pathfinding;
+using Erg.Core.Systems;
 
 public abstract class Critter : Entity
 {
     public int Speed { get; protected set; }   // np. 100 = normal
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
+    public Attributes Attributes { get; }
+    public Species Species { get; protected set; } = Species.Human;
     public IBehavior? Behavior { get; protected set; }
 
     // Hit Points
@@ -72,6 +75,38 @@ public abstract class Critter : Entity
     public float RegenChancePerSegment { get; protected set; } = 0.001f;
     public Dice RegenDice { get; protected set; } = new Dice(1, 1);
     public int PendingRegen { get; protected set; } = 0;
+
+    // ========== Attribute Training ==========
+
+    /// <summary>
+    /// Trains an attribute using the species-specific training function.
+    /// </summary>
+    public void TrainAttribute(Erg.Core.Systems.Attribute attr, double amount, double trainingSpeed = 1.0)
+    {
+        var function = Species.GetTrainingFunction(attr, Attributes);
+        attr.Train(amount, function, trainingSpeed);
+    }
+
+    public void TrainStrength(double amount, double trainingSpeed = 1.0)
+        => Attributes.Strength.Train(amount, Species.StrengthTraining, trainingSpeed);
+
+    public void TrainEndurance(double amount, double trainingSpeed = 1.0)
+        => Attributes.Endurance.Train(amount, Species.EnduranceTraining, trainingSpeed);
+
+    public void TrainAgility(double amount, double trainingSpeed = 1.0)
+        => Attributes.Agility.Train(amount, Species.AgilityTraining, trainingSpeed);
+
+    public void TrainPerception(double amount, double trainingSpeed = 1.0)
+        => Attributes.Perception.Train(amount, Species.PerceptionTraining, trainingSpeed);
+
+    public void TrainIntelligence(double amount, double trainingSpeed = 1.0)
+        => Attributes.Intelligence.Train(amount, Species.IntelligenceTraining, trainingSpeed);
+
+    public void TrainWillpower(double amount, double trainingSpeed = 1.0)
+        => Attributes.Willpower.Train(amount, Species.WillpowerTraining, trainingSpeed);
+
+    public void TrainCharisma(double amount, double trainingSpeed = 1.0)
+        => Attributes.Charisma.Train(amount, Species.CharismaTraining, trainingSpeed);
 
     /// <summary>
     /// Checks if this critter can enter the given tile based on Locomotion.
@@ -149,6 +184,7 @@ public abstract class Critter : Entity
         HitPoints = maxHitPoints;
         UnarmedDamage = unarmedDamage ?? new Dice(1, 4);
         Behavior = behavior;
+        Attributes = new Attributes();
     }
 
     public void GainEnergy()
