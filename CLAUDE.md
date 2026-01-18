@@ -147,3 +147,7 @@ Spawn ratios in dungeon generator:
 - Movement: arrow keys and numpad (including diagonals via Kp1/3/7/9)
 - Actions: I=inventory, O=open doors, C=close doors, G=pick up items, Space=start game/continue messages
 - Debug: F5=toggle cheat mode (reveals all tiles)
+
+### Documentation
+Design documents are located in `Erg/Docs/`:
+- `SYSTEMS.md` - Game systems design: attributes (Strength, Endurance, etc.), derived attributes (Vitality, Speed), skills, abilities, and Genus-based ranges. Core reference for implementing character mechanics.
