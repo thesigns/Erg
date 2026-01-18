@@ -15,7 +15,7 @@
 
 Erg is a traditional roguelike in the spirit of the classics. Procedurally generated dungeons, permadeath (eventually), turn-based tactical combat, and everything rendered in glorious Unicode.
 
-You descend into the depths. Zombies shamble through crypts. Amoebas lurk in underground pools...
+You descend into the depths. Zombies shamble through crypts. The drowned rise from flooded chambers. Something watches from the shadows...
 
 ## Features
 
@@ -25,9 +25,14 @@ You descend into the depths. Zombies shamble through crypts. Amoebas lurk in und
 - Secret doors hiding treasures
 
 **Creatures**
-- Zombies with actual AI - they scan their surroundings, track you with A* pathfinding, and occasionally forget what they were doing
-- Amoebas dwelling in water, preferring the depths
-- More to come...
+
+*The Undead* - Territorial creatures that guard their domains:
+- Zombies shambling through crypts and corridors
+- Drowned lurking in flooded chambers - swift swimmers with powerful strokes
+- Hanged haunting the depths - rare, resilient, and relentless
+
+*Other Creatures*
+- Amoebas dwelling in underground pools
 
 **Combat & Mechanics**
 - Turn-based with speed/energy system (faster creatures act more often)
