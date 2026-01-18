@@ -10,7 +10,7 @@ public class Zombie : Critter
     public override int SightRange => 6;
 
     public Zombie(int x, int y)
-        : base("zombie", x, y, 'z', 0x8B4513FF, 0x000000FF,
+        : base("Zombie", x, y, 'z', 0x8B4513FF, 0x000000FF,
                unarmedDamage: new Dice(1, 6),
                behavior: new TerritorialBehavior(forgetChance: 0.005, territoryRadius: 6))
     {

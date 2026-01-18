@@ -9,7 +9,7 @@ public class Drowned : Critter
     public override int SightRange => 6;
 
     public Drowned(int x, int y)
-        : base("drowned", x, y, 'z', 0x4169E1FF, 0x000000FF,
+        : base("Drowned", x, y, 'z', 0x4169E1FF, 0x000000FF,
                unarmedDamage: new Dice(1, 6),
                behavior: new TerritorialBehavior(forgetChance: 0.01, territoryRadius: 8))
     {

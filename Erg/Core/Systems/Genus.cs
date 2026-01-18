@@ -153,10 +153,10 @@ public class Genus
     /// </summary>
     public static Genus Zombius { get; } = new("Zombius")
     {
-        MinEnergyRegenRate = 70, MaxEnergyRegenRate = 90,
-        MinHitPoints = 20, MaxHitPoints = 120,
+        MinEnergyRegenRate = 60, MaxEnergyRegenRate = 90,
+        MinHitPoints = 40, MaxHitPoints = 120,
         MinDamageBonus = 1, MaxDamageBonus = 6,
-        UnarmedAttackMin = 5, UnarmedAttackMax = 30,
+        UnarmedAttackMin = 15, UnarmedAttackMax = 40,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
     };
 }
