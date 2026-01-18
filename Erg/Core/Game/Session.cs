@@ -346,40 +346,8 @@ public class Session
 
     public void ReadBook(Book book)
     {
-        Messages.Clear();
-
-        // Can't read if Reading is 0
-        if (Player.Reading == 0)
-        {
-            Messages.Add("You can't read.");
-            return;
-        }
-
-        bool consumed = book.OnRead(Player, this);
-
-        // Train Literacy from reading practice
-        Player.TrainLiteracy(0.01, this);
-
-        // Message about reading
-        Messages.Add($"You read {book.Name}.");
-
-        // Message based on Reading level
-        int reading = Player.Reading;
-        string comprehension = reading switch
-        {
-            < 20 => "You barely understood anything.",
-            < 40 => "You understood some of it.",
-            < 60 => "You grasped most of the content.",
-            < 80 => "You understood it well.",
-            _ => "You fully comprehended the text."
-        };
-        Messages.Add(comprehension);
-
-        // Remove if consumed
-        if (consumed)
-        {
-            Player.Inventory.Remove(book);
-        }
+        var action = new ReadAction(book);
+        action.Execute(Player, this);
     }
 
     public bool IsPlayerOnStairsDown()
