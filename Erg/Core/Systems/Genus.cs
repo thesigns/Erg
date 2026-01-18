@@ -145,7 +145,7 @@ public class Genus
         MinHitPoints = 90, MaxHitPoints = 130,
         MinDamageBonus = 2, MaxDamageBonus = 16,
         UnarmedAttackMin = 15, UnarmedAttackMax = 60,
-        UnarmedDefenseMin = 20, UnarmedDefenseMax = 70
+        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
     };
 
     /// <summary>
