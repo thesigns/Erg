@@ -11,6 +11,10 @@ public class PlayView : IGameView
     private bool _awaitingAttackConfirmation = false;
     private Critter? _pendingAttackTarget = null;
 
+    // Door direction selection
+    private bool _awaitingDoorDirection = false;
+    private bool _doorActionIsOpen = true; // true = open, false = close
+
     // Advanced examine mode
     private bool _advancedExamineMode = false;
     private int _examineX;
@@ -73,6 +77,40 @@ public class PlayView : IGameView
                 _pendingAttackTarget = null;
                 _session.Messages.Clear();
                 return;
+            }
+            return; // Block other input while waiting
+        }
+
+        // Door direction selection
+        if (_awaitingDoorDirection)
+        {
+            if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Escape))
+            {
+                _awaitingDoorDirection = false;
+                _session.Messages.Clear();
+                return;
+            }
+
+            if (TryReadMovement(input, out int ddx, out int ddy))
+            {
+                int doorX = _session.Player.X + ddx;
+                int doorY = _session.Player.Y + ddy;
+
+                bool success = _doorActionIsOpen
+                    ? _session.TryOpenDoorAt(doorX, doorY)
+                    : _session.TryCloseDoorAt(doorX, doorY);
+
+                if (success)
+                {
+                    _session.ComputeFov();
+                    ProcessTurnAndCheckDeath();
+                }
+                else
+                {
+                    _session.Messages.Clear();
+                    _session.Messages.Add(_doorActionIsOpen ? "No closed door there." : "No open door there.");
+                }
+                _awaitingDoorDirection = false;
             }
             return; // Block other input while waiting
         }
@@ -170,17 +208,49 @@ public class PlayView : IGameView
 
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.O))
         {
-            _session.OpenAdjacentDoors();
-            _session.ComputeFov();
-            if (ProcessTurnAndCheckDeath()) return;
+            int count = _session.CountAdjacentClosedDoors();
+            if (count == 0)
+            {
+                _session.Messages.Clear();
+                _session.Messages.Add("No doors to open.");
+            }
+            else if (count == 1)
+            {
+                _session.OpenAdjacentDoors();
+                _session.ComputeFov();
+                if (ProcessTurnAndCheckDeath()) return;
+            }
+            else
+            {
+                _session.Messages.Clear();
+                _session.Messages.Add("Which door? (choose direction)");
+                _awaitingDoorDirection = true;
+                _doorActionIsOpen = true;
+            }
             return;
         }
 
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.C))
         {
-            _session.CloseAdjacentDoors();
-            _session.ComputeFov();
-            if (ProcessTurnAndCheckDeath()) return;
+            int count = _session.CountAdjacentOpenDoors();
+            if (count == 0)
+            {
+                _session.Messages.Clear();
+                _session.Messages.Add("No doors to close.");
+            }
+            else if (count == 1)
+            {
+                _session.CloseAdjacentDoors();
+                _session.ComputeFov();
+                if (ProcessTurnAndCheckDeath()) return;
+            }
+            else
+            {
+                _session.Messages.Clear();
+                _session.Messages.Add("Which door? (choose direction)");
+                _awaitingDoorDirection = true;
+                _doorActionIsOpen = false;
+            }
             return;
         }
 

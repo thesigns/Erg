@@ -295,6 +295,28 @@ public class Session
         (-1,  1), (0,  1), (1,  1)
     };
 
+    public int CountAdjacentClosedDoors()
+    {
+        int count = 0;
+        foreach (var (dx, dy) in AllDirections)
+        {
+            var tile = Area.GetTile(Player.X + dx, Player.Y + dy);
+            if (tile?.Type == TileType.ClosedDoor) count++;
+        }
+        return count;
+    }
+
+    public int CountAdjacentOpenDoors()
+    {
+        int count = 0;
+        foreach (var (dx, dy) in AllDirections)
+        {
+            var tile = Area.GetTile(Player.X + dx, Player.Y + dy);
+            if (tile?.Type == TileType.OpenDoor) count++;
+        }
+        return count;
+    }
+
     public bool TryOpenDoorAt(int x, int y)
     {
         var tile = Area.GetTile(x, y);
@@ -303,6 +325,19 @@ public class Session
             Area.SetTile(x, y, Tile.OpenDoor);
             Messages.Clear();
             Messages.Add("You open a door.");
+            return true;
+        }
+        return false;
+    }
+
+    public bool TryCloseDoorAt(int x, int y)
+    {
+        var tile = Area.GetTile(x, y);
+        if (tile?.Type == TileType.OpenDoor)
+        {
+            Area.SetTile(x, y, Tile.ClosedDoor);
+            Messages.Clear();
+            Messages.Add("You close a door.");
             return true;
         }
         return false;
