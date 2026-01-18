@@ -188,7 +188,7 @@ public abstract class Critter : Entity
         TrainAttrForDepth(Attributes.Charisma, Genus.CharismaTraining, minAmount, maxAmount, random);
     }
 
-    private void TrainAttrForDepth(Erg.Core.Systems.Attribute attr, TrainingFunction func, double min, double max, Random random)
+    protected void TrainAttrForDepth(Erg.Core.Systems.Attribute attr, TrainingFunction func, double min, double max, Random random)
     {
         double amount = min + random.NextDouble() * (max - min);
         attr.Train(amount, func, 1.0);

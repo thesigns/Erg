@@ -16,4 +16,29 @@ public class Drowned : Critter
         Genus = Genus.Zombius;
         Locomotion = Locomotion.Semiaquatic;
     }
+
+    public override void DepthTraining(int depth, Random random)
+    {
+        int depthDelta = Math.Max(0, depth - MinDepth);
+
+        double baseMin = 0.2;
+        double baseMax = 0.5;
+        double depthMin = depthDelta * 0.02;
+        double depthMax = depthDelta * 0.05;
+
+        double minAmount = baseMin + depthMin;
+        double maxAmount = baseMax + depthMax;
+
+        // Drowned: wyższe Agility i Strength (pływanie rozwija)
+        double highMin = minAmount + 0.25;
+        double highMax = maxAmount + 0.25;
+
+        TrainAttrForDepth(Attributes.Strength, Genus.StrengthTraining, highMin, highMax, random);
+        TrainAttrForDepth(Attributes.Endurance, Genus.EnduranceTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Agility, Genus.AgilityTraining, highMin, highMax, random);
+        TrainAttrForDepth(Attributes.Perception, Genus.PerceptionTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Intelligence, Genus.IntelligenceTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Willpower, Genus.WillpowerTraining, minAmount, maxAmount, random);
+        TrainAttrForDepth(Attributes.Charisma, Genus.CharismaTraining, minAmount, maxAmount, random);
+    }
 }
