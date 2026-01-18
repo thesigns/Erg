@@ -54,6 +54,6 @@ public class ReadAction : CritterAction
             critter.Inventory.Remove(Book);
         }
 
-        return Success();
+        return Success(10000);
     }
 }
