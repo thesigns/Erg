@@ -2273,9 +2273,8 @@ public class DungeonGenerator3 : IDungeonGenerator
 
             if (_random.Next(2) == 0)
             {
-                // Gold Coin with random count 1-100
-                int goldAmount = _random.Next(1, 101);
-                area.AddItem(new GoldCoin(x, y, goldAmount));
+                // Random coin type
+                area.AddItem(CreateRandomCoin(x, y));
             }
             else
             {
@@ -2303,13 +2302,22 @@ public class DungeonGenerator3 : IDungeonGenerator
                 {
                     if (_random.Next(100) < 70)  // 70% chance
                     {
-                        int treasureAmount = _random.Next(50, 201);  // 50-200
-                        var treasure = new GoldCoin(x, y, treasureAmount);
-                        area.AddItem(treasure);
+                        area.AddItem(CreateRandomCoin(x, y));
                     }
                 }
             }
         }
+    }
+
+    private Item CreateRandomCoin(int x, int y)
+    {
+        int roll = _random.Next(100);
+        if (roll < 90)      // 90%
+            return new CopperCoin(x, y, _random.Next(1, 81));  // 1-80
+        else if (roll < 99) // 9%
+            return new SilverCoin(x, y, _random.Next(1, 9));   // 1-8
+        else                // 1%
+            return new GoldCoin(x, y, 1);                       // zawsze 1
     }
 
     #endregion
