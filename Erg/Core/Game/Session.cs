@@ -477,8 +477,8 @@ public class Session
         Messages.Clear();
         Messages.Add("You search the area around you.");
 
-        // Success chance: 1/Searching (Searching=1 → 100%, Searching=50 → 2%)
-        bool success = Random.Next(Player.Searching) == 0;
+        // Success chance: Searching% (Searching=100 → 100%, Searching=50 → 50%)
+        bool success = Random.Next(100) < Player.Searching;
 
         if (!success)
         {
@@ -507,9 +507,8 @@ public class Session
 
     private void PassiveSearch()
     {
-        // Passive search: 1/20 of normal chance (1/(Searching*20))
-        int passiveSearching = Player.Searching * 20;
-        if (Random.Next(passiveSearching) != 0)
+        // Passive search: 1/20 of normal chance (Searching/20 %)
+        if (Random.Next(100) >= Player.Searching / 20)
             return;
 
         // Check for secret doors in adjacent tiles

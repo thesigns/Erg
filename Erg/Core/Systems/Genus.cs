@@ -50,11 +50,11 @@ public class Genus
     // ========== Searching Ability ==========
 
     /// <summary>
-    /// Searching ability range - average attempts needed to find something.
-    /// Lower is better! Actual value: Lerp(Max, Min, Observation)
+    /// Searching ability range (0-100%). Higher is better.
+    /// Actual value: Lerp(SearchingMin, SearchingMax, Observation)
     /// </summary>
-    public int SearchingMin { get; init; } = 1;
-    public int SearchingMax { get; init; } = 20;
+    public int SearchingMin { get; init; } = 10;
+    public int SearchingMax { get; init; } = 80;
 
     // ========== Reading Ability ==========
 
@@ -133,7 +133,7 @@ public class Genus
         MinDamageBonus = 2, MaxDamageBonus = 12,
         UnarmedAttackMin = 10, UnarmedAttackMax = 50,
         UnarmedDefenseMin = 10, UnarmedDefenseMax = 50,
-        SearchingMin = 1, SearchingMax = 5,
+        SearchingMin = 10, SearchingMax = 90,
         ReadingMin = 0, ReadingMax = 100
     };
 
@@ -147,7 +147,7 @@ public class Genus
         MinDamageBonus = 6, MaxDamageBonus = 18,
         UnarmedAttackMin = 25, UnarmedAttackMax = 80,
         UnarmedDefenseMin = 15, UnarmedDefenseMax = 40,
-        SearchingMin = 3, SearchingMax = 20,
+        SearchingMin = 10, SearchingMax = 50,
         ReadingMin = 0, ReadingMax = 30
     };
 
@@ -161,7 +161,7 @@ public class Genus
         MinDamageBonus = 0, MaxDamageBonus = 3,
         UnarmedAttackMin = 5, UnarmedAttackMax = 20,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
-        SearchingMin = 5, SearchingMax = 20,
+        SearchingMin = 5, SearchingMax = 30,
         ReadingMin = 0, ReadingMax = 0
     };
 
@@ -175,7 +175,7 @@ public class Genus
         MinDamageBonus = 2, MaxDamageBonus = 16,
         UnarmedAttackMin = 15, UnarmedAttackMax = 60,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
-        SearchingMin = 2, SearchingMax = 15,
+        SearchingMin = 20, SearchingMax = 70,
         ReadingMin = 0, ReadingMax = 15
     };
 
@@ -189,7 +189,7 @@ public class Genus
         MinDamageBonus = 1, MaxDamageBonus = 6,
         UnarmedAttackMin = 15, UnarmedAttackMax = 40,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
-        SearchingMin = 4, SearchingMax = 20,
+        SearchingMin = 5, SearchingMax = 30,
         ReadingMin = 0, ReadingMax = 5
     };
 }

@@ -59,11 +59,10 @@ public abstract class Critter : Entity
 
     // ========== Searching Ability ==========
     /// <summary>
-    /// Average attempts needed to find something hidden. Lower is better.
-    /// Formula: Lerp(SearchingMax, SearchingMin, Observation)
-    /// High Observation → low Searching (finds quickly)
+    /// Searching ability (0-100%). Higher is better.
+    /// Formula: Lerp(SearchingMin, SearchingMax, Observation)
     /// </summary>
-    public int Searching => Lerp(Genus.SearchingMax, Genus.SearchingMin, Derived.Observation);
+    public int Searching => Lerp(Genus.SearchingMin, Genus.SearchingMax, Derived.Observation);
 
     // ========== Reading Ability ==========
     /// <summary>
