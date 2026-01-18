@@ -12,7 +12,7 @@ public class Zombie : Critter
     public Zombie(int x, int y)
         : base("zombie", x, y, 'z', 0x8B4513FF, 0x000000FF,
                unarmedDamage: new Dice(1, 6),
-               behavior: ZombieBehavior.Instance)
+               behavior: new TerritorialBehavior(forgetChance: 0.005, territoryRadius: 6))
     {
         Genus = Genus.Zombius;
         Locomotion = Locomotion.Terrestrial;

@@ -87,25 +87,31 @@ public class AreaPopulator
 
     private Critter CreateCritterForTile(int x, int y, Tile? tile, bool isWater)
     {
-        // Undead aura tiles (graveyards) always spawn zombies
+        // UndeadAura: Zombie (80%) or Hanged (20%)
         if (tile?.SpecialEffect == SpecialEffect.UndeadAura)
         {
-            return new Zombie(x, y);
+            return _random.Next(100) < 80
+                ? new Zombie(x, y)
+                : new Hanged(x, y);
         }
 
-        // Water tiles spawn amoebas
+        // Water: Drowned (50%) or Amoeba (50%)
         if (isWater)
         {
-            return new Amoeba(x, y);
+            return _random.Next(2) == 0
+                ? new Drowned(x, y)
+                : new Amoeba(x, y);
         }
 
-        // Normal tiles: random selection
+        // Normal tiles: Zombie 70%, Hanged 20%, Dummy 5%, SpinningDummy 5%
         int roll = _random.Next(100);
-        if (roll < 40)
-            return new Dummy(x, y);
-        else if (roll < 80)
-            return new SpinningDummy(x, y);
-        else
+        if (roll < 70)
             return new Zombie(x, y);
+        else if (roll < 90)
+            return new Hanged(x, y);
+        else if (roll < 95)
+            return new Dummy(x, y);
+        else
+            return new SpinningDummy(x, y);
     }
 }
