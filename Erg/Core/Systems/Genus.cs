@@ -35,14 +35,14 @@ public class Genus
 
     /// <summary>
     /// Unarmed attack ability range. Actual value is:
-    /// UnarmedAttack = Lerp(Min, Max, UnarmedAttackSkill)
+    /// UnarmedAttack = Lerp(Min, Max, UnarmedAttackProficiency)
     /// </summary>
     public int UnarmedAttackMin { get; init; } = 10;
     public int UnarmedAttackMax { get; init; } = 50;
 
     /// <summary>
     /// Unarmed defense ability range. Actual value is:
-    /// UnarmedDefense = Lerp(Min, Max, UnarmedDefenseSkill)
+    /// UnarmedDefense = Lerp(Min, Max, UnarmedDefenseProficiency)
     /// </summary>
     public int UnarmedDefenseMin { get; init; } = 10;
     public int UnarmedDefenseMax { get; init; } = 50;

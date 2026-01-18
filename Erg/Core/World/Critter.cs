@@ -47,15 +47,15 @@ public abstract class Critter : Entity
     // ========== Unarmed Combat Abilities ==========
     /// <summary>
     /// Unarmed attack ability. Used in combat to determine hit chance.
-    /// Formula: Lerp(UnarmedAttackMin, UnarmedAttackMax, UnarmedAttackSkill)
+    /// Formula: Lerp(UnarmedAttackMin, UnarmedAttackMax, UnarmedAttackProficiency)
     /// </summary>
-    public int UnarmedAttack => Lerp(Genus.UnarmedAttackMin, Genus.UnarmedAttackMax, Derived.UnarmedAttackSkill);
+    public int UnarmedAttack => Lerp(Genus.UnarmedAttackMin, Genus.UnarmedAttackMax, Derived.UnarmedAttackProficiency);
 
     /// <summary>
     /// Unarmed defense ability. Used in combat to determine dodge/block chance.
-    /// Formula: Lerp(UnarmedDefenseMin, UnarmedDefenseMax, UnarmedDefenseSkill)
+    /// Formula: Lerp(UnarmedDefenseMin, UnarmedDefenseMax, UnarmedDefenseProficiency)
     /// </summary>
-    public int UnarmedDefense => Lerp(Genus.UnarmedDefenseMin, Genus.UnarmedDefenseMax, Derived.UnarmedDefenseSkill);
+    public int UnarmedDefense => Lerp(Genus.UnarmedDefenseMin, Genus.UnarmedDefenseMax, Derived.UnarmedDefenseProficiency);
 
     public Critter? KilledBy { get; private set; }
 

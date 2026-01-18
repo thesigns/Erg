@@ -37,22 +37,22 @@ public class Derived
         0.1 * _attributes.Endurance.CurrentValue +
         0.1 * _attributes.Willpower.CurrentValue;
 
-    // ========== Derived Skills ==========
+    // ========== Combat Proficiency ==========
 
     /// <summary>
-    /// Derived unarmed attack skill - combination of speed and combat training.
+    /// Unarmed attack proficiency - combination of speed and combat training.
     /// Used for calculating UnarmedAttack ability.
     /// </summary>
-    public double UnarmedAttackSkill =>
+    public double UnarmedAttackProficiency =>
         0.2 * Speed +
         0.6 * _skills.UnarmedSkill.CurrentValue +
         0.2 * _skills.AttackSkill.CurrentValue;
 
     /// <summary>
-    /// Derived unarmed defense skill - combination of speed and combat training.
+    /// Unarmed defense proficiency - combination of speed and combat training.
     /// Used for calculating UnarmedDefense ability.
     /// </summary>
-    public double UnarmedDefenseSkill =>
+    public double UnarmedDefenseProficiency =>
         0.2 * Speed +
         0.6 * _skills.UnarmedSkill.CurrentValue +
         0.2 * _skills.DefenseSkill.CurrentValue;
@@ -63,6 +63,6 @@ public class Derived
 
     public string VitalityDisplay => ToDisplayValue(Vitality);
     public string SpeedDisplay => ToDisplayValue(Speed);
-    public string UnarmedAttackSkillDisplay => ToDisplayValue(UnarmedAttackSkill);
-    public string UnarmedDefenseSkillDisplay => ToDisplayValue(UnarmedDefenseSkill);
+    public string UnarmedAttackProficiencyDisplay => ToDisplayValue(UnarmedAttackProficiency);
+    public string UnarmedDefenseProficiencyDisplay => ToDisplayValue(UnarmedDefenseProficiency);
 }

@@ -34,6 +34,9 @@ public class RaylibInput : IInput
         UpdateKey(KeyboardKey.Kp2, Raylib_cs.KeyboardKey.Kp2, now);
         UpdateKey(KeyboardKey.Kp3, Raylib_cs.KeyboardKey.Kp3, now);
         
+        UpdateKey(KeyboardKey.Two, Raylib_cs.KeyboardKey.Two, now);
+        UpdateKey(KeyboardKey.Three, Raylib_cs.KeyboardKey.Three, now);
+        
         UpdateKey(KeyboardKey.C, Raylib_cs.KeyboardKey.C, now);
         UpdateKey(KeyboardKey.D, Raylib_cs.KeyboardKey.D, now);
         UpdateKey(KeyboardKey.G, Raylib_cs.KeyboardKey.G, now);

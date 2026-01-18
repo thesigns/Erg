@@ -161,6 +161,13 @@ public class PlayView : IGameView
             return;
         }
 
+        // Shift+3 (= #) - Skills view
+        if (shiftHeld && input.KeyPulse.GetValueOrDefault(KeyboardKey.Three))
+        {
+            _game.SwitchView(new SkillsView(_game, this));
+            return;
+        }
+
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.O))
         {
             _session.OpenAdjacentDoors();
