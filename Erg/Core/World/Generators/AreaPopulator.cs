@@ -57,6 +57,10 @@ public class AreaPopulator
                 // Add water tiles twice for higher spawn chance
                 if (isWater)
                     positions.Add((x, y, true));
+
+                // Add undead aura tiles twice for higher spawn chance
+                if (tile.SpecialEffect == SpecialEffect.UndeadAura)
+                    positions.Add((x, y, isWater));
             }
         }
 
@@ -78,6 +82,7 @@ public class AreaPopulator
         critter.DepthTraining(_area.Depth, _random);
         critter.FullHeal();
         _area.SetCritter(critter);
+        critter.Behavior?.OnSpawn(critter, _area);
     }
 
     private Critter CreateCritterForTile(int x, int y, Tile? tile, bool isWater)
