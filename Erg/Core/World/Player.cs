@@ -26,6 +26,10 @@ public class Player : Critter
         SetRandomAttribute(Attributes.Intelligence, random);
         SetRandomAttribute(Attributes.Willpower, random);
         SetRandomAttribute(Attributes.Charisma, random);
+
+        // Początkowy trening Unarmed (przyszłość: zależne od profesji)
+        double unarmedAmount = 0.1 + random.NextDouble() * 0.4; // 0.1-0.5
+        Skills.Unarmed.SetBaseValue(unarmedAmount);
     }
 
     private void SetRandomAttribute(Erg.Core.Systems.Attribute attr, Random random)
