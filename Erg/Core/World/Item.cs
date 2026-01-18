@@ -5,6 +5,7 @@ namespace Erg.Core.World;
 public class Item : Entity
 {
     public int Count { get; set; }
+    public virtual int Value { get; } = 0;
 
     public Item(
         string name,
