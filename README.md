@@ -64,18 +64,59 @@ dotnet run --project Erg/Erg.csproj
 
 ## Controls
 
+### Movement & Combat
+
 | Key | Action |
 |-----|--------|
-| Arrow keys / Numpad | Move (8 directions) |
+| Arrow keys | Move in 4 directions |
+| Numpad 1-9 | Move in 8 directions (diagonals included) |
+| Numpad 5 | Wait a turn |
+
+To attack a hostile creature, simply walk into it. The game will automatically engage in combat.
+
+If you try to attack a non-hostile creature, you'll be asked to confirm with `Y` or `N`.
+
+### Interaction
+
+| Key | Action |
+|-----|--------|
+| `g` | Pick up items |
+| `o` | Open door |
+| `c` | Close door |
+| `s` | Search for secret doors |
+
+When multiple doors are adjacent, you'll be prompted to choose a direction. Doors cannot be closed if something is blocking them.
+
+### Stairs
+
+| Key | Action |
+|-----|--------|
 | `>` | Descend stairs |
 | `<` | Ascend stairs |
-| `g` | Pick up items |
+
+At depth 1, ascending the stairs means escaping the dungeon.
+
+### Examination
+
+| Key | Action |
+|-----|--------|
+| `x` | Examine adjacent tile (choose direction) |
+| `Alt+x` | Free-look mode (move cursor freely) |
+
+### Screens
+
+| Key | Action |
+|-----|--------|
 | `i` | Inventory |
-| `o` / `c` | Open / Close doors |
-| `x` | Examine adjacent tile |
-| `Alt+x` | Free-look examine mode |
-| `Numpad 5` | Wait a turn |
-| `Space` | Continue messages |
+| `#` | Skills |
+
+### Messages
+
+| Key | Action |
+|-----|--------|
+| `Space` | Continue to next message |
+| `Enter` | Skip all messages |
+| `Escape` | Cancel current action |
 
 ## Current State
 

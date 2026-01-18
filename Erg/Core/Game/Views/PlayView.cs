@@ -481,7 +481,8 @@ public class PlayView : IGameView
                             $"Dmg: {player.UnarmedDamage.ToString(player.DamageBonus)}";
         RenderTextLine(output, 23, combatText);
 
-        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  EnRg:{player.EnergyRegenRate}";
+        double activeChance = 100.0 / player.Searching;
+        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  Tempo:{player.EnergyRegenRate}  Search:{activeChance:F0}%";
         RenderTextLine(output, 24, statsText);
     }
 

@@ -134,6 +134,10 @@ public class Session
         {
             var destTile = Area.GetTile(Player.X, Player.Y);
             int cost = (int)(CritterAction.StandardCost * Player.GetMovementCostMultiplier(destTile!));
+
+            // Passive search while moving (1/20 of normal chance)
+            PassiveSearch();
+
             return MoveResult.Movement(cost);
         }
 
@@ -460,6 +464,27 @@ public class Session
 
         if (!foundSomething)
             Messages.Add("You haven't found anything... yet.");
+    }
+
+    private void PassiveSearch()
+    {
+        // Passive search: 1/20 of normal chance (1/(Searching*20))
+        int passiveSearching = Player.Searching * 20;
+        if (Random.Next(passiveSearching) != 0)
+            return;
+
+        // Check for secret doors in adjacent tiles
+        foreach (var (dx, dy) in AllDirections)
+        {
+            int nx = Player.X + dx;
+            int ny = Player.Y + dy;
+            var tile = Area.GetTile(nx, ny);
+            if (tile?.Type == TileType.SecretDoor)
+            {
+                Area.SetTile(nx, ny, Tile.ClosedDoor);
+                Messages.Add("You notice a secret door!");
+            }
+        }
     }
 
     public bool IsPlayerOnStairsDown()
