@@ -11,13 +11,14 @@ public abstract class Critter : Entity
 {
     /// <summary>
     /// Energy regeneration rate interpolated from Genus min/max based on Speed.
-    /// Formula: Lerp(MinEnergyRegenRate, MaxEnergyRegenRate, DerivedAttributes.Speed)
+    /// Formula: Lerp(MinEnergyRegenRate, MaxEnergyRegenRate, Derived.Speed)
     /// </summary>
-    public int EnergyRegenRate => Lerp(Genus.MinEnergyRegenRate, Genus.MaxEnergyRegenRate, DerivedAttributes.Speed);
+    public int EnergyRegenRate => Lerp(Genus.MinEnergyRegenRate, Genus.MaxEnergyRegenRate, Derived.Speed);
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
-    public DerivedAttributes DerivedAttributes { get; }
+    public Skills Skills { get; }
+    public Derived Derived { get; }
     public Genus Genus { get; protected set; } = Genus.Human;
     public IBehavior? Behavior { get; protected set; }
 
@@ -26,7 +27,7 @@ public abstract class Critter : Entity
     /// Max HP interpolated from Genus.MinHitPoints to Genus.MaxHitPoints based on Vitality.
     /// Formula: Lerp(MinHitPoints, MaxHitPoints, Vitality)
     /// </summary>
-    public int MaxHitPoints => Lerp(Genus.MinHitPoints, Genus.MaxHitPoints, DerivedAttributes.Vitality);
+    public int MaxHitPoints => Lerp(Genus.MinHitPoints, Genus.MaxHitPoints, Derived.Vitality);
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
 
@@ -41,7 +42,21 @@ public abstract class Critter : Entity
     /// Bonus damage based on Speed. Represents kinetic energy of strikes.
     /// Formula: Lerp(MinDamageBonus, MaxDamageBonus, Speed)
     /// </summary>
-    public int DamageBonus => Lerp(Genus.MinDamageBonus, Genus.MaxDamageBonus, DerivedAttributes.Speed);
+    public int DamageBonus => Lerp(Genus.MinDamageBonus, Genus.MaxDamageBonus, Derived.Speed);
+
+    // ========== Unarmed Combat Abilities ==========
+    /// <summary>
+    /// Unarmed attack ability. Used in combat to determine hit chance.
+    /// Formula: Lerp(UnarmedAttackMin, UnarmedAttackMax, UnarmedProficiency)
+    /// </summary>
+    public int UnarmedAttack => Lerp(Genus.UnarmedAttackMin, Genus.UnarmedAttackMax, Derived.UnarmedProficiency);
+
+    /// <summary>
+    /// Unarmed defense ability. Used in combat to determine dodge/block chance.
+    /// Formula: Lerp(UnarmedDefenseMin, UnarmedDefenseMax, UnarmedProficiency)
+    /// </summary>
+    public int UnarmedDefense => Lerp(Genus.UnarmedDefenseMin, Genus.UnarmedDefenseMax, Derived.UnarmedProficiency);
+
     public Critter? KilledBy { get; private set; }
 
     // Pronouns
@@ -122,6 +137,26 @@ public abstract class Critter : Entity
 
     public void TrainCharisma(double amount, Session session)
         => Attributes.Charisma.Train(amount, Genus.CharismaTraining, session.TrainingSpeed);
+
+    // ========== Skill Training ==========
+
+    /// <summary>
+    /// Trains a skill using the species-specific training function.
+    /// </summary>
+    public void TrainSkill(Skill skill, double amount, Session session)
+    {
+        var function = Genus.GetSkillTrainingFunction(skill, Skills);
+        skill.Train(amount, function, session.TrainingSpeed);
+    }
+
+    public void TrainReading(double amount, Session session)
+        => Skills.Reading.Train(amount, Genus.ReadingTraining, session.TrainingSpeed);
+
+    public void TrainSwimming(double amount, Session session)
+        => Skills.Swimming.Train(amount, Genus.SwimmingTraining, session.TrainingSpeed);
+
+    public void TrainUnarmed(double amount, Session session)
+        => Skills.Unarmed.Train(amount, Genus.UnarmedTraining, session.TrainingSpeed);
 
     // ========== Depth-Based Training ==========
 
@@ -229,7 +264,8 @@ public abstract class Critter : Entity
     {
         Energy = 0;
         Attributes = new Attributes();
-        DerivedAttributes = new DerivedAttributes(Attributes);
+        Skills = new Skills();
+        Derived = new Derived(Attributes, Skills);
         HitPoints = MaxHitPoints;
         UnarmedDamage = unarmedDamage ?? new Dice(1, 4);
         Behavior = behavior;

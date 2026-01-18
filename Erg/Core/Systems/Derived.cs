@@ -1,33 +1,35 @@
 namespace Erg.Core.Systems;
 
 /// <summary>
-/// Atrybuty pochodne - wartości obliczane na podstawie atrybutów podstawowych.
-/// Nie są rozwijane bezpośrednio, zmieniają się gdy zmieniają się atrybuty źródłowe.
+/// Wartości pochodne - obliczane na podstawie atrybutów podstawowych i umiejętności.
+/// Nie są rozwijane bezpośrednio, zmieniają się gdy zmieniają się atrybuty/umiejętności źródłowe.
 /// </summary>
-public class DerivedAttributes
+public class Derived
 {
     private readonly Attributes _attributes;
+    private readonly Skills _skills;
 
-    public DerivedAttributes(Attributes attributes)
+    public Derived(Attributes attributes, Skills skills)
     {
         _attributes = attributes;
+        _skills = skills;
     }
+
+    // ========== Derived Attributes ==========
 
     /// <summary>
     /// Ogólna kondycja organizmu, odporność biologiczna, zdolność do regeneracji.
     /// Używane do obliczania MaxHitPoints, tempa regeneracji itp.
-    /// Formula: 0.2 * Strength + 0.5 * Endurance + 0.2 * Agility + 0.1 * Willpower
     /// </summary>
     public double Vitality =>
         0.2 * _attributes.Strength.CurrentValue +
-        0.5 * _attributes.Endurance.CurrentValue +
-        0.2 * _attributes.Agility.CurrentValue +
+        0.6 * _attributes.Endurance.CurrentValue +
+        0.1 * _attributes.Agility.CurrentValue +
         0.1 * _attributes.Willpower.CurrentValue;
 
     /// <summary>
     /// Eksplozywna szybkość - zdolność do szybkiego działania.
     /// Używane do obliczania EnergyRegenRate.
-    /// Formula: 0.4 * Strength + 0.4 * Agility + 0.1 * Endurance + 0.1 * Willpower
     /// </summary>
     public double Speed =>
         0.4 * _attributes.Strength.CurrentValue +
@@ -35,10 +37,22 @@ public class DerivedAttributes
         0.1 * _attributes.Endurance.CurrentValue +
         0.1 * _attributes.Willpower.CurrentValue;
 
+    // ========== Derived Skills ==========
+
+    /// <summary>
+    /// Umiejętność pochodna walki wręcz - kombinacja siły, zręczności i treningu.
+    /// Używane do obliczania UnarmedAttack i UnarmedDefense abilities.
+    /// </summary>
+    public double UnarmedProficiency =>
+        0.2 * _attributes.Strength.CurrentValue +
+        0.2 * _attributes.Agility.CurrentValue +
+        0.6 * _skills.Unarmed.CurrentValue;
+
     // ========== Display Values (1-99) ==========
 
     private static string ToDisplayValue(double value) => ((int)(1 + value * 98)).ToString("D2");
 
     public string VitalityDisplay => ToDisplayValue(Vitality);
     public string SpeedDisplay => ToDisplayValue(Speed);
+    public string UnarmedProficiencyDisplay => ToDisplayValue(UnarmedProficiency);
 }

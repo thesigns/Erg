@@ -31,6 +31,23 @@ public class Genus
     public int MinDamageBonus { get; init; } = 0;
     public int MaxDamageBonus { get; init; } = 5;
 
+    // ========== Ability Ranges (Unarmed Combat) ==========
+
+    /// <summary>
+    /// Unarmed attack ability range. Actual value is:
+    /// UnarmedAttack = Lerp(Min, Max, UnarmedProficiency)
+    /// </summary>
+    public int UnarmedAttackMin { get; init; } = 10;
+    public int UnarmedAttackMax { get; init; } = 50;
+
+    /// <summary>
+    /// Unarmed defense ability range. Actual value is:
+    /// UnarmedDefense = Lerp(Min, Max, UnarmedProficiency)
+    /// </summary>
+    public int UnarmedDefenseMin { get; init; } = 10;
+    public int UnarmedDefenseMax { get; init; } = 50;
+
+    // ========== Attribute Training Functions ==========
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction EnduranceTraining { get; init; } = TrainingFunction.Linear();
@@ -39,6 +56,12 @@ public class Genus
     public TrainingFunction IntelligenceTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction WillpowerTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction CharismaTraining { get; init; } = TrainingFunction.Linear();
+
+    // ========== Skill Training Functions ==========
+    // Funkcje treningowe per umiejętność (domyślnie Linear)
+    public TrainingFunction ReadingTraining { get; init; } = TrainingFunction.Linear();
+    public TrainingFunction SwimmingTraining { get; init; } = TrainingFunction.Linear();
+    public TrainingFunction UnarmedTraining { get; init; } = TrainingFunction.Linear();
 
     public Genus(string name)
     {
@@ -62,6 +85,19 @@ public class Genus
         return TrainingFunction.Linear();
     }
 
+    /// <summary>
+    /// Gets the training function for a specific skill.
+    /// </summary>
+    public TrainingFunction GetSkillTrainingFunction(Skill skill, Skills skills)
+    {
+        if (ReferenceEquals(skill, skills.Reading)) return ReadingTraining;
+        if (ReferenceEquals(skill, skills.Swimming)) return SwimmingTraining;
+        if (ReferenceEquals(skill, skills.Unarmed)) return UnarmedTraining;
+
+        // Fallback to linear if skill not recognized
+        return TrainingFunction.Linear();
+    }
+
     // ========== Predefiniowane rodzaje ==========
 
     /// <summary>
@@ -71,7 +107,9 @@ public class Genus
     {
         MinEnergyRegenRate = 80, MaxEnergyRegenRate = 120,
         MinHitPoints = 60, MaxHitPoints = 100,
-        MinDamageBonus = 2, MaxDamageBonus = 12
+        MinDamageBonus = 2, MaxDamageBonus = 12,
+        UnarmedAttackMin = 10, UnarmedAttackMax = 50,
+        UnarmedDefenseMin = 10, UnarmedDefenseMax = 50
     };
 
     /// <summary>
@@ -81,7 +119,9 @@ public class Genus
     {
         MinEnergyRegenRate = 60, MaxEnergyRegenRate = 90,
         MinHitPoints = 130, MaxHitPoints = 240,
-        MinDamageBonus = 6, MaxDamageBonus = 18
+        MinDamageBonus = 6, MaxDamageBonus = 18,
+        UnarmedAttackMin = 25, UnarmedAttackMax = 80,
+        UnarmedDefenseMin = 15, UnarmedDefenseMax = 40
     };
 
     /// <summary>
@@ -91,7 +131,9 @@ public class Genus
     {
         MinEnergyRegenRate = 30, MaxEnergyRegenRate = 70,
         MinHitPoints = 10, MaxHitPoints = 35,
-        MinDamageBonus = 0, MaxDamageBonus = 3
+        MinDamageBonus = 0, MaxDamageBonus = 3,
+        UnarmedAttackMin = 5, UnarmedAttackMax = 20,
+        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
     };
 
     /// <summary>
@@ -101,7 +143,9 @@ public class Genus
     {
         MinEnergyRegenRate = 70, MaxEnergyRegenRate = 110,
         MinHitPoints = 90, MaxHitPoints = 130,
-        MinDamageBonus = 2, MaxDamageBonus = 16
+        MinDamageBonus = 2, MaxDamageBonus = 16,
+        UnarmedAttackMin = 15, UnarmedAttackMax = 60,
+        UnarmedDefenseMin = 20, UnarmedDefenseMax = 70
     };
 
     /// <summary>
@@ -111,6 +155,8 @@ public class Genus
     {
         MinEnergyRegenRate = 70, MaxEnergyRegenRate = 90,
         MinHitPoints = 20, MaxHitPoints = 120,
-        MinDamageBonus = 1, MaxDamageBonus = 6
+        MinDamageBonus = 1, MaxDamageBonus = 6,
+        UnarmedAttackMin = 5, UnarmedAttackMax = 30,
+        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
     };
 }
