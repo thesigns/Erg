@@ -1,3 +1,4 @@
+using Erg.Core.World.Actions;
 using Erg.Core.World.Critters;
 
 namespace Erg.Core.World.Behaviors;

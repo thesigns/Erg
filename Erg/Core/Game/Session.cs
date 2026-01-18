@@ -5,6 +5,7 @@ using Erg.Core.Combat;
 using Erg.Core.Game;
 using Erg.Core.Messages;
 using Erg.Core.World;
+using Erg.Core.World.Actions;
 using Erg.Core.World.Behaviors;
 using Erg.Core.World.Critters;
 using Erg.Core.World.Generators;

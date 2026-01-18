@@ -1,6 +1,6 @@
 using Erg.Core.Combat;
 
-namespace Erg.Core.World.Behaviors;
+namespace Erg.Core.World.Actions;
 
 public class UnarmedAttackAction : CritterAction
 {

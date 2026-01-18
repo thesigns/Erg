@@ -1,4 +1,4 @@
-namespace Erg.Core.World.Behaviors;
+namespace Erg.Core.World.Actions;
 
 public class WaitAction : CritterAction
 {

@@ -1,3 +1,5 @@
+using Erg.Core.World.Actions;
+
 namespace Erg.Core.World.Behaviors;
 
 public class SpinAttackBehavior : IBehavior
