@@ -29,10 +29,10 @@ public class Skill
     public double CurrentValue => Math.Clamp(BaseValue + TotalModifier, 0.0, 1.0);
 
     /// <summary>
-    /// Display value for GUI (1-99).
-    /// 1 = minimum (0.0), 99 = maximum (1.0)
+    /// Display value for GUI (0-100).
+    /// 0 = minimum (0.0), 100 = maximum (1.0)
     /// </summary>
-    public string DisplayValue => ((int)(1 + CurrentValue * 98)).ToString("D2");
+    public string DisplayValue => ((int)(CurrentValue * 100)).ToString();
 
     /// <summary>
     /// Training factor based on current base value. Higher values train slower.

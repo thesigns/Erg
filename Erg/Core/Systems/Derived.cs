@@ -48,9 +48,9 @@ public class Derived
         0.2 * _attributes.Agility.CurrentValue +
         0.6 * _skills.Unarmed.CurrentValue;
 
-    // ========== Display Values (1-99) ==========
+    // ========== Display Values (0-100) ==========
 
-    private static string ToDisplayValue(double value) => ((int)(1 + value * 98)).ToString("D2");
+    private static string ToDisplayValue(double value) => ((int)(value * 100)).ToString();
 
     public string VitalityDisplay => ToDisplayValue(Vitality);
     public string SpeedDisplay => ToDisplayValue(Speed);
