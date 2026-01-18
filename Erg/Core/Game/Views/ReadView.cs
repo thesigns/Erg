@@ -4,6 +4,7 @@ using System.Linq;
 using Erg.Core.Abstractions;
 using Erg.Core.Ui;
 using Erg.Core.World;
+using Erg.Core.World.Actions;
 using Erg.Core.World.Items;
 
 namespace Erg.Core.Game.Views;
@@ -56,7 +57,21 @@ public class ReadView : IGameView
                 var item = _readableItems[i];
                 if (item is Book book)
                 {
-                    _game.CurrentSession.ReadBook(book);
+                    var action = new ReadAction(book);
+                    var result = action.Execute(_game.CurrentSession.Player, _game.CurrentSession);
+
+                    if (result.Success)
+                    {
+                        _game.CurrentSession.IncrementTurn();
+                        _game.CurrentSession.ProcessCritterTurns(result.EnergyCost);
+
+                        // Check if player died during NPC turns
+                        if (!_game.CurrentSession.Player.IsAlive)
+                        {
+                            _game.SwitchView(new GameSummaryView(_game, GameEndReason.Died));
+                            return;
+                        }
+                    }
                 }
                 _game.SwitchView(_previousView);
                 return;
