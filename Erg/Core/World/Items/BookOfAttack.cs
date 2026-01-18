@@ -7,7 +7,7 @@ namespace Erg.Core.World.Items;
 /// </summary>
 public class BookOfAttack : Book
 {
-    private const double BaseTraining = 0.2;
+    private const double BaseTraining = 0.04;
 
     public BookOfAttack(int x, int y) : base("Book of Attack", x, y) { }
 
