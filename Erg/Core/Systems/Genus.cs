@@ -123,7 +123,7 @@ public class Genus
         MinDamageBonus = 2, MaxDamageBonus = 12,
         UnarmedAttackMin = 10, UnarmedAttackMax = 50,
         UnarmedDefenseMin = 10, UnarmedDefenseMax = 50,
-        SearchingMin = 1, SearchingMax = 10
+        SearchingMin = 1, SearchingMax = 5
     };
 
     /// <summary>
