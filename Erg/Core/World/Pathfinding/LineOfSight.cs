@@ -6,8 +6,16 @@ public static class LineOfSight
     /// Sprawdza czy z (x1,y1) widać (x2,y2).
     /// Sprawdza oba kierunki żeby uniknąć asymetrii tile-based map.
     /// </summary>
-    public static bool CanSee(Area area, int x1, int y1, int x2, int y2)
+    /// <param name="range">Maksymalny zasięg (odległość Chebysheva). 0 lub mniej = bez limitu.</param>
+    public static bool CanSee(Area area, int x1, int y1, int x2, int y2, int range = 0)
     {
+        if (range > 0)
+        {
+            int dx = Math.Abs(x2 - x1);
+            int dy = Math.Abs(y2 - y1);
+            if (Math.Max(dx, dy) > range) return false;
+        }
+
         return HasLineOfSight(area, x1, y1, x2, y2)
             || HasLineOfSight(area, x2, y2, x1, y1);
     }

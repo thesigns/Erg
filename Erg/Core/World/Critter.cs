@@ -67,10 +67,7 @@ public abstract class Critter : Entity
     /// </summary>
     public bool CanSeeTile(Area area, int x, int y)
     {
-        int dx = Math.Abs(x - X);
-        int dy = Math.Abs(y - Y);
-        if (Math.Max(dx, dy) > SightRange) return false;
-        return LineOfSight.CanSee(area, X, Y, x, y);
+        return LineOfSight.CanSee(area, X, Y, x, y, SightRange);
     }
 
     /// <summary>
