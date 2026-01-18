@@ -13,9 +13,20 @@ public static class Combat
         bool seeAttacker = session.CanPlayerSee(attacker);
         bool seeDefender = session.CanPlayerSee(defender);
 
-        // Hit chance: Attack / (Attack + Defense), clamped to 5%-95%
+        // Surprise attack logic:
+        // - NPC: surprise if attacker not in defender's enemies
+        // - Player: surprise only if can't see attacker AND attacker not in enemies
+        bool isSurprise;
+        if (defender is Player)
+            isSurprise = !seeAttacker && !defender.Enemies.Contains(attacker);
+        else
+            isSurprise = !defender.Enemies.Contains(attacker);
+
+        // Hit chance: Attack / (Attack + Defense)
+        // Surprise: min 50%, normal: min 5%
         double hitChance = (double)attacker.UnarmedAttack / (attacker.UnarmedAttack + defender.UnarmedDefense);
-        hitChance = Math.Clamp(hitChance, 0.05, 0.95);
+        double minHitChance = isSurprise ? 0.50 : 0.05;
+        hitChance = Math.Clamp(hitChance, minHitChance, 0.95);
 
         bool hit = random.NextDouble() < hitChance;
 
@@ -30,32 +41,36 @@ public static class Combat
         }
 
         // Hit - calculate and apply damage
-        int damage = attacker.UnarmedDamage.Roll(random) + attacker.DamageBonus;
+        // Surprise: max damage, normal: roll
+        int damage = isSurprise
+            ? attacker.UnarmedDamage.Max() + attacker.DamageBonus
+            : attacker.UnarmedDamage.Roll(random) + attacker.DamageBonus;
         defender.TakeDamage(damage, attacker);
 
         // Damage info only when player is directly involved
         bool playerInvolved = attacker is Player || defender is Player;
+        string surpriseText = isSurprise ? " by surprise" : "";
 
         // Attack message based on visibility
         if (seeAttacker && seeDefender)
         {
             if (playerInvolved)
-                messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} {NameOf(defender, false)} for {damage} damage.");
+                messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} {NameOf(defender, false)}{surpriseText} for {damage} damage!");
             else
-                messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} {NameOf(defender, false)}.");
+                messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} {NameOf(defender, false)}{surpriseText}.");
         }
         else if (seeAttacker && !seeDefender)
         {
             // Attacker visible only - no damage info
-            messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} something.");
+            messages.Add($"{NameOf(attacker)} {Verb(attacker, "hit", "hits")} something{surpriseText}.");
         }
         else if (!seeAttacker && seeDefender)
         {
             // Defender visible only
             if (defender is Player)
-                messages.Add($"Something hits {NameOf(defender, false)} for {damage} damage.");
+                messages.Add($"Something hits {NameOf(defender, false)}{surpriseText} for {damage} damage!");
             else
-                messages.Add($"Something hits {NameOf(defender, false)}.");
+                messages.Add($"Something hits {NameOf(defender, false)}{surpriseText}.");
         }
         // Neither visible: no message (silent combat)
 

@@ -40,6 +40,11 @@ public readonly partial struct Dice
     }
 
     /// <summary>
+    /// Returns the maximum possible roll result.
+    /// </summary>
+    public int Max() => DiceCount * DiceSides + Modifier;
+
+    /// <summary>
     /// Returns the dice notation string (e.g., "2d6+4", "1d8-2", "3d10").
     /// </summary>
     public override string ToString()
