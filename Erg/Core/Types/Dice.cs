@@ -54,6 +54,22 @@ public readonly partial struct Dice
     }
 
     /// <summary>
+    /// Returns the dice notation string with an extra bonus added to the modifier.
+    /// Useful for displaying damage with DamageBonus included.
+    /// </summary>
+    public string ToString(int extraBonus)
+    {
+        int totalModifier = Modifier + extraBonus;
+        string baseNotation = $"{DiceCount}d{DiceSides}";
+        return totalModifier switch
+        {
+            > 0 => $"{baseNotation}+{totalModifier}",
+            < 0 => $"{baseNotation}{totalModifier}",
+            _ => baseNotation
+        };
+    }
+
+    /// <summary>
     /// Parses a dice notation string (e.g., "2d6+4", "1d8-2", "3d10") into a Dice struct.
     /// </summary>
     public static Dice Parse(string notation)

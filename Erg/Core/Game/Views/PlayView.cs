@@ -374,14 +374,11 @@ public class PlayView : IGameView
         RenderTextLine(output, 22, depthText);
 
         var player = _session.Player;
-        var attrs = player.Attributes;
-        string attrText = $"St:{attrs.Strength.DisplayValue}  En:{attrs.Endurance.DisplayValue}  " +
-                          $"Ag:{attrs.Agility.DisplayValue}  Pe:{attrs.Perception.DisplayValue}  " +
-                          $"In:{attrs.Intelligence.DisplayValue}  Wi:{attrs.Willpower.DisplayValue}  " +
-                          $"Ch:{attrs.Charisma.DisplayValue}";
-        RenderTextLine(output, 23, attrText);
+        string combatText = $"A/D (Unarmed): {player.UnarmedAttack}/{player.UnarmedDefense}  " +
+                            $"Dmg: {player.UnarmedDamage.ToString(player.DamageBonus)}";
+        RenderTextLine(output, 23, combatText);
 
-        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  ERR:{player.EnergyRegenRate}";
+        string statsText = $"HP:{player.HitPoints}/{player.MaxHitPoints}  EnRg:{player.EnergyRegenRate}";
         RenderTextLine(output, 24, statsText);
     }
 
