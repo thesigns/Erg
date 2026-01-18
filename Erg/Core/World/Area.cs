@@ -30,7 +30,7 @@ public class Area
         }
     }
     
-    public Tile GetTile(int x, int y)
+    public Tile? GetTile(int x, int y)
     {
         if (x < 0 || x >= Width || y < 0 || y >= Height)
             return null; // lub Tile.Wall

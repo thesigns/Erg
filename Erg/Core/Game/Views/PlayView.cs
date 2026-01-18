@@ -418,6 +418,7 @@ public class PlayView : IGameView
                 bool explored = area.IsExplored(x, y);
                 bool seen = fov.IsSeen(x, y);
                 var tile = area.GetTile(x, y);
+                if (tile == null) continue;
 
                 if (!explored)
                 {

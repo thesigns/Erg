@@ -7,10 +7,10 @@ public class Game
 {
     private IOutput _output;
     private IInput _input;
-    private IGameView _currentView;
+    private IGameView _currentView = null!;
     private readonly CheatKeys _cheatKeys = new();
 
-    private Session _currentSession;
+    private Session _currentSession = null!;
     public Session CurrentSession => _currentSession;
     
     public Game(IOutput output, IInput input)
