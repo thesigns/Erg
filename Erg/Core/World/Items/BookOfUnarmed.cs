@@ -3,7 +3,7 @@ using Erg.Core.Game;
 namespace Erg.Core.World.Items;
 
 /// <summary>
-/// A book that trains the Unarmed skill when read.
+/// A book that trains the theoretical component of the Unarmed skill when read.
 /// </summary>
 public class BookOfUnarmed : Book
 {
@@ -15,7 +15,7 @@ public class BookOfUnarmed : Book
     {
         double readingMultiplier = reader.Reading / 100.0;
         double trainingAmount = BaseTraining * readingMultiplier;
-        reader.TrainUnarmed(trainingAmount, session);
+        reader.TrainUnarmedTheory(trainingAmount, session);
         return true;
     }
 }

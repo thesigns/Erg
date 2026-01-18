@@ -30,6 +30,13 @@ public static class Combat
 
         bool hit = random.NextDouble() < hitChance;
 
+        // Combat practice training (both combatants learn from fighting)
+        const double CombatTrainingAmount = 0.01;
+        attacker.TrainUnarmedPractice(CombatTrainingAmount, session);
+        attacker.TrainAttackPractice(CombatTrainingAmount, session);
+        defender.TrainUnarmedPractice(CombatTrainingAmount, session);
+        defender.TrainDefensePractice(CombatTrainingAmount, session);
+
         if (!hit)
         {
             // Miss - no damage

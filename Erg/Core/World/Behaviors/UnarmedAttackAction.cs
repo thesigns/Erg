@@ -11,9 +11,7 @@ public class UnarmedAttackAction : CritterAction
         Target = target;
     }
 
-    public override int EnergyCost => StandardCost;
-
-    public override bool Execute(Critter critter, Session session)
+    public override ActionResult Execute(Critter critter, Session session)
     {
         Combat.Combat.UnarmedAttack(critter, Target, session);
 
@@ -24,6 +22,6 @@ public class UnarmedAttackAction : CritterAction
             session.Area.RemoveCritter(Target);
         }
 
-        return true;
+        return Success();
     }
 }

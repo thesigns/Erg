@@ -91,7 +91,8 @@ public class Session
 
     public bool TryMovePlayer(int dx, int dy)
     {
-        return TryMove(Player, dx, dy);
+        var moveAction = new MoveAction(dx, dy);
+        return moveAction.Execute(Player, this).Success;
     }
 
     public MoveResult TryMoveOrAttack(int dx, int dy)
@@ -130,16 +131,14 @@ public class Session
             return MoveResult.ConfirmAttack(blocker);
         }
 
-        // Normal movement
-        if (TryMove(Player, dx, dy))
+        // Normal movement - use MoveAction for unified logic
+        var moveAction = new MoveAction(dx, dy);
+        var result = moveAction.Execute(Player, this);
+
+        if (result.Success)
         {
-            var destTile = Area.GetTile(Player.X, Player.Y);
-            int cost = (int)(CritterAction.StandardCost * Player.GetMovementCostMultiplier(destTile!));
-
-            // Passive search while moving (1/20 of normal chance)
-            PassiveSearch();
-
-            return MoveResult.Movement(cost);
+            // Passive search is now handled in MoveAction.Execute()
+            return MoveResult.Movement(result.EnergyCost);
         }
 
         return MoveResult.Blocked();
@@ -156,66 +155,6 @@ public class Session
             Area.RemoveCritter(target);
         }
     }
-
-    private bool TryMove(Critter critter, int dx, int dy)
-    {
-        int nx = critter.X + dx;
-        int ny = critter.Y + dy;
-
-        var tile = Area.GetTile(nx, ny);
-        if (tile == null || !critter.CanEnterTile(tile))
-            return false;
-
-        var blocker = Area.GetBlockingCritter(nx, ny);
-        if (blocker != null)
-            return false; // na razie nic więcej
-
-        // Zapisz stary SpecialEffect przed ruchem
-        var oldTile = Area.GetTile(critter.X, critter.Y);
-        var oldEffect = oldTile?.SpecialEffect ?? SpecialEffect.None;
-
-        Area.MoveCritter(critter, nx, ny);
-
-        // Wyczyść stare wiadomości z poprzedniej tury
-        Messages.Clear();
-
-        // Locomotion message (e.g. "You swim.", "You wade knee-deep in water.")
-        var locoMessage = critter.GetLocomotionMessage(tile);
-        if (locoMessage != null)
-            Messages.Add(locoMessage);
-
-        // Sprawdź czy wchodzimy na kafelek z innym SpecialEffect
-        var newEffect = tile.SpecialEffect;
-        if (newEffect != oldEffect && newEffect != SpecialEffect.None)
-        {
-            Messages.Add(GetSpecialEffectMessage(newEffect));
-        }
-
-        Messages.Add($"{tile.Name}.");
-
-        // Sprawdź itemy na nowej pozycji
-        var items = Area.GetItems(nx, ny);
-        if (items.Count > 1)
-        {
-            Messages.Add("Several items are lying here.");
-        }
-        else if (items.Count == 1)
-        {
-            var item = items[0];
-            if (item.Count > 1)
-                Messages.Add($"{item.Count} {item.Name}s are lying here.");
-            else
-                Messages.Add($"{item.Name} is lying here.");
-        }
-
-        return true;
-    }
-
-    private static string GetSpecialEffectMessage(SpecialEffect effect) => effect switch
-    {
-        SpecialEffect.UndeadAura => "A chill of death hangs over this place.",
-        _ => ""
-    };
 
     public void Examine(int dx, int dy)
     {
@@ -404,30 +343,6 @@ public class Session
         return anySuccess;
     }
 
-    public void PickUpItems()
-    {
-        Messages.Clear();
-
-        var tile = Area.GetTile(Player.X, Player.Y);
-        if (tile == null || tile.Items.Count == 0)
-        {
-            Messages.Add("There is nothing here to pick up.");
-            return;
-        }
-
-        foreach (var item in tile.Items.ToList())
-        {
-            Player.Inventory.Add(item);
-            Area.RemoveItem(item);
-
-            if (item.Count > 1)
-                Messages.Add($"You pick up {item.Count} {item.Name}s.");
-            else
-                Messages.Add($"You pick up {item.Name}.");
-
-        }
-    }
-
     public void ReadBook(Book book)
     {
         Messages.Clear();
@@ -463,65 +378,6 @@ public class Session
         if (consumed)
         {
             Player.Inventory.Remove(book);
-        }
-    }
-
-    public void PlayerWait()
-    {
-        Messages.Clear();
-        Messages.Add("You wait.");
-    }
-
-    public void PlayerSearch()
-    {
-        Messages.Clear();
-        Messages.Add("You search the area around you.");
-
-        // Success chance: Searching% (Searching=100 → 100%, Searching=50 → 50%)
-        bool success = Random.Next(100) < Player.Searching;
-
-        if (!success)
-        {
-            Messages.Add("You haven't found anything... yet.");
-            return;
-        }
-
-        // Check for secret doors in adjacent tiles
-        bool foundSomething = false;
-        foreach (var (dx, dy) in AllDirections)
-        {
-            int nx = Player.X + dx;
-            int ny = Player.Y + dy;
-            var tile = Area.GetTile(nx, ny);
-            if (tile?.Type == TileType.SecretDoor)
-            {
-                Area.SetTile(nx, ny, Tile.ClosedDoor);
-                Messages.Add("You found a secret door!");
-                foundSomething = true;
-            }
-        }
-
-        if (!foundSomething)
-            Messages.Add("You haven't found anything... yet.");
-    }
-
-    private void PassiveSearch()
-    {
-        // Passive search: 1/20 of normal chance (Searching/20 %)
-        if (Random.Next(100) >= Player.Searching / 20)
-            return;
-
-        // Check for secret doors in adjacent tiles
-        foreach (var (dx, dy) in AllDirections)
-        {
-            int nx = Player.X + dx;
-            int ny = Player.Y + dy;
-            var tile = Area.GetTile(nx, ny);
-            if (tile?.Type == TileType.SecretDoor)
-            {
-                Area.SetTile(nx, ny, Tile.ClosedDoor);
-                Messages.Add("You notice a secret door!");
-            }
         }
     }
 
@@ -609,8 +465,8 @@ public class Session
                     }
 
                     var action = critter.Behavior.DecideAction(critter, this);
-                    action.Execute(critter, this);
-                    critter.SpendEnergy(action.EnergyCost);
+                    var result = action.Execute(critter, this);
+                    critter.SpendEnergy(result.EnergyCost);
                 }
             }
         }

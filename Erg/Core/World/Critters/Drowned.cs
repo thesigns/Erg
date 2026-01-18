@@ -41,6 +41,9 @@ public class Drowned : Critter
         TrainAttrForDepth(Attributes.Intelligence, Genus.IntelligenceTraining, minAmount, maxAmount, random);
         TrainAttrForDepth(Attributes.Willpower, Genus.WillpowerTraining, minAmount, maxAmount, random);
         TrainAttrForDepth(Attributes.Charisma, Genus.CharismaTraining, minAmount, maxAmount, random);
+
+        // Semiaquatic - good swimmer
+        Skills.SwimmingSkill.SetPracticeValue(0.5 + random.NextDouble() * 0.3); // 50-80%
     }
 
     public override void OnDeath(Area area)

@@ -13,9 +13,7 @@ public class SpinAttackAction : CritterAction
         _dy = dy;
     }
 
-    public override int EnergyCost => StandardCost;
-
-    public override bool Execute(Critter critter, Session session)
+    public override ActionResult Execute(Critter critter, Session session)
     {
         int targetX = critter.X + _dx;
         int targetY = critter.Y + _dy;
@@ -35,6 +33,6 @@ public class SpinAttackAction : CritterAction
         }
         // Jeśli brak celu - atak "w powietrze", energia i tak zużyta
 
-        return true;
+        return Success();
     }
 }

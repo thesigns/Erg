@@ -3,7 +3,7 @@ using Erg.Core.Game;
 namespace Erg.Core.World.Items;
 
 /// <summary>
-/// A book that trains the Literacy skill when read.
+/// A book that trains the theoretical component of the Literacy skill when read.
 /// </summary>
 public class BookOfLiteracy : Book
 {
@@ -15,7 +15,7 @@ public class BookOfLiteracy : Book
     {
         double readingMultiplier = reader.Reading / 100.0;
         double trainingAmount = BaseTraining * readingMultiplier;
-        reader.TrainLiteracy(trainingAmount, session);
+        reader.TrainLiteracyTheory(trainingAmount, session);
         return true;
     }
 }

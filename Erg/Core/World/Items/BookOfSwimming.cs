@@ -3,7 +3,7 @@ using Erg.Core.Game;
 namespace Erg.Core.World.Items;
 
 /// <summary>
-/// A book that trains the Swimming skill when read.
+/// A book that trains the theoretical component of the Swimming skill when read.
 /// </summary>
 public class BookOfSwimming : Book
 {
@@ -15,7 +15,7 @@ public class BookOfSwimming : Book
     {
         double readingMultiplier = reader.Reading / 100.0;
         double trainingAmount = BaseTraining * readingMultiplier;
-        reader.TrainSwimming(trainingAmount, session);
+        reader.TrainSwimmingTheory(trainingAmount, session);
         return true;
     }
 }

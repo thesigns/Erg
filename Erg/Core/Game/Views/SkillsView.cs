@@ -1,4 +1,5 @@
 using Erg.Core.Abstractions;
+using Erg.Core.Systems;
 using Erg.Core.Ui;
 
 namespace Erg.Core.Game.Views;
@@ -48,14 +49,19 @@ public class SkillsView : IGameView
 
         // Combat Skills (base)
         int row = 6;
-        WriteSkillLine(writer, 2, row++, "Attack", skills.AttackSkill.DisplayValue);
-        WriteSkillLine(writer, 2, row++, "Defense", skills.DefenseSkill.DisplayValue);
-        WriteSkillLine(writer, 2, row++, "Unarmed", skills.UnarmedSkill.DisplayValue);
+        WriteSkillLine(writer, 2, row++, "Attack", skills.AttackSkill);
+        WriteSkillLine(writer, 2, row++, "Defense", skills.DefenseSkill);
+        WriteSkillLine(writer, 2, row++, "Unarmed", skills.UnarmedSkill);
 
         // Other Skills (alphabetical)
         row = 6;
-        WriteSkillLine(writer, 42, row++, "Literacy", skills.LiteracySkill.DisplayValue);
-        WriteSkillLine(writer, 42, row++, "Swimming", skills.SwimmingSkill.DisplayValue);
+        WriteSkillLine(writer, 42, row++, "Literacy", skills.LiteracySkill);
+        WriteSkillLine(writer, 42, row++, "Swimming", skills.SwimmingSkill);
+
+        // Legend
+        writer.Locate(2, 12);
+        writer.SetForegroundColor(128, 128, 128);
+        writer.Write("T = Theory (books), P = Practice (doing)");
 
         // Footer
         writer.Locate(2, output.Rows - 2);
@@ -66,12 +72,28 @@ public class SkillsView : IGameView
         output.Render();
     }
 
-    private void WriteSkillLine(Writer writer, int col, int row, string name, string value)
+    private void WriteSkillLine(Writer writer, int col, int row, string name, Skill skill)
     {
         writer.Locate(col, row);
         writer.SetForegroundColor(200, 200, 200);
-        writer.Write(name.PadRight(18));
+        writer.Write(name.PadRight(12));
+
+        // Theory component (cyan)
+        writer.SetForegroundColor(100, 200, 200);
+        writer.Write($"{skill.TheoryDisplayValue}%T");
+
+        writer.SetForegroundColor(128, 128, 128);
+        writer.Write(" + ");
+
+        // Practice component (yellow)
+        writer.SetForegroundColor(200, 200, 100);
+        writer.Write($"{skill.PracticeDisplayValue}%P");
+
+        writer.SetForegroundColor(128, 128, 128);
+        writer.Write(" = ");
+
+        // Total (green)
         writer.SetForegroundColor(100, 255, 100);
-        writer.Write($"{value}%");
+        writer.Write($"{skill.DisplayValue}%");
     }
 }

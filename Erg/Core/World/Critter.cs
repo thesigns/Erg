@@ -178,6 +178,40 @@ public abstract class Critter : Entity
     public void TrainDefense(double amount, Session session)
         => Skills.DefenseSkill.Train(amount, Genus.DefenseTraining, session.TrainingSpeed);
 
+    // ========== Theory Training (from books/study) ==========
+
+    public void TrainLiteracyTheory(double amount, Session session)
+        => Skills.LiteracySkill.TrainTheory(amount, Genus.LiteracyTraining, session.TrainingSpeed);
+
+    public void TrainSwimmingTheory(double amount, Session session)
+        => Skills.SwimmingSkill.TrainTheory(amount, Genus.SwimmingTraining, session.TrainingSpeed);
+
+    public void TrainUnarmedTheory(double amount, Session session)
+        => Skills.UnarmedSkill.TrainTheory(amount, Genus.UnarmedTraining, session.TrainingSpeed);
+
+    public void TrainAttackTheory(double amount, Session session)
+        => Skills.AttackSkill.TrainTheory(amount, Genus.AttackTraining, session.TrainingSpeed);
+
+    public void TrainDefenseTheory(double amount, Session session)
+        => Skills.DefenseSkill.TrainTheory(amount, Genus.DefenseTraining, session.TrainingSpeed);
+
+    // ========== Practice Training (from doing) ==========
+
+    public void TrainLiteracyPractice(double amount, Session session)
+        => Skills.LiteracySkill.TrainPractice(amount, Genus.LiteracyTraining, session.TrainingSpeed);
+
+    public void TrainSwimmingPractice(double amount, Session session)
+        => Skills.SwimmingSkill.TrainPractice(amount, Genus.SwimmingTraining, session.TrainingSpeed);
+
+    public void TrainUnarmedPractice(double amount, Session session)
+        => Skills.UnarmedSkill.TrainPractice(amount, Genus.UnarmedTraining, session.TrainingSpeed);
+
+    public void TrainAttackPractice(double amount, Session session)
+        => Skills.AttackSkill.TrainPractice(amount, Genus.AttackTraining, session.TrainingSpeed);
+
+    public void TrainDefensePractice(double amount, Session session)
+        => Skills.DefenseSkill.TrainPractice(amount, Genus.DefenseTraining, session.TrainingSpeed);
+
     // ========== Depth-Based Training ==========
 
     /// <summary>

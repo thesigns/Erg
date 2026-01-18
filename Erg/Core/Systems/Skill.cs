@@ -1,22 +1,60 @@
 namespace Erg.Core.Systems;
 
 /// <summary>
-/// Represents a single skill (e.g., Reading, Swimming, Unarmed) with base value and modifiers.
+/// Represents a single skill (e.g., Reading, Swimming, Unarmed) with theoretical and practical components.
+/// Skills are split into theory (learned from books/study) and practice (learned from doing).
 /// Values are normalized to 0-1 range.
 /// </summary>
 public class Skill
 {
-    private double _baseValue;
+    private double _theoryValue;
+    private double _practiceValue;
     private readonly Dictionary<object, double> _modifiers = new();
 
     /// <summary>
-    /// Base (permanent) value of the skill, developed through training. Range: 0-1.
+    /// Maximum value that can be achieved through theoretical training (books, study).
+    /// Default is 0.5 (50% of skill from theory).
     /// </summary>
-    public double BaseValue
+    public double TheoryMax { get; init; } = 0.5;
+
+    /// <summary>
+    /// Maximum value that can be achieved through practical training (doing the skill).
+    /// Default is 0.5 (50% of skill from practice).
+    /// </summary>
+    public double PracticeMax { get; init; } = 0.5;
+
+    /// <summary>
+    /// Raw theoretical value (not clamped to TheoryMax).
+    /// </summary>
+    public double TheoryValue
     {
-        get => _baseValue;
-        private set => _baseValue = Math.Clamp(value, 0.0, 1.0);
+        get => _theoryValue;
+        private set => _theoryValue = Math.Clamp(value, 0.0, 1.0);
     }
+
+    /// <summary>
+    /// Raw practical value (not clamped to PracticeMax).
+    /// </summary>
+    public double PracticeValue
+    {
+        get => _practiceValue;
+        private set => _practiceValue = Math.Clamp(value, 0.0, 1.0);
+    }
+
+    /// <summary>
+    /// Effective theoretical contribution (clamped to TheoryMax).
+    /// </summary>
+    public double EffectiveTheory => Math.Min(TheoryValue, TheoryMax);
+
+    /// <summary>
+    /// Effective practical contribution (clamped to PracticeMax).
+    /// </summary>
+    public double EffectivePractice => Math.Min(PracticeValue, PracticeMax);
+
+    /// <summary>
+    /// Base (permanent) value of the skill = EffectiveTheory + EffectivePractice, clamped to 0-1.
+    /// </summary>
+    public double BaseValue => Math.Clamp(EffectiveTheory + EffectivePractice, 0.0, 1.0);
 
     /// <summary>
     /// Sum of all active modifiers from various sources (items, effects, etc.).
@@ -34,32 +72,82 @@ public class Skill
     /// </summary>
     public string DisplayValue => ((int)(CurrentValue * 100)).ToString();
 
+    /// <summary>
+    /// Display value for theory component (0-100 based on EffectiveTheory).
+    /// </summary>
+    public string TheoryDisplayValue => ((int)(EffectiveTheory * 100)).ToString();
+
+    /// <summary>
+    /// Display value for practice component (0-100 based on EffectivePractice).
+    /// </summary>
+    public string PracticeDisplayValue => ((int)(EffectivePractice * 100)).ToString();
+
     public Skill(double baseValue = 0.0)
     {
-        BaseValue = baseValue;
+        // For backward compatibility, split initial value equally between theory and practice
+        TheoryValue = baseValue / 2;
+        PracticeValue = baseValue / 2;
     }
 
     /// <summary>
-    /// Sets the base value directly. Use for creature initialization.
+    /// Sets the base value by splitting equally between theory and practice.
+    /// Use for creature initialization when you don't care about the split.
     /// </summary>
     public void SetBaseValue(double value)
     {
-        BaseValue = value;
+        TheoryValue = value / 2;
+        PracticeValue = value / 2;
     }
 
     /// <summary>
-    /// Trains the skill using a specific training function.
+    /// Sets the theory value directly.
+    /// </summary>
+    public void SetTheoryValue(double value)
+    {
+        TheoryValue = value;
+    }
+
+    /// <summary>
+    /// Sets the practice value directly.
+    /// </summary>
+    public void SetPracticeValue(double value)
+    {
+        PracticeValue = value;
+    }
+
+    /// <summary>
+    /// Trains the theoretical component using a specific training function.
+    /// Used for book learning and study.
+    /// </summary>
+    public void TrainTheory(double amount, TrainingFunction function, double trainingSpeed)
+    {
+        double factor = function.Calculate(TheoryValue);
+        TheoryValue += amount * factor * trainingSpeed;
+    }
+
+    /// <summary>
+    /// Trains the practical component using a specific training function.
+    /// Used for learning by doing.
+    /// </summary>
+    public void TrainPractice(double amount, TrainingFunction function, double trainingSpeed)
+    {
+        double factor = function.Calculate(PracticeValue);
+        PracticeValue += amount * factor * trainingSpeed;
+    }
+
+    /// <summary>
+    /// Trains the skill (practice component) using a specific training function.
     /// Positive amount = training (increase), negative = atrophy (decrease).
-    /// Change is: amount * function.Calculate(BaseValue) * trainingSpeed
+    /// Change is: amount * function.Calculate(PracticeValue) * trainingSpeed
     /// </summary>
     public void Train(double amount, TrainingFunction function, double trainingSpeed)
     {
-        double factor = function.Calculate(BaseValue);
-        BaseValue += amount * factor * trainingSpeed;
+        // Default Train() trains practice for backward compatibility
+        TrainPractice(amount, function, trainingSpeed);
     }
 
     /// <summary>
-    /// Trains the skill using the default linear function.
+    /// Trains the skill (practice component) using the default linear function.
     /// Positive amount = training, negative = atrophy.
     /// </summary>
     public void Train(double amount, double trainingSpeed)

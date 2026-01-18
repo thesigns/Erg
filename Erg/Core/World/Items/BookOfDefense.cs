@@ -3,7 +3,7 @@ using Erg.Core.Game;
 namespace Erg.Core.World.Items;
 
 /// <summary>
-/// A book that trains the Defense skill when read.
+/// A book that trains the theoretical component of the Defense skill when read.
 /// </summary>
 public class BookOfDefense : Book
 {
@@ -15,7 +15,7 @@ public class BookOfDefense : Book
     {
         double readingMultiplier = reader.Reading / 100.0;
         double trainingAmount = BaseTraining * readingMultiplier;
-        reader.TrainDefense(trainingAmount, session);
+        reader.TrainDefenseTheory(trainingAmount, session);
         return true;
     }
 }

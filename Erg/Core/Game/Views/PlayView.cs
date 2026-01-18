@@ -1,5 +1,6 @@
 ﻿using Erg.Core.Abstractions;
 using Erg.Core.World;
+using Erg.Core.World.Behaviors;
 
 namespace Erg.Core.Game.Views;
 
@@ -95,35 +96,46 @@ public class PlayView : IGameView
             {
                 int doorX = _session.Player.X + ddx;
                 int doorY = _session.Player.Y + ddy;
+                var tile = _session.Area.GetTile(doorX, doorY);
 
                 if (_doorActionIsOpen)
                 {
-                    bool success = _session.TryOpenDoorAt(doorX, doorY);
-                    if (success)
-                    {
-                        _session.ComputeFov();
-                        ProcessTurnAndCheckDeath();
-                    }
-                    else
+                    // Check if there's a closed door first
+                    if (tile?.Type != TileType.ClosedDoor)
                     {
                         _session.Messages.Clear();
                         _session.Messages.Add("No closed door there.");
                     }
+                    else
+                    {
+                        var action = new OpenDoorAction(doorX, doorY);
+                        var result = action.Execute(_session.Player, _session);
+                        if (result.Success)
+                        {
+                            _session.ComputeFov();
+                            ProcessTurnAndCheckDeath(result.EnergyCost);
+                        }
+                    }
                 }
                 else
                 {
-                    var result = _session.TryCloseDoorAt(doorX, doorY);
-                    if (result == DoorCloseResult.Success)
-                    {
-                        _session.ComputeFov();
-                        ProcessTurnAndCheckDeath();
-                    }
-                    else if (result == DoorCloseResult.NoDoor)
+                    // Check if there's an open door first
+                    if (tile?.Type != TileType.OpenDoor)
                     {
                         _session.Messages.Clear();
                         _session.Messages.Add("No open door there.");
                     }
-                    // Blocked - message already set, no turn consumed
+                    else
+                    {
+                        var action = new CloseDoorAction(doorX, doorY);
+                        var result = action.Execute(_session.Player, _session);
+                        if (result.Success)
+                        {
+                            _session.ComputeFov();
+                            ProcessTurnAndCheckDeath(result.EnergyCost);
+                        }
+                        // If failed (blocked) - message already set by action, no turn consumed
+                    }
                 }
                 _awaitingDoorDirection = false;
             }
@@ -281,24 +293,32 @@ public class PlayView : IGameView
 
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.G))
         {
-            _session.PickUpItems();
-            if (ProcessTurnAndCheckDeath()) return;
+            var action = new PickupAction();
+            var result = action.Execute(_session.Player, _session);
+            if (result.Success)
+            {
+                if (ProcessTurnAndCheckDeath(result.EnergyCost)) return;
+            }
             return;
         }
 
         // S - Search
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.S))
         {
-            _session.PlayerSearch();
-            if (ProcessTurnAndCheckDeath()) return;
+            var action = new SearchAction();
+            var result = action.Execute(_session.Player, _session);
+            if (ProcessTurnAndCheckDeath(result.EnergyCost)) return;
             return;
         }
 
         // Numpad 5 - Wait
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp5))
         {
-            _session.PlayerWait();
-            if (ProcessTurnAndCheckDeath()) return;
+            var action = WaitAction.Instance;
+            var result = action.Execute(_session.Player, _session);
+            _session.Messages.Clear();
+            _session.Messages.Add("You wait.");
+            if (ProcessTurnAndCheckDeath(result.EnergyCost)) return;
             return;
         }
 
