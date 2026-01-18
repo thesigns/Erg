@@ -2263,6 +2263,7 @@ public class DungeonGenerator3 : IDungeonGenerator
         if (validFloors.Count == 0) return;
 
         // Place items based on floor count (at least 1)
+        // 50% gold coins, 50% random books
         int itemCount = Math.Max(1, validFloors.Count / area.TilesPerItem);
         for (int i = 0; i < itemCount; i++)
         {
@@ -2270,10 +2271,26 @@ public class DungeonGenerator3 : IDungeonGenerator
             int index = _random.Next(validFloors.Count);
             var (x, y) = validFloors[index];
 
-            // Create Gold Coin with random count 1-100
-            int goldAmount = _random.Next(1, 101);
-            var coin = new GoldCoin(x, y, goldAmount);
-            area.AddItem(coin);
+            if (_random.Next(2) == 0)
+            {
+                // Gold Coin with random count 1-100
+                int goldAmount = _random.Next(1, 101);
+                area.AddItem(new GoldCoin(x, y, goldAmount));
+            }
+            else
+            {
+                // Random Book
+                int bookType = _random.Next(5);
+                Item book = bookType switch
+                {
+                    0 => new BookOfAttack(x, y),
+                    1 => new BookOfDefense(x, y),
+                    2 => new BookOfUnarmed(x, y),
+                    3 => new BookOfLiteracy(x, y),
+                    _ => new BookOfSwimming(x, y)
+                };
+                area.AddItem(book);
+            }
         }
 
         // Place treasure in MazeRoom (70% chance per tile, 50-200 gold)

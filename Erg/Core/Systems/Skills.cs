@@ -7,7 +7,7 @@ namespace Erg.Core.Systems;
 public class Skills
 {
     /// <summary>Ability to read and comprehend written text.</summary>
-    public Skill ReadingSkill { get; }
+    public Skill LiteracySkill { get; }
 
     /// <summary>Ability to swim and move through water.</summary>
     public Skill SwimmingSkill { get; }
@@ -26,7 +26,7 @@ public class Skills
     /// </summary>
     public Skills(double defaultValue = 0.0)
     {
-        ReadingSkill = new Skill(defaultValue);
+        LiteracySkill = new Skill(defaultValue);
         SwimmingSkill = new Skill(defaultValue);
         UnarmedSkill = new Skill(defaultValue);
         AttackSkill = new Skill(defaultValue);
@@ -36,9 +36,9 @@ public class Skills
     /// <summary>
     /// Creates skills with individual values.
     /// </summary>
-    public Skills(double reading, double swimming, double unarmed, double attack = 0.0, double defense = 0.0)
+    public Skills(double literacy, double swimming, double unarmed, double attack = 0.0, double defense = 0.0)
     {
-        ReadingSkill = new Skill(reading);
+        LiteracySkill = new Skill(literacy);
         SwimmingSkill = new Skill(swimming);
         UnarmedSkill = new Skill(unarmed);
         AttackSkill = new Skill(attack);
@@ -50,7 +50,7 @@ public class Skills
     /// </summary>
     public IEnumerable<(string Name, Skill Skill)> All()
     {
-        yield return ("Reading", ReadingSkill);
+        yield return ("Literacy", LiteracySkill);
         yield return ("Swimming", SwimmingSkill);
         yield return ("Unarmed", UnarmedSkill);
         yield return ("Attack", AttackSkill);

@@ -34,6 +34,10 @@ public class Player : Critter
         Skills.AttackSkill.SetBaseValue(attackAmount);
         double defenseAmount = 0.1 + random.NextDouble() * 0.3; // 0.1-0.4
         Skills.DefenseSkill.SetBaseValue(defenseAmount);
+        double literacyAmount = 0.1 + random.NextDouble() * 0.2; // 0.1-0.3
+        Skills.LiteracySkill.SetBaseValue(literacyAmount);
+        double swimmingAmount = 0.1 + random.NextDouble() * 0.2; // 0.1-0.3
+        Skills.SwimmingSkill.SetBaseValue(swimmingAmount);
     }
 
     private void SetRandomAttribute(Erg.Core.Systems.Attribute attr, Random random)

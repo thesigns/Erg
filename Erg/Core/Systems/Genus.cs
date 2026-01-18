@@ -56,6 +56,16 @@ public class Genus
     public int SearchingMin { get; init; } = 1;
     public int SearchingMax { get; init; } = 20;
 
+    // ========== Reading Ability ==========
+
+    /// <summary>
+    /// Reading ability range (0-100%). Actual value:
+    /// Reading = Lerp(ReadingMin, ReadingMax, LiteracyProficiency)
+    /// Affects how much training is gained from reading books.
+    /// </summary>
+    public int ReadingMin { get; init; } = 0;
+    public int ReadingMax { get; init; } = 100;
+
     // ========== Attribute Training Functions ==========
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
@@ -68,7 +78,7 @@ public class Genus
 
     // ========== Skill Training Functions ==========
     // Funkcje treningowe per umiejętność (domyślnie Linear)
-    public TrainingFunction ReadingTraining { get; init; } = TrainingFunction.Linear();
+    public TrainingFunction LiteracyTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction SwimmingTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction UnarmedTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction AttackTraining { get; init; } = TrainingFunction.Linear();
@@ -101,7 +111,7 @@ public class Genus
     /// </summary>
     public TrainingFunction GetSkillTrainingFunction(Skill skill, Skills skills)
     {
-        if (ReferenceEquals(skill, skills.ReadingSkill)) return ReadingTraining;
+        if (ReferenceEquals(skill, skills.LiteracySkill)) return LiteracyTraining;
         if (ReferenceEquals(skill, skills.SwimmingSkill)) return SwimmingTraining;
         if (ReferenceEquals(skill, skills.UnarmedSkill)) return UnarmedTraining;
         if (ReferenceEquals(skill, skills.AttackSkill)) return AttackTraining;
@@ -123,7 +133,8 @@ public class Genus
         MinDamageBonus = 2, MaxDamageBonus = 12,
         UnarmedAttackMin = 10, UnarmedAttackMax = 50,
         UnarmedDefenseMin = 10, UnarmedDefenseMax = 50,
-        SearchingMin = 1, SearchingMax = 5
+        SearchingMin = 1, SearchingMax = 5,
+        ReadingMin = 0, ReadingMax = 100
     };
 
     /// <summary>
@@ -136,7 +147,8 @@ public class Genus
         MinDamageBonus = 6, MaxDamageBonus = 18,
         UnarmedAttackMin = 25, UnarmedAttackMax = 80,
         UnarmedDefenseMin = 15, UnarmedDefenseMax = 40,
-        SearchingMin = 3, SearchingMax = 20
+        SearchingMin = 3, SearchingMax = 20,
+        ReadingMin = 0, ReadingMax = 30
     };
 
     /// <summary>
@@ -149,7 +161,8 @@ public class Genus
         MinDamageBonus = 0, MaxDamageBonus = 3,
         UnarmedAttackMin = 5, UnarmedAttackMax = 20,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
-        SearchingMin = 5, SearchingMax = 20
+        SearchingMin = 5, SearchingMax = 20,
+        ReadingMin = 0, ReadingMax = 0
     };
 
     /// <summary>
@@ -162,7 +175,8 @@ public class Genus
         MinDamageBonus = 2, MaxDamageBonus = 16,
         UnarmedAttackMin = 15, UnarmedAttackMax = 60,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
-        SearchingMin = 2, SearchingMax = 15
+        SearchingMin = 2, SearchingMax = 15,
+        ReadingMin = 0, ReadingMax = 15
     };
 
     /// <summary>
@@ -175,6 +189,7 @@ public class Genus
         MinDamageBonus = 1, MaxDamageBonus = 6,
         UnarmedAttackMin = 15, UnarmedAttackMax = 40,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
-        SearchingMin = 4, SearchingMax = 20
+        SearchingMin = 4, SearchingMax = 20,
+        ReadingMin = 0, ReadingMax = 5
     };
 }

@@ -65,6 +65,13 @@ public abstract class Critter : Entity
     /// </summary>
     public int Searching => Lerp(Genus.SearchingMax, Genus.SearchingMin, Derived.Observation);
 
+    // ========== Reading Ability ==========
+    /// <summary>
+    /// Reading ability (0-100%). Affects training gained from books.
+    /// Formula: Lerp(ReadingMin, ReadingMax, LiteracyProficiency)
+    /// </summary>
+    public int Reading => Lerp(Genus.ReadingMin, Genus.ReadingMax, Derived.LiteracyProficiency);
+
     public Critter? KilledBy { get; private set; }
 
     // Pronouns
@@ -157,8 +164,8 @@ public abstract class Critter : Entity
         skill.Train(amount, function, session.TrainingSpeed);
     }
 
-    public void TrainReading(double amount, Session session)
-        => Skills.ReadingSkill.Train(amount, Genus.ReadingTraining, session.TrainingSpeed);
+    public void TrainLiteracy(double amount, Session session)
+        => Skills.LiteracySkill.Train(amount, Genus.LiteracyTraining, session.TrainingSpeed);
 
     public void TrainSwimming(double amount, Session session)
         => Skills.SwimmingSkill.Train(amount, Genus.SwimmingTraining, session.TrainingSpeed);

@@ -54,7 +54,7 @@ public class SkillsView : IGameView
 
         // Other Skills (alphabetical)
         row = 6;
-        WriteSkillLine(writer, 42, row++, "Reading", skills.ReadingSkill.DisplayValue);
+        WriteSkillLine(writer, 42, row++, "Literacy", skills.LiteracySkill.DisplayValue);
         WriteSkillLine(writer, 42, row++, "Swimming", skills.SwimmingSkill.DisplayValue);
 
         // Footer

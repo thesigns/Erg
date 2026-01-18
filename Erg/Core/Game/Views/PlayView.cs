@@ -214,6 +214,13 @@ public class PlayView : IGameView
             return;
         }
 
+        // R - Read
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.R))
+        {
+            _game.SwitchView(new ReadView(_game, this));
+            return;
+        }
+
         // Shift+3 (= #) - Skills view
         if (shiftHeld && input.KeyPulse.GetValueOrDefault(KeyboardKey.Three))
         {

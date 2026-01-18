@@ -65,6 +65,16 @@ public class Derived
         0.6 * _skills.UnarmedSkill.CurrentValue +
         0.2 * _skills.DefenseSkill.CurrentValue;
 
+    // ========== Literacy Proficiency ==========
+
+    /// <summary>
+    /// Literacy proficiency - combination of intelligence and literacy training.
+    /// Used for calculating Reading ability.
+    /// </summary>
+    public double LiteracyProficiency =>
+        0.1 * _attributes.Intelligence.CurrentValue +
+        0.9 * _skills.LiteracySkill.CurrentValue;
+
     // ========== Display Values (0-100) ==========
 
     private static string ToDisplayValue(double value) => ((int)(value * 100)).ToString();
@@ -74,4 +84,5 @@ public class Derived
     public string ObservationDisplay => ToDisplayValue(Observation);
     public string UnarmedAttackProficiencyDisplay => ToDisplayValue(UnarmedAttackProficiency);
     public string UnarmedDefenseProficiencyDisplay => ToDisplayValue(UnarmedDefenseProficiency);
+    public string LiteracyProficiencyDisplay => ToDisplayValue(LiteracyProficiency);
 }

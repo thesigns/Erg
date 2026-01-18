@@ -37,16 +37,32 @@ public class RaylibInput : IInput
         UpdateKey(KeyboardKey.Two, Raylib_cs.KeyboardKey.Two, now);
         UpdateKey(KeyboardKey.Three, Raylib_cs.KeyboardKey.Three, now);
         
+        UpdateKey(KeyboardKey.A, Raylib_cs.KeyboardKey.A, now);
+        UpdateKey(KeyboardKey.B, Raylib_cs.KeyboardKey.B, now);
         UpdateKey(KeyboardKey.C, Raylib_cs.KeyboardKey.C, now);
         UpdateKey(KeyboardKey.D, Raylib_cs.KeyboardKey.D, now);
+        UpdateKey(KeyboardKey.E, Raylib_cs.KeyboardKey.E, now);
+        UpdateKey(KeyboardKey.F, Raylib_cs.KeyboardKey.F, now);
         UpdateKey(KeyboardKey.G, Raylib_cs.KeyboardKey.G, now);
+        UpdateKey(KeyboardKey.H, Raylib_cs.KeyboardKey.H, now);
         UpdateKey(KeyboardKey.I, Raylib_cs.KeyboardKey.I, now);
+        UpdateKey(KeyboardKey.J, Raylib_cs.KeyboardKey.J, now);
+        UpdateKey(KeyboardKey.K, Raylib_cs.KeyboardKey.K, now);
+        UpdateKey(KeyboardKey.L, Raylib_cs.KeyboardKey.L, now);
+        UpdateKey(KeyboardKey.M, Raylib_cs.KeyboardKey.M, now);
         UpdateKey(KeyboardKey.N, Raylib_cs.KeyboardKey.N, now);
         UpdateKey(KeyboardKey.O, Raylib_cs.KeyboardKey.O, now);
+        UpdateKey(KeyboardKey.P, Raylib_cs.KeyboardKey.P, now);
+        UpdateKey(KeyboardKey.Q, Raylib_cs.KeyboardKey.Q, now);
         UpdateKey(KeyboardKey.R, Raylib_cs.KeyboardKey.R, now);
         UpdateKey(KeyboardKey.S, Raylib_cs.KeyboardKey.S, now);
+        UpdateKey(KeyboardKey.T, Raylib_cs.KeyboardKey.T, now);
+        UpdateKey(KeyboardKey.U, Raylib_cs.KeyboardKey.U, now);
+        UpdateKey(KeyboardKey.V, Raylib_cs.KeyboardKey.V, now);
+        UpdateKey(KeyboardKey.W, Raylib_cs.KeyboardKey.W, now);
         UpdateKey(KeyboardKey.X, Raylib_cs.KeyboardKey.X, now);
         UpdateKey(KeyboardKey.Y, Raylib_cs.KeyboardKey.Y, now);
+        UpdateKey(KeyboardKey.Z, Raylib_cs.KeyboardKey.Z, now);
         
         UpdateKey(KeyboardKey.Escape, Raylib_cs.KeyboardKey.Escape, now);
         UpdateKey(KeyboardKey.Space, Raylib_cs.KeyboardKey.Space, now);
