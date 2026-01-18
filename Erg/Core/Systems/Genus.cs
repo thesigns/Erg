@@ -105,9 +105,9 @@ public class Genus
     };
 
     /// <summary>
-    /// Risen — ożywieńcy. Powolne, duży rozrzut HitPoints
+    /// Zombius — zombie, utopce, szubieniczniki. Niezbyt nadgryzione czasem, chodzące trupy.
     /// </summary>
-    public static Genus Risen { get; } = new("Risen")
+    public static Genus Zombius { get; } = new("Zombius")
     {
         MinEnergyRegenRate = 70, MaxEnergyRegenRate = 90,
         MinHitPoints = 20, MaxHitPoints = 120,
