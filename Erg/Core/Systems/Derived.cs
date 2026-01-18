@@ -1,8 +1,8 @@
 namespace Erg.Core.Systems;
 
 /// <summary>
-/// Wartości pochodne - obliczane na podstawie atrybutów podstawowych i umiejętności.
-/// Nie są rozwijane bezpośrednio, zmieniają się gdy zmieniają się atrybuty/umiejętności źródłowe.
+/// Derived values - calculated from base attributes and skills.
+/// Not trained directly, they change when source attributes/skills change.
 /// </summary>
 public class Derived
 {
@@ -18,8 +18,8 @@ public class Derived
     // ========== Derived Attributes ==========
 
     /// <summary>
-    /// Ogólna kondycja organizmu, odporność biologiczna, zdolność do regeneracji.
-    /// Używane do obliczania MaxHitPoints, tempa regeneracji itp.
+    /// Overall physical condition, biological resistance, regeneration capability.
+    /// Used for calculating MaxHitPoints, regeneration rate, etc.
     /// </summary>
     public double Vitality =>
         0.2 * _attributes.Strength.CurrentValue +
@@ -28,8 +28,8 @@ public class Derived
         0.1 * _attributes.Willpower.CurrentValue;
 
     /// <summary>
-    /// Eksplozywna szybkość - zdolność do szybkiego działania.
-    /// Używane do obliczania EnergyRegenRate.
+    /// Explosive speed - ability to act quickly.
+    /// Used for calculating EnergyRegenRate.
     /// </summary>
     public double Speed =>
         0.4 * _attributes.Strength.CurrentValue +
@@ -40,8 +40,8 @@ public class Derived
     // ========== Derived Skills ==========
 
     /// <summary>
-    /// Pochodna umiejętność ataku wręcz - kombinacja szybkości i treningu walki.
-    /// Używane do obliczania UnarmedAttack ability.
+    /// Derived unarmed attack skill - combination of speed and combat training.
+    /// Used for calculating UnarmedAttack ability.
     /// </summary>
     public double UnarmedAttackSkill =>
         0.2 * Speed +
@@ -49,8 +49,8 @@ public class Derived
         0.2 * _skills.AttackSkill.CurrentValue;
 
     /// <summary>
-    /// Pochodna umiejętność obrony wręcz - kombinacja szybkości i treningu walki.
-    /// Używane do obliczania UnarmedDefense ability.
+    /// Derived unarmed defense skill - combination of speed and combat training.
+    /// Used for calculating UnarmedDefense ability.
     /// </summary>
     public double UnarmedDefenseSkill =>
         0.2 * Speed +
