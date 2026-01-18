@@ -10,11 +10,28 @@ public static class Combat
         var random = session.Random;
         var messages = session.Messages;
 
-        int damage = attacker.UnarmedDamage.Roll(random) + attacker.DamageBonus;
-        defender.TakeDamage(damage, attacker);
-
         bool seeAttacker = session.CanPlayerSee(attacker);
         bool seeDefender = session.CanPlayerSee(defender);
+
+        // Hit chance: Attack / (Attack + Defense), clamped to 5%-95%
+        double hitChance = (double)attacker.UnarmedAttack / (attacker.UnarmedAttack + defender.UnarmedDefense);
+        hitChance = Math.Clamp(hitChance, 0.05, 0.95);
+
+        bool hit = random.NextDouble() < hitChance;
+
+        if (!hit)
+        {
+            // Miss - no damage
+            if (seeAttacker || seeDefender)
+            {
+                messages.Add($"{NameOf(attacker)} {Verb(attacker, "miss", "misses")} {NameOf(defender, false)}.");
+            }
+            return;
+        }
+
+        // Hit - calculate and apply damage
+        int damage = attacker.UnarmedDamage.Roll(random) + attacker.DamageBonus;
+        defender.TakeDamage(damage, attacker);
 
         // Damage info only when player is directly involved
         bool playerInvolved = attacker is Player || defender is Player;
