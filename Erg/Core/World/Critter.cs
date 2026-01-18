@@ -47,15 +47,15 @@ public abstract class Critter : Entity
     // ========== Unarmed Combat Abilities ==========
     /// <summary>
     /// Unarmed attack ability. Used in combat to determine hit chance.
-    /// Formula: Lerp(UnarmedAttackMin, UnarmedAttackMax, UnarmedProficiency)
+    /// Formula: Lerp(UnarmedAttackMin, UnarmedAttackMax, UnarmedAttackSkill)
     /// </summary>
-    public int UnarmedAttack => Lerp(Genus.UnarmedAttackMin, Genus.UnarmedAttackMax, Derived.UnarmedProficiency);
+    public int UnarmedAttack => Lerp(Genus.UnarmedAttackMin, Genus.UnarmedAttackMax, Derived.UnarmedAttackSkill);
 
     /// <summary>
     /// Unarmed defense ability. Used in combat to determine dodge/block chance.
-    /// Formula: Lerp(UnarmedDefenseMin, UnarmedDefenseMax, UnarmedProficiency)
+    /// Formula: Lerp(UnarmedDefenseMin, UnarmedDefenseMax, UnarmedDefenseSkill)
     /// </summary>
-    public int UnarmedDefense => Lerp(Genus.UnarmedDefenseMin, Genus.UnarmedDefenseMax, Derived.UnarmedProficiency);
+    public int UnarmedDefense => Lerp(Genus.UnarmedDefenseMin, Genus.UnarmedDefenseMax, Derived.UnarmedDefenseSkill);
 
     public Critter? KilledBy { get; private set; }
 
@@ -150,13 +150,19 @@ public abstract class Critter : Entity
     }
 
     public void TrainReading(double amount, Session session)
-        => Skills.Reading.Train(amount, Genus.ReadingTraining, session.TrainingSpeed);
+        => Skills.ReadingSkill.Train(amount, Genus.ReadingTraining, session.TrainingSpeed);
 
     public void TrainSwimming(double amount, Session session)
-        => Skills.Swimming.Train(amount, Genus.SwimmingTraining, session.TrainingSpeed);
+        => Skills.SwimmingSkill.Train(amount, Genus.SwimmingTraining, session.TrainingSpeed);
 
     public void TrainUnarmed(double amount, Session session)
-        => Skills.Unarmed.Train(amount, Genus.UnarmedTraining, session.TrainingSpeed);
+        => Skills.UnarmedSkill.Train(amount, Genus.UnarmedTraining, session.TrainingSpeed);
+
+    public void TrainAttack(double amount, Session session)
+        => Skills.AttackSkill.Train(amount, Genus.AttackTraining, session.TrainingSpeed);
+
+    public void TrainDefense(double amount, Session session)
+        => Skills.DefenseSkill.Train(amount, Genus.DefenseTraining, session.TrainingSpeed);
 
     // ========== Depth-Based Training ==========
 

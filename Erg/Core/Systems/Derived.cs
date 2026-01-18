@@ -40,13 +40,22 @@ public class Derived
     // ========== Derived Skills ==========
 
     /// <summary>
-    /// Umiejętność pochodna walki wręcz - kombinacja siły, zręczności i treningu.
-    /// Używane do obliczania UnarmedAttack i UnarmedDefense abilities.
+    /// Pochodna umiejętność ataku wręcz - kombinacja szybkości i treningu walki.
+    /// Używane do obliczania UnarmedAttack ability.
     /// </summary>
-    public double UnarmedProficiency =>
-        0.2 * _attributes.Strength.CurrentValue +
-        0.2 * _attributes.Agility.CurrentValue +
-        0.6 * _skills.Unarmed.CurrentValue;
+    public double UnarmedAttackSkill =>
+        0.2 * Speed +
+        0.6 * _skills.UnarmedSkill.CurrentValue +
+        0.2 * _skills.AttackSkill.CurrentValue;
+
+    /// <summary>
+    /// Pochodna umiejętność obrony wręcz - kombinacja szybkości i treningu walki.
+    /// Używane do obliczania UnarmedDefense ability.
+    /// </summary>
+    public double UnarmedDefenseSkill =>
+        0.2 * Speed +
+        0.6 * _skills.UnarmedSkill.CurrentValue +
+        0.2 * _skills.DefenseSkill.CurrentValue;
 
     // ========== Display Values (0-100) ==========
 
@@ -54,5 +63,6 @@ public class Derived
 
     public string VitalityDisplay => ToDisplayValue(Vitality);
     public string SpeedDisplay => ToDisplayValue(Speed);
-    public string UnarmedProficiencyDisplay => ToDisplayValue(UnarmedProficiency);
+    public string UnarmedAttackSkillDisplay => ToDisplayValue(UnarmedAttackSkill);
+    public string UnarmedDefenseSkillDisplay => ToDisplayValue(UnarmedDefenseSkill);
 }

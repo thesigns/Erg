@@ -35,14 +35,14 @@ public class Genus
 
     /// <summary>
     /// Unarmed attack ability range. Actual value is:
-    /// UnarmedAttack = Lerp(Min, Max, UnarmedProficiency)
+    /// UnarmedAttack = Lerp(Min, Max, UnarmedAttackSkill)
     /// </summary>
     public int UnarmedAttackMin { get; init; } = 10;
     public int UnarmedAttackMax { get; init; } = 50;
 
     /// <summary>
     /// Unarmed defense ability range. Actual value is:
-    /// UnarmedDefense = Lerp(Min, Max, UnarmedProficiency)
+    /// UnarmedDefense = Lerp(Min, Max, UnarmedDefenseSkill)
     /// </summary>
     public int UnarmedDefenseMin { get; init; } = 10;
     public int UnarmedDefenseMax { get; init; } = 50;
@@ -62,6 +62,8 @@ public class Genus
     public TrainingFunction ReadingTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction SwimmingTraining { get; init; } = TrainingFunction.Linear();
     public TrainingFunction UnarmedTraining { get; init; } = TrainingFunction.Linear();
+    public TrainingFunction AttackTraining { get; init; } = TrainingFunction.Linear();
+    public TrainingFunction DefenseTraining { get; init; } = TrainingFunction.Linear();
 
     public Genus(string name)
     {
@@ -90,9 +92,11 @@ public class Genus
     /// </summary>
     public TrainingFunction GetSkillTrainingFunction(Skill skill, Skills skills)
     {
-        if (ReferenceEquals(skill, skills.Reading)) return ReadingTraining;
-        if (ReferenceEquals(skill, skills.Swimming)) return SwimmingTraining;
-        if (ReferenceEquals(skill, skills.Unarmed)) return UnarmedTraining;
+        if (ReferenceEquals(skill, skills.ReadingSkill)) return ReadingTraining;
+        if (ReferenceEquals(skill, skills.SwimmingSkill)) return SwimmingTraining;
+        if (ReferenceEquals(skill, skills.UnarmedSkill)) return UnarmedTraining;
+        if (ReferenceEquals(skill, skills.AttackSkill)) return AttackTraining;
+        if (ReferenceEquals(skill, skills.DefenseSkill)) return DefenseTraining;
 
         // Fallback to linear if skill not recognized
         return TrainingFunction.Linear();

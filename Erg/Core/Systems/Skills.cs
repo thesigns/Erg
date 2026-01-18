@@ -7,32 +7,42 @@ namespace Erg.Core.Systems;
 public class Skills
 {
     /// <summary>Ability to read and comprehend written text.</summary>
-    public Skill Reading { get; }
+    public Skill ReadingSkill { get; }
 
     /// <summary>Ability to swim and move through water.</summary>
-    public Skill Swimming { get; }
+    public Skill SwimmingSkill { get; }
 
     /// <summary>Proficiency in unarmed combat (punching, kicking, grappling).</summary>
-    public Skill Unarmed { get; }
+    public Skill UnarmedSkill { get; }
+
+    /// <summary>General attack proficiency - hitting, aiming, timing.</summary>
+    public Skill AttackSkill { get; }
+
+    /// <summary>General defense proficiency - dodging, blocking, parrying.</summary>
+    public Skill DefenseSkill { get; }
 
     /// <summary>
     /// Creates skills with all values set to the same default.
     /// </summary>
     public Skills(double defaultValue = 0.0)
     {
-        Reading = new Skill(defaultValue);
-        Swimming = new Skill(defaultValue);
-        Unarmed = new Skill(defaultValue);
+        ReadingSkill = new Skill(defaultValue);
+        SwimmingSkill = new Skill(defaultValue);
+        UnarmedSkill = new Skill(defaultValue);
+        AttackSkill = new Skill(defaultValue);
+        DefenseSkill = new Skill(defaultValue);
     }
 
     /// <summary>
     /// Creates skills with individual values.
     /// </summary>
-    public Skills(double reading, double swimming, double unarmed)
+    public Skills(double reading, double swimming, double unarmed, double attack = 0.0, double defense = 0.0)
     {
-        Reading = new Skill(reading);
-        Swimming = new Skill(swimming);
-        Unarmed = new Skill(unarmed);
+        ReadingSkill = new Skill(reading);
+        SwimmingSkill = new Skill(swimming);
+        UnarmedSkill = new Skill(unarmed);
+        AttackSkill = new Skill(attack);
+        DefenseSkill = new Skill(defense);
     }
 
     /// <summary>
@@ -40,9 +50,11 @@ public class Skills
     /// </summary>
     public IEnumerable<(string Name, Skill Skill)> All()
     {
-        yield return ("Reading", Reading);
-        yield return ("Swimming", Swimming);
-        yield return ("Unarmed", Unarmed);
+        yield return ("Reading", ReadingSkill);
+        yield return ("Swimming", SwimmingSkill);
+        yield return ("Unarmed", UnarmedSkill);
+        yield return ("Attack", AttackSkill);
+        yield return ("Defense", DefenseSkill);
     }
 
     /// <summary>
