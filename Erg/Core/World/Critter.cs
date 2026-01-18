@@ -57,6 +57,14 @@ public abstract class Critter : Entity
     /// </summary>
     public int UnarmedDefense => Lerp(Genus.UnarmedDefenseMin, Genus.UnarmedDefenseMax, Derived.UnarmedDefenseProficiency);
 
+    // ========== Searching Ability ==========
+    /// <summary>
+    /// Average attempts needed to find something hidden. Lower is better.
+    /// Formula: Lerp(SearchingMax, SearchingMin, Observation)
+    /// High Observation → low Searching (finds quickly)
+    /// </summary>
+    public int Searching => Lerp(Genus.SearchingMax, Genus.SearchingMin, Derived.Observation);
+
     public Critter? KilledBy { get; private set; }
 
     // Pronouns

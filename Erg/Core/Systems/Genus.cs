@@ -47,6 +47,15 @@ public class Genus
     public int UnarmedDefenseMin { get; init; } = 10;
     public int UnarmedDefenseMax { get; init; } = 50;
 
+    // ========== Searching Ability ==========
+
+    /// <summary>
+    /// Searching ability range - average attempts needed to find something.
+    /// Lower is better! Actual value: Lerp(Max, Min, Observation)
+    /// </summary>
+    public int SearchingMin { get; init; } = 1;
+    public int SearchingMax { get; init; } = 20;
+
     // ========== Attribute Training Functions ==========
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
@@ -113,7 +122,8 @@ public class Genus
         MinHitPoints = 60, MaxHitPoints = 100,
         MinDamageBonus = 2, MaxDamageBonus = 12,
         UnarmedAttackMin = 10, UnarmedAttackMax = 50,
-        UnarmedDefenseMin = 10, UnarmedDefenseMax = 50
+        UnarmedDefenseMin = 10, UnarmedDefenseMax = 50,
+        SearchingMin = 1, SearchingMax = 10
     };
 
     /// <summary>
@@ -125,7 +135,8 @@ public class Genus
         MinHitPoints = 130, MaxHitPoints = 240,
         MinDamageBonus = 6, MaxDamageBonus = 18,
         UnarmedAttackMin = 25, UnarmedAttackMax = 80,
-        UnarmedDefenseMin = 15, UnarmedDefenseMax = 40
+        UnarmedDefenseMin = 15, UnarmedDefenseMax = 40,
+        SearchingMin = 3, SearchingMax = 20
     };
 
     /// <summary>
@@ -137,7 +148,8 @@ public class Genus
         MinHitPoints = 10, MaxHitPoints = 35,
         MinDamageBonus = 0, MaxDamageBonus = 3,
         UnarmedAttackMin = 5, UnarmedAttackMax = 20,
-        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
+        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
+        SearchingMin = 5, SearchingMax = 20
     };
 
     /// <summary>
@@ -149,7 +161,8 @@ public class Genus
         MinHitPoints = 90, MaxHitPoints = 130,
         MinDamageBonus = 2, MaxDamageBonus = 16,
         UnarmedAttackMin = 15, UnarmedAttackMax = 60,
-        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
+        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
+        SearchingMin = 2, SearchingMax = 15
     };
 
     /// <summary>
@@ -161,6 +174,7 @@ public class Genus
         MinHitPoints = 40, MaxHitPoints = 120,
         MinDamageBonus = 1, MaxDamageBonus = 6,
         UnarmedAttackMin = 15, UnarmedAttackMax = 40,
-        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10
+        UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
+        SearchingMin = 4, SearchingMax = 20
     };
 }

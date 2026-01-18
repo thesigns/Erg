@@ -429,6 +429,39 @@ public class Session
         Messages.Add("You wait.");
     }
 
+    public void PlayerSearch()
+    {
+        Messages.Clear();
+        Messages.Add("You search the area around you.");
+
+        // Success chance: 1/Searching (Searching=1 → 100%, Searching=50 → 2%)
+        bool success = Random.Next(Player.Searching) == 0;
+
+        if (!success)
+        {
+            Messages.Add("You haven't found anything... yet.");
+            return;
+        }
+
+        // Check for secret doors in adjacent tiles
+        bool foundSomething = false;
+        foreach (var (dx, dy) in AllDirections)
+        {
+            int nx = Player.X + dx;
+            int ny = Player.Y + dy;
+            var tile = Area.GetTile(nx, ny);
+            if (tile?.Type == TileType.SecretDoor)
+            {
+                Area.SetTile(nx, ny, Tile.ClosedDoor);
+                Messages.Add("You found a secret door!");
+                foundSomething = true;
+            }
+        }
+
+        if (!foundSomething)
+            Messages.Add("You haven't found anything... yet.");
+    }
+
     public bool IsPlayerOnStairsDown()
     {
         var tile = Area.GetTile(Player.X, Player.Y);

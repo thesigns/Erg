@@ -279,6 +279,14 @@ public class PlayView : IGameView
             return;
         }
 
+        // S - Search
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.S))
+        {
+            _session.PlayerSearch();
+            if (ProcessTurnAndCheckDeath()) return;
+            return;
+        }
+
         // Numpad 5 - Wait
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Kp5))
         {

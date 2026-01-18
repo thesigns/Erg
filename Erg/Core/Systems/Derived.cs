@@ -37,6 +37,14 @@ public class Derived
         0.1 * _attributes.Endurance.CurrentValue +
         0.1 * _attributes.Willpower.CurrentValue;
 
+    /// <summary>
+    /// Observation - combination of physical perception and mental awareness.
+    /// Used for searching, spotting hidden things, etc.
+    /// </summary>
+    public double Observation =>
+        0.7 * _attributes.Perception.CurrentValue +
+        0.3 * _attributes.Intelligence.CurrentValue;
+
     // ========== Combat Proficiency ==========
 
     /// <summary>
@@ -63,6 +71,7 @@ public class Derived
 
     public string VitalityDisplay => ToDisplayValue(Vitality);
     public string SpeedDisplay => ToDisplayValue(Speed);
+    public string ObservationDisplay => ToDisplayValue(Observation);
     public string UnarmedAttackProficiencyDisplay => ToDisplayValue(UnarmedAttackProficiency);
     public string UnarmedDefenseProficiencyDisplay => ToDisplayValue(UnarmedDefenseProficiency);
 }
