@@ -442,9 +442,9 @@ public class PlayView : IGameView
     {
         // Dim the foreground color by reducing RGB values
         uint fg = glyph.ForegroundColor;
-        byte r = (byte)(((fg >> 24) & 0xFF) / 3);
-        byte g = (byte)(((fg >> 16) & 0xFF) / 3);
-        byte b = (byte)(((fg >> 8) & 0xFF) / 3);
+        byte r = (byte)(((fg >> 24) & 0xFF) * 0.45);
+        byte g = (byte)(((fg >> 16) & 0xFF) * 0.45);
+        byte b = (byte)(((fg >> 8) & 0xFF) * 0.45);
         byte a = (byte)(fg & 0xFF);
         uint dimmedFg = (uint)((r << 24) | (g << 16) | (b << 8) | a);
 
