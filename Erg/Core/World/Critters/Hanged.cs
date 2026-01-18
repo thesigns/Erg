@@ -1,6 +1,7 @@
 using Erg.Core.Systems;
 using Erg.Core.Types;
 using Erg.Core.World.Behaviors;
+using Erg.Core.World.Items;
 
 namespace Erg.Core.World.Critters;
 
@@ -44,5 +45,11 @@ public class Hanged : Critter
         TrainAttrForDepth(Attributes.Intelligence, Genus.IntelligenceTraining, highMin, highMax, random);
         TrainAttrForDepth(Attributes.Willpower, Genus.WillpowerTraining, highMin, highMax, random);
         TrainAttrForDepth(Attributes.Charisma, Genus.CharismaTraining, minAmount, maxAmount, random);
+    }
+
+    public override void OnDeath(Area area)
+    {
+        base.OnDeath(area);
+        area.AddItem(new HangedCorpse(X, Y));
     }
 }

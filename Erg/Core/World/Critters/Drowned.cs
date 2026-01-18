@@ -1,6 +1,7 @@
 using Erg.Core.Systems;
 using Erg.Core.Types;
 using Erg.Core.World.Behaviors;
+using Erg.Core.World.Items;
 
 namespace Erg.Core.World.Critters;
 
@@ -40,5 +41,11 @@ public class Drowned : Critter
         TrainAttrForDepth(Attributes.Intelligence, Genus.IntelligenceTraining, minAmount, maxAmount, random);
         TrainAttrForDepth(Attributes.Willpower, Genus.WillpowerTraining, minAmount, maxAmount, random);
         TrainAttrForDepth(Attributes.Charisma, Genus.CharismaTraining, minAmount, maxAmount, random);
+    }
+
+    public override void OnDeath(Area area)
+    {
+        base.OnDeath(area);
+        area.AddItem(new DrownedCorpse(X, Y));
     }
 }
