@@ -14,36 +14,38 @@ public abstract class TrainingFunction
     public abstract double Calculate(double baseValue);
 
     /// <summary>
-    /// Stała szybkość treningu, bez spowolnienia przy wysokich wartościach.
+    /// Constant training speed, no slowdown at high values.
     /// </summary>
     public static TrainingFunction Constant(double value = 1.0) => new ConstantFunction(value);
 
     /// <summary>
-    /// Równomierne spowolnienie — im wyższy poziom, tym wolniejszy trening.
+    /// Even slowdown — the higher the level, the slower the training.
+    /// Parameters start and end define the factor at the beginning (baseValue=0) and end (baseValue=1).
     /// </summary>
-    public static TrainingFunction Linear() => new LinearFunction();
+    public static TrainingFunction Linear(double start = 1.0, double end = 0.5)
+        => new LinearFunction(start, end);
 
     /// <summary>
-    /// Początkowo łatwy trening, drastyczne spowolnienie przy wysokich wartościach.
+    /// Initially easy training, drastic slowdown at high values.
     /// </summary>
     public static TrainingFunction Quadratic() => new QuadraticFunction();
 
     /// <summary>
-    /// Szybkie początkowe spowolnienie, potem stabilny, powolny progres.
+    /// Fast initial slowdown, then stable, slow progress.
     /// </summary>
     public static TrainingFunction SquareRoot() => new SquareRootFunction();
 
     /// <summary>
-    /// Trening nigdy nie zatrzymuje się całkowicie, zawsze jest minimalny postęp.
+    /// Training never stops completely, there's always minimal progress.
     /// </summary>
     public static TrainingFunction Exponential(double k = 3.0) => new ExponentialFunction(k);
 
     /// <summary>
-    /// Jak liniowy, ale z gwarantowanym minimum — nawet mistrz może się rozwijać.
+    /// Like linear, but with guaranteed minimum — even a master can improve.
     /// </summary>
     public static TrainingFunction Capped(double minimum = 0.1) => new CappedFunction(minimum);
 
-    // ========== Implementacje ==========
+    // ========== Implementations ==========
 
     private sealed class ConstantFunction : TrainingFunction
     {
@@ -54,7 +56,17 @@ public abstract class TrainingFunction
 
     private sealed class LinearFunction : TrainingFunction
     {
-        public override double Calculate(double baseValue) => 1.0 - baseValue;
+        private readonly double _start;
+        private readonly double _end;
+
+        public LinearFunction(double start, double end)
+        {
+            _start = start;
+            _end = end;
+        }
+
+        public override double Calculate(double baseValue)
+            => _start + (_end - _start) * baseValue;
     }
 
     private sealed class QuadraticFunction : TrainingFunction

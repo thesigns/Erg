@@ -34,12 +34,6 @@ public class Attribute
     /// </summary>
     public string DisplayValue => ((int)(CurrentValue * 100)).ToString();
 
-    /// <summary>
-    /// Training factor based on current base value. Higher values train slower.
-    /// Formula: 1 - BaseValue (default, can be overridden by TrainingFunction)
-    /// </summary>
-    public double TrainingFactor => 1.0 - BaseValue;
-
     public Attribute(double baseValue = 0.5)
     {
         BaseValue = baseValue;

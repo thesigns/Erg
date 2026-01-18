@@ -83,17 +83,22 @@ Podobnie jak atrybuty, umiejętności są względne względem Genus i określaj�
 
 Trenowanie umiejętności podstawowych odbywa się szybciej niż trenowanie atrybutów podstawowych i może następować poprzez czytanie podręczników, trening u nauczycieli NPC oraz praktykę (np. pływanie zwiększa umiejętność Pływanie). Nieużywane umiejętności mogą ulegać degradacji (ujemnemu treningowi), jednak proces ten zachodzi bardzo powoli.
 
-## WSPÓŁCZYNNIKI TRENINGU
+## FUNKCJE TRENINGU (TrainingFunction)
 
-Każdemu atrybutowi oraz każdej umiejętności podstawowej przypisany jest współczynnik treningu, określany funkcją zależną od jego wartości bazowej. Domyślnie współczynnik ten definiowany jest jako:
+Każdemu atrybutowi oraz każdej umiejętności podstawowej przypisana jest funkcja treningu (`TrainingFunction`), określająca jak szybko postępuje trening w zależności od aktualnej wartości bazowej. Domyślną funkcją jest `Linear(start: 1.0, end: 0.5)`:
 
-`TrainingFactor = 1 - WartośćBazowa`
+- Przy wartości bazowej 0.0 → współczynnik = 1.0 (pełna prędkość)
+- Przy wartości bazowej 1.0 → współczynnik = 0.5 (połowa prędkości)
 
-Przykładowo:
+Wzrost oraz spadek bazowych atrybutów i umiejętności podstawowych jest mnożony przez wynik funkcji treningu oraz globalną wartość gry **TrainingSpeed**. Przy domyślnej funkcji liniowej szybkość rozwoju maleje stopniowo, ale nigdy nie spada do zera — nawet mistrz może się nadal rozwijać.
 
-`StrengthTrainingFactor = 1 - BaseStrength`
-
-Wzrost oraz spadek bazowych atrybutów i umiejętności podstawowych jest mnożony przez odpowiadający im współczynnik treningu oraz globalną wartość gry **TrainingSpeed**. Przy zastosowaniu domyślnej funkcji szybkość rozwoju maleje liniowo wraz ze wzrostem wartości bazowej, aż do osiągnięcia zera przy wartości maksymalnej.
+Dostępne funkcje treningu:
+- `Linear(start, end)` — liniowe spowolnienie od start do end
+- `Constant(value)` — stała prędkość
+- `Quadratic()` — drastyczne spowolnienie przy wysokich wartościach
+- `SquareRoot()` — szybkie początkowe spowolnienie, potem stabilny progres
+- `Exponential(k)` — wykładniczy spadek, zawsze minimalny postęp
+- `Capped(minimum)` — jak liniowy, ale z gwarantowanym minimum
 
 ## UMIEJĘTNOŚCI POCHODNE
 
