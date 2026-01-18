@@ -79,16 +79,6 @@ Critters use a speed/energy system for fair turn scheduling:
 - Killing grants XP to attacker equal to defender's `Value`
 - Combat messages vary based on player visibility of combatants
 
-### Experience System
-- `ExperienceLevel` - starts at 1, increases on level up
-- `ExperiencePoints` - current XP, accumulates from kills
-- `ExperienceToNextLevel` - calculated via `ExperienceConfig.CalculateXPForLevel(level)` using formula `BaseXP * level^Exponent`
-- `ExperienceMultiplier` - modifies XP gain (100 = x1.0)
-- `BaseValue` / `Value` - critter worth; `Value = BaseValue * ExperienceLevel`
-- `GainExperience(baseAmount, session?)` - adds XP with auto level-up; shows messages if session provided
-- `OnLevelUp(newLevel)` - grants +4 MaxHitPoints and HitPoints
-- Config in `Core/Types/ExperienceConfig.cs` (BaseXP=100, Exponent=2.0)
-
 ### Message System
 - `MessageBuffer` - Handles game messages with word-wrapping and pagination
 - Messages cleared on player movement; --More-- prompt for long messages
