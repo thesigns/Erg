@@ -25,6 +25,8 @@ public struct MoveResult
         new() { NeedsConfirmation = true, Target = target };
 }
 
+public enum DoorCloseResult { Success, NoDoor, Blocked }
+
 public class Session
 {
     public Random Random { get; }
@@ -330,17 +332,23 @@ public class Session
         return false;
     }
 
-    public bool TryCloseDoorAt(int x, int y)
+    public DoorCloseResult TryCloseDoorAt(int x, int y)
     {
         var tile = Area.GetTile(x, y);
-        if (tile?.Type == TileType.OpenDoor)
+        if (tile?.Type != TileType.OpenDoor)
+            return DoorCloseResult.NoDoor;
+
+        if (tile.Critter != null || tile.Items.Count > 0)
         {
-            Area.SetTile(x, y, Tile.ClosedDoor);
             Messages.Clear();
-            Messages.Add("You close a door.");
-            return true;
+            Messages.Add("Something blocks the door.");
+            return DoorCloseResult.Blocked;
         }
-        return false;
+
+        Area.SetTile(x, y, Tile.ClosedDoor);
+        Messages.Clear();
+        Messages.Add("You close a door.");
+        return DoorCloseResult.Success;
     }
 
     public void OpenAdjacentDoors()
@@ -364,9 +372,11 @@ public class Session
         }
     }
 
-    public void CloseAdjacentDoors()
+    public bool CloseAdjacentDoors()
     {
         Messages.Clear();
+        bool anySuccess = false;
+
         foreach (var (dx, dy) in AllDirections)
         {
             int nx = Player.X + dx;
@@ -374,10 +384,19 @@ public class Session
             var tile = Area.GetTile(nx, ny);
             if (tile?.Type == TileType.OpenDoor)
             {
-                Area.SetTile(nx, ny, Tile.ClosedDoor);
-                Messages.Add("You close a door.");
+                if (tile.Critter != null || tile.Items.Count > 0)
+                {
+                    Messages.Add("Something blocks the door.");
+                }
+                else
+                {
+                    Area.SetTile(nx, ny, Tile.ClosedDoor);
+                    Messages.Add("You close a door.");
+                    anySuccess = true;
+                }
             }
         }
+        return anySuccess;
     }
 
     public void PickUpItems()

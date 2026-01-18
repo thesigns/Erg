@@ -96,19 +96,34 @@ public class PlayView : IGameView
                 int doorX = _session.Player.X + ddx;
                 int doorY = _session.Player.Y + ddy;
 
-                bool success = _doorActionIsOpen
-                    ? _session.TryOpenDoorAt(doorX, doorY)
-                    : _session.TryCloseDoorAt(doorX, doorY);
-
-                if (success)
+                if (_doorActionIsOpen)
                 {
-                    _session.ComputeFov();
-                    ProcessTurnAndCheckDeath();
+                    bool success = _session.TryOpenDoorAt(doorX, doorY);
+                    if (success)
+                    {
+                        _session.ComputeFov();
+                        ProcessTurnAndCheckDeath();
+                    }
+                    else
+                    {
+                        _session.Messages.Clear();
+                        _session.Messages.Add("No closed door there.");
+                    }
                 }
                 else
                 {
-                    _session.Messages.Clear();
-                    _session.Messages.Add(_doorActionIsOpen ? "No closed door there." : "No open door there.");
+                    var result = _session.TryCloseDoorAt(doorX, doorY);
+                    if (result == DoorCloseResult.Success)
+                    {
+                        _session.ComputeFov();
+                        ProcessTurnAndCheckDeath();
+                    }
+                    else if (result == DoorCloseResult.NoDoor)
+                    {
+                        _session.Messages.Clear();
+                        _session.Messages.Add("No open door there.");
+                    }
+                    // Blocked - message already set, no turn consumed
                 }
                 _awaitingDoorDirection = false;
             }
@@ -240,9 +255,12 @@ public class PlayView : IGameView
             }
             else if (count == 1)
             {
-                _session.CloseAdjacentDoors();
-                _session.ComputeFov();
-                if (ProcessTurnAndCheckDeath()) return;
+                if (_session.CloseAdjacentDoors())
+                {
+                    _session.ComputeFov();
+                    if (ProcessTurnAndCheckDeath()) return;
+                }
+                // Blocked - message set, no turn consumed
             }
             else
             {
