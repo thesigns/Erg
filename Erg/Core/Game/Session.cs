@@ -97,7 +97,18 @@ public class Session
         int ny = Player.Y + dy;
 
         var tile = Area.GetTile(nx, ny);
-        if (tile == null || !Player.CanEnterTile(tile))
+        if (tile == null)
+            return MoveResult.Blocked();
+
+        // Auto-open closed doors (not secret)
+        if (!Player.CanEnterTile(tile) && tile.Type == TileType.ClosedDoor && Player.CanOpenDoor)
+        {
+            TryOpenDoorAt(nx, ny);
+            ComputeFov();
+            return MoveResult.Movement();
+        }
+
+        if (!Player.CanEnterTile(tile))
             return MoveResult.Blocked();
 
         var blocker = Area.GetBlockingCritter(nx, ny);
@@ -283,6 +294,19 @@ public class Session
         (-1,  0),          (1,  0),
         (-1,  1), (0,  1), (1,  1)
     };
+
+    public bool TryOpenDoorAt(int x, int y)
+    {
+        var tile = Area.GetTile(x, y);
+        if (tile?.Type == TileType.ClosedDoor)
+        {
+            Area.SetTile(x, y, Tile.OpenDoor);
+            Messages.Clear();
+            Messages.Add("You open a door.");
+            return true;
+        }
+        return false;
+    }
 
     public void OpenAdjacentDoors()
     {
