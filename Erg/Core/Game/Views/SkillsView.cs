@@ -52,17 +52,6 @@ public class SkillsView : IGameView
         WriteSkillLine(writer, 2, row++, "Defense", skills.DefenseSkill.DisplayValue);
         WriteSkillLine(writer, 2, row++, "Unarmed", skills.UnarmedSkill.DisplayValue);
 
-        // Combat Proficiency header
-        row++;
-        writer.SetForegroundColor(100, 200, 200);
-        writer.Locate(2, row++);
-        writer.Write("-- Combat Proficiency --");
-        row++;
-
-        // Combat Proficiency (derived from attributes + skills)
-        WriteSkillLine(writer, 2, row++, "Unarmed Attack", derived.UnarmedAttackProficiencyDisplay);
-        WriteSkillLine(writer, 2, row++, "Unarmed Defense", derived.UnarmedDefenseProficiencyDisplay);
-
         // Other Skills (alphabetical)
         row = 6;
         WriteSkillLine(writer, 42, row++, "Reading", skills.ReadingSkill.DisplayValue);
