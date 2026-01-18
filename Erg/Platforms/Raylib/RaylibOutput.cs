@@ -48,7 +48,7 @@ public class RaylibOutput : IOutput, IOverlayRenderer
         var cp = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"; // Ascii
         cp += "ĄĆĘŁŃÓŚŹŻąćęłńóśźż"; // Polish
         cp += "·□▣≈±"; // Tiles
-        cp += "¤×"; // Items
+        cp += "¤×ϗ"; // Items
         
         var codepoints = cp.Select(c => (int)c).ToArray();
 

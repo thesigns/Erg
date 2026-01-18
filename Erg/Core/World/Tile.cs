@@ -75,7 +75,7 @@ public class Tile
         new('▣', 0x8B4513FF, 0x000000FF, false, false, "Closed Door", TileType.ClosedDoor, TileStructure.Entrance, flyable: false);
 
     public static Tile SecretDoor =>
-        new('X', 0x808080FF, 0x000000FF, false, false, "Secret Door", TileType.SecretDoor, TileStructure.Entrance, flyable: false);
+        new('#', 0x808080FF, 0x000000FF, false, false, "Secret Door", TileType.SecretDoor, TileStructure.Entrance, flyable: false);
 
     public static Tile RandomDoor =>
         new('?', 0x8B4513FF, 0x000000FF, false, false, "Door", TileType.RandomDoor, TileStructure.Entrance, flyable: false);
