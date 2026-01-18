@@ -38,7 +38,7 @@ The game uses abstraction interfaces (`IInput`, `IOutput`) to decouple core game
 - `Entity` - Base class for all game objects with position, glyph, and blocking properties
 - `Critter` - Mobile entities with speed/energy system for turn scheduling; has Inventory, `CanOpenDoor` (virtual, default false)
 - `Player` - The player character (extends Critter); `CanOpenDoor = true`
-- `Item` - Collectible objects with stacking support (`CanStackWith`, `StackWith`)
+- `Item` - Collectible objects with `Value` property and stacking support (`CanStackWith`, `StackWith`)
 - `Inventory` - Collection of items with automatic stacking on add
 - `Tile` - Static map elements with walkability and transparency; can contain one Critter and multiple Items
   - Display priority: Critter > Multiple items (%) > Single item > Tile glyph
@@ -54,13 +54,23 @@ Critters use a speed/energy system for fair turn scheduling:
 
 ### Behavior/AI System
 - `IBehavior` interface: `DecideAction(Critter, Session)` returns a `CritterAction`
-- `CritterAction` abstract class: defines `EnergyCost` and `Execute()` method
 - Implementations:
   - `PassiveBehavior` - do nothing (Dummy)
   - `SpinAttackBehavior` - special spinning attack (SpinningDummy)
   - `AmoebaBehavior` - greedy movement toward enemies, prefers water
-  - `ZombieBehavior` - scans area in expanding squares (1-6), uses LOS and A* pathfinding, attacks non-zombies
+  - `TerritorialBehavior` - guards spawn area, uses LOS and A* pathfinding
 - Located in `Core/World/Behaviors/`
+
+### Action System
+- `CritterAction` abstract class: `Execute()` returns `ActionResult(Success, EnergyCost)`
+- Actions (located in `Core/World/Actions/`):
+  - `MoveAction` - movement with terrain cost, passive search, swimming training
+  - `WaitAction` - skip turn (singleton)
+  - `UnarmedAttackAction`, `SpinAttackAction` - combat actions
+  - `OpenDoorAction`, `CloseDoorAction` - door manipulation
+  - `PickupAction` - collect items from ground
+  - `SearchAction` - actively search for secret doors
+  - `ReadAction` - read books (costs 10000 energy = 10 turns)
 
 ### Combat System
 - `Combat.UnarmedAttack(attacker, defender, session)` handles unarmed damage calculation
@@ -96,7 +106,7 @@ Critters use a speed/energy system for fair turn scheduling:
 9. **Wall Processing** - Convert rocks adjacent to floors to DungeonWall
 10. **Impenetrable Rock** - Seal map edges
 11. **Stairs Placement** - StairsUp at player start, StairsDown at farthest room
-12. **Item Placement** - Scatter 2-10 gold coins in rooms
+12. **Item Placement** - Scatter coins (90% copper, 9% silver, 1% gold) and books
 13. **Critter Placement** - Spawn enemies in rooms
 
 Debug support: `GenerateStepByStep()` yields generation steps; `DebugGenerationView` visualizes progress (D from intro)
@@ -141,11 +151,20 @@ Spawn ratios in dungeon generator:
 - Water tiles: 100% Amoeba
 - Normal tiles: 40% Dummy, 40% SpinningDummy, 20% Zombie
 
+### Items
+Located in `Core/World/Items/`:
+- `Coin` (abstract) - base class for currency, symbol '¤'
+  - `CopperCoin` - Value=5, copper color, spawns 90% (1-80 count)
+  - `SilverCoin` - Value=50, silver color, spawns 9% (1-8 count)
+  - `GoldCoin` - Value=1000, gold color, spawns 1% (always 1)
+- `Book` (abstract) - readable items, Value=200, trains skills via `OnRead()`
+- `Corpse` (abstract) - dropped on death, Value=50
+
 ### Input System
 - `KeyPulse` - Single press detection with key repeat support
 - `KeyHeld` - Continuous hold detection
 - Movement: arrow keys and numpad (including diagonals via Kp1/3/7/9)
-- Actions: I=inventory, O=open doors, C=close doors, G=pick up items, Space=start game/continue messages
+- Actions: I=inventory, O=open doors, C=close doors, G=pick up items, S=search, R=read, Space=start game/continue messages
 - Debug: F5=toggle cheat mode (reveals all tiles)
 
 ### Documentation
