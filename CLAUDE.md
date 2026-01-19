@@ -17,14 +17,17 @@ dotnet build Erg/Erg.csproj -c Release
 
 ## Project Overview
 
-Erg is a roguelike game written in C# targeting .NET 9.0, using Raylib-cs for graphics rendering. It follows a terminal-style character grid display (80x25) typical of roguelikes.
+Erg is a roguelike game written in C# targeting .NET 9.0 with swappable rendering backends (currently SFML.Net, Raylib-cs also available). It follows a terminal-style character grid display (80x25) typical of roguelikes.
 
 ## Architecture
 
 ### Platform Abstraction Layer
 The game uses abstraction interfaces (`IInput`, `IOutput`) to decouple core game logic from the rendering platform:
-- `Core/Abstractions/` - Platform-independent interfaces
-- `Platforms/Raylib/` - Raylib-cs implementation (`RaylibInput`, `RaylibOutput`)
+- `Core/Abstractions/` - Platform-independent interfaces (`IInput`, `IOutput`, `IOverlayRenderer`, `Glyph`, `KeyboardKey`)
+- `Platforms/Raylib/` - Raylib-cs 7.0.2 implementation (`RaylibInput`, `RaylibOutput`)
+- `Platforms/Sfml/` - SFML.Net 3.0.0 implementation (`SfmlInput`, `SfmlOutput`) - currently active
+
+To switch platforms, change the `using` directive and instantiation in `Program.cs`.
 
 ### Game Flow
 - `Game` class manages the main loop and view transitions

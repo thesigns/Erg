@@ -4,10 +4,10 @@
 
 ```
   ###·####·###
-  #·········+#
+  #··········#
   #··z··@····#
-  +···········
-  #··z·····j·#
+  ············
+  #····z·····#
   ###·########
 ```
 
@@ -127,7 +127,9 @@ Feel free to poke around.
 ## Tech
 
 - C# / .NET 9.0
-- Raylib via raylib-cs for rendering
+- Swappable rendering backends:
+  - **SFML.Net 3.0** (currently active)
+  - **Raylib-cs 7.0.2** (available)
 - Custom A* pathfinding and line-of-sight algorithms
 - No external game frameworks - just the basics
 
