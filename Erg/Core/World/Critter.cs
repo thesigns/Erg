@@ -71,6 +71,14 @@ public abstract class Critter : Entity
     /// </summary>
     public int Reading => Lerp(Genus.ReadingMin, Genus.ReadingMax, Derived.LiteracyProficiency);
 
+    // ========== Swimming Ability ==========
+    /// <summary>
+    /// Swimming ability (0-100). Affects movement cost in water.
+    /// Formula: Lerp(SwimmingMin, SwimmingMax, SwimmingSkill)
+    /// 0=2x slower, 50=neutral, 100=2x faster (as multiplier on Locomotion base).
+    /// </summary>
+    public int Swimming => Lerp(Genus.SwimmingMin, Genus.SwimmingMax, Skills.SwimmingSkill.CurrentValue);
+
     public Critter? KilledBy { get; private set; }
 
     // Pronouns
@@ -231,21 +239,40 @@ public abstract class Critter : Entity
     }
 
     /// <summary>
-    /// Returns movement energy cost multiplier based on terrain.
-    /// 1.0 = normal, greater than 1.0 = slower
+    /// Returns swimming multiplier based on Swimming ability.
+    /// Swimming 0 → 2.0x (worse), 50 → 1.0x (neutral), 100 → 0.5x (better)
+    /// </summary>
+    private float GetSwimmingMultiplier()
+    {
+        if (Swimming <= 50)
+            return 2.0f - Swimming / 50.0f;         // 2.0 → 1.0
+        else
+            return 1.0f - (Swimming - 50) / 100.0f; // 1.0 → 0.5
+    }
+
+    /// <summary>
+    /// Returns movement energy cost multiplier based on terrain and Swimming.
+    /// 1.0 = normal, greater than 1.0 = slower, less than 1.0 = faster
     /// </summary>
     public virtual float GetMovementCostMultiplier(Tile tile)
     {
+        // Semiaquatic: penalty on land (unchanged by Swimming)
+        if (Locomotion == Locomotion.Semiaquatic && !tile.Swimmable)
+            return 2.0f;
+
+        // Amphibious in water: base penalty * swimming modifier
         if (Locomotion == Locomotion.Amphibious)
         {
-            if (tile.Type == TileType.DeepWater) return 2.0f;      // Speed 50
-            if (tile.Type == TileType.ShallowWater) return 1.25f;  // Speed 80
+            if (tile.Type == TileType.DeepWater)
+                return 2.0f * GetSwimmingMultiplier();   // base 2.0x
+            if (tile.Type == TileType.ShallowWater)
+                return 1.25f * GetSwimmingMultiplier();  // base 1.25x
         }
-        if (Locomotion == Locomotion.Semiaquatic)
-        {
-            // Penalty on land, comfortable in water
-            if (!tile.Swimmable) return 2.0f;
-        }
+
+        // Semiaquatic in water: base 1.0x * swimming modifier
+        if (Locomotion == Locomotion.Semiaquatic && tile.Swimmable)
+            return 1.0f * GetSwimmingMultiplier();
+
         return 1.0f;
     }
 

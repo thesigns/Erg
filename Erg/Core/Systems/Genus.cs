@@ -66,6 +66,16 @@ public class Genus
     public int ReadingMin { get; init; } = 0;
     public int ReadingMax { get; init; } = 100;
 
+    // ========== Swimming Ability ==========
+
+    /// <summary>
+    /// Swimming ability range (0-100). Actual value:
+    /// Swimming = Lerp(SwimmingMin, SwimmingMax, SwimmingSkill)
+    /// Affects movement cost in water: 0=2x slower, 50=neutral, 100=2x faster.
+    /// </summary>
+    public int SwimmingMin { get; init; } = 0;
+    public int SwimmingMax { get; init; } = 100;
+
     // ========== Attribute Training Functions ==========
     // Funkcje treningowe per atrybut (domyślnie Linear)
     public TrainingFunction StrengthTraining { get; init; } = TrainingFunction.Linear();
@@ -134,7 +144,8 @@ public class Genus
         UnarmedAttackMin = 10, UnarmedAttackMax = 50,
         UnarmedDefenseMin = 10, UnarmedDefenseMax = 50,
         SearchingMin = 10, SearchingMax = 90,
-        ReadingMin = 0, ReadingMax = 100
+        ReadingMin = 0, ReadingMax = 100,
+        SwimmingMin = 0, SwimmingMax = 100
     };
 
     /// <summary>
@@ -148,7 +159,8 @@ public class Genus
         UnarmedAttackMin = 25, UnarmedAttackMax = 80,
         UnarmedDefenseMin = 15, UnarmedDefenseMax = 40,
         SearchingMin = 10, SearchingMax = 50,
-        ReadingMin = 0, ReadingMax = 30
+        ReadingMin = 0, ReadingMax = 30,
+        SwimmingMin = 0, SwimmingMax = 40
     };
 
     /// <summary>
@@ -162,7 +174,8 @@ public class Genus
         UnarmedAttackMin = 5, UnarmedAttackMax = 20,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
         SearchingMin = 5, SearchingMax = 30,
-        ReadingMin = 0, ReadingMax = 0
+        ReadingMin = 0, ReadingMax = 0,
+        SwimmingMin = 60, SwimmingMax = 100
     };
 
     /// <summary>
@@ -176,7 +189,8 @@ public class Genus
         UnarmedAttackMin = 15, UnarmedAttackMax = 60,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
         SearchingMin = 20, SearchingMax = 70,
-        ReadingMin = 0, ReadingMax = 15
+        ReadingMin = 0, ReadingMax = 15,
+        SwimmingMin = 0, SwimmingMax = 20
     };
 
     /// <summary>
@@ -190,6 +204,7 @@ public class Genus
         UnarmedAttackMin = 15, UnarmedAttackMax = 40,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
         SearchingMin = 5, SearchingMax = 30,
-        ReadingMin = 0, ReadingMax = 5
+        ReadingMin = 0, ReadingMax = 5,
+        SwimmingMin = 0, SwimmingMax = 70
     };
 }
