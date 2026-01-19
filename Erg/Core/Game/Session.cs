@@ -2,6 +2,7 @@
 using System.Linq;
 using Erg.Core;
 using Erg.Core.Combat;
+using Erg.Core.Types;
 using Erg.Core.Game;
 using Erg.Core.Messages;
 using Erg.Core.World;
@@ -435,10 +436,63 @@ public class Session
 
                     var action = critter.Behavior.DecideAction(critter, this);
                     var result = action.Execute(critter, this);
+
+                    // Check drowning after action
+                    if (result.EnergyCost > 0 && CheckDrowning(critter, result.EnergyCost))
+                        break;
+
                     critter.SpendEnergy(result.EnergyCost);
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Checks if critter drowns and applies damage. Called after actions with cost > 0.
+    /// </summary>
+    public bool CheckDrowning(Critter critter, int energyCost)
+    {
+        if (energyCost <= 0) return false;
+
+        var tile = Area.GetTile(critter.X, critter.Y);
+        if (tile?.Type != TileType.DeepWater) return false;
+
+        // Aquatic/Semiaquatic/Aerial never drown
+        if (critter.Locomotion is Locomotion.Aquatic or Locomotion.Semiaquatic or Locomotion.Aerial)
+            return false;
+
+        // Swimming 50+ = no drowning
+        int swimming = critter.Swimming;
+        if (swimming >= 50) return false;
+
+        // Drowning chance: 100% at 0, 0% at 50
+        double drownChance = 1.0 - (swimming / 50.0);
+        if (Random.NextDouble() >= drownChance) return false;
+
+        // Damage: 1d3 per 1000 cost (rounded up)
+        int diceCount = (int)Math.Ceiling(energyCost / 1000.0);
+        int damage = new Dice(diceCount, 3).Roll(Random);
+
+        // Messages
+        if (critter is Player)
+            Messages.Add("You are drowning!");
+        else if (CanPlayerSee(critter))
+            Messages.Add($"{critter.Name} is drowning!");
+
+        critter.TakeDamage(damage);
+
+        if (!critter.IsAlive)
+        {
+            if (critter is Player)
+                Messages.Add("You have drowned!");
+            else if (CanPlayerSee(critter))
+                Messages.Add($"{critter.Name} drowns!");
+
+            critter.OnDeath(Area);
+            Area.RemoveCritter(critter);
+            return true;
+        }
+        return false;
     }
 
     private IEnumerable<Critter> GetAllCritters()

@@ -347,6 +347,14 @@ public class PlayView : IGameView
     private bool ProcessTurnAndCheckDeath(int energyCost = 1000)
     {
         _session.IncrementTurn();
+
+        // Check player drowning after their action
+        if (_session.CheckDrowning(_session.Player, energyCost))
+        {
+            _game.SwitchView(new GameSummaryView(_game, GameEndReason.Died));
+            return true;
+        }
+
         _session.ProcessCritterTurns(energyCost);
         if (!_session.Player.IsAlive)
         {
