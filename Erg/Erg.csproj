@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <Folder Include="Core\Systems\" />
+      <Folder Include="Platforms\Sfml\" />
     </ItemGroup>
 
 </Project>
