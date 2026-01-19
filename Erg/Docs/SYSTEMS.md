@@ -55,8 +55,8 @@ Przykładowe właściwości dodatkowe:
 Przykład: Właściwość MaxHitPoints
 
 Wartość MaxHitPoints jest obliczana na podstawie:
-- Genus.MinHitPoints
-- Genus.MaxHitPoints
+- Genus.HitPointsMin
+- Genus.HitPointsMax
 - atrybutu pochodnego Vitality
 
 Obliczenie wykorzystuje interpolację liniową (LERP), gdzie Vitality określa pozycję pomiędzy wartościami minimalną i maksymalną dla danego Genusa.
@@ -67,8 +67,8 @@ Dzięki temu różne rodzaje organizmów mogą mieć skrajnie odmienne limity �
 Przykład: Właściwość EnergyRegenRate
 
 Wartość EnergyRegenRate jest obliczana na podstawie:
-- Genus.MinEnergyRegenRate
-- Genus.MaxEnergyRegenRate
+- Genus.EnergyRegenRateMin
+- Genus.EnergyRegenRateMax
 - atrybutu pochodnego Speed
 
 Obliczenie wykorzystuje interpolację liniową (LERP), gdzie Speed określa pozycję pomiędzy wartościami minimalną i maksymalną dla danego Genusa.

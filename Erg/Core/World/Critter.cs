@@ -11,9 +11,9 @@ public abstract class Critter : Entity
 {
     /// <summary>
     /// Energy regeneration rate interpolated from Genus min/max based on Speed.
-    /// Formula: Lerp(MinEnergyRegenRate, MaxEnergyRegenRate, Derived.Speed)
+    /// Formula: Lerp(EnergyRegenRateMin, EnergyRegenRateMax, Derived.Speed)
     /// </summary>
-    public int EnergyRegenRate => Lerp(Genus.MinEnergyRegenRate, Genus.MaxEnergyRegenRate, Derived.Speed);
+    public int EnergyRegenRate => Lerp(Genus.EnergyRegenRateMin, Genus.EnergyRegenRateMax, Derived.Speed);
     public int Energy { get; protected set; }  // akumulowana
     public Inventory Inventory { get; } = new();
     public Attributes Attributes { get; }
@@ -24,10 +24,10 @@ public abstract class Critter : Entity
 
     // Hit Points
     /// <summary>
-    /// Max HP interpolated from Genus.MinHitPoints to Genus.MaxHitPoints based on Vitality.
-    /// Formula: Lerp(MinHitPoints, MaxHitPoints, Vitality)
+    /// Max HP interpolated from Genus.HitPointsMin to Genus.HitPointsMax based on Vitality.
+    /// Formula: Lerp(HitPointsMin, HitPointsMax, Vitality)
     /// </summary>
-    public int MaxHitPoints => Lerp(Genus.MinHitPoints, Genus.MaxHitPoints, Derived.Vitality);
+    public int MaxHitPoints => Lerp(Genus.HitPointsMin, Genus.HitPointsMax, Derived.Vitality);
     public int HitPoints { get; protected set; }
     public bool IsAlive => HitPoints > 0;
 
@@ -40,9 +40,9 @@ public abstract class Critter : Entity
     public Dice UnarmedDamage { get; protected set; }
     /// <summary>
     /// Bonus damage based on Speed. Represents kinetic energy of strikes.
-    /// Formula: Lerp(MinDamageBonus, MaxDamageBonus, Speed)
+    /// Formula: Lerp(DamageBonusMin, DamageBonusMax, Speed)
     /// </summary>
-    public int DamageBonus => Lerp(Genus.MinDamageBonus, Genus.MaxDamageBonus, Derived.Speed);
+    public int DamageBonus => Lerp(Genus.DamageBonusMin, Genus.DamageBonusMax, Derived.Speed);
 
     // ========== Unarmed Combat Abilities ==========
     /// <summary>

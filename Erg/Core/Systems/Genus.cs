@@ -11,25 +11,25 @@ public class Genus
 
     /// <summary>
     /// Speed range for the genus. Actual speed is calculated as:
-    /// Speed = Lerp(MinEnergyRegenRate, MaxEnergyRegenRate, Agility)
+    /// Speed = Lerp(EnergyRegenRateMin, EnergyRegenRateMax, Agility)
     /// </summary>
-    public int MinEnergyRegenRate { get; init; } = 50;
-    public int MaxEnergyRegenRate { get; init; } = 150;
+    public int EnergyRegenRateMin { get; init; } = 50;
+    public int EnergyRegenRateMax { get; init; } = 150;
 
     /// <summary>
-    /// Hit points range for the genus. Actual MaxHitPoints is calculated as:
-    /// MaxHitPoints = Lerp(MinHitPoints, MaxHitPoints, Endurance)
+    /// Hit points range for the genus. Actual HitPointsMax is calculated as:
+    /// HitPointsMax = Lerp(HitPointsMin, HitPointsMax, Endurance)
     /// </summary>
-    public int MinHitPoints { get; init; } = 10;
-    public int MaxHitPoints { get; init; } = 30;
+    public int HitPointsMin { get; init; } = 10;
+    public int HitPointsMax { get; init; } = 30;
 
     /// <summary>
     /// Damage bonus range for the genus. Actual DamageBonus is calculated as:
-    /// DamageBonus = Lerp(MinDamageBonus, MaxDamageBonus, Speed)
+    /// DamageBonus = Lerp(DamageBonusMin, DamageBonusMax, Speed)
     /// Represents kinetic energy of strikes - faster creatures hit harder.
     /// </summary>
-    public int MinDamageBonus { get; init; } = 0;
-    public int MaxDamageBonus { get; init; } = 5;
+    public int DamageBonusMin { get; init; } = 0;
+    public int DamageBonusMax { get; init; } = 5;
 
     // ========== Ability Ranges (Unarmed Combat) ==========
 
@@ -128,9 +128,9 @@ public class Genus
     /// </summary>
     public static Genus Human { get; } = new("Human")
     {
-        MinEnergyRegenRate = 80, MaxEnergyRegenRate = 120,
-        MinHitPoints = 60, MaxHitPoints = 100,
-        MinDamageBonus = 2, MaxDamageBonus = 12,
+        EnergyRegenRateMin = 80, EnergyRegenRateMax = 120,
+        HitPointsMin = 60, HitPointsMax = 100,
+        DamageBonusMin = 2, DamageBonusMax = 12,
         UnarmedAttackMin = 10, UnarmedAttackMax = 50,
         UnarmedDefenseMin = 10, UnarmedDefenseMax = 50,
         SearchingMin = 10, SearchingMax = 90,
@@ -142,9 +142,9 @@ public class Genus
     /// </summary>
     public static Genus Troll { get; } = new("Troll")
     {
-        MinEnergyRegenRate = 60, MaxEnergyRegenRate = 90,
-        MinHitPoints = 130, MaxHitPoints = 240,
-        MinDamageBonus = 6, MaxDamageBonus = 18,
+        EnergyRegenRateMin = 60, EnergyRegenRateMax = 90,
+        HitPointsMin = 130, HitPointsMax = 240,
+        DamageBonusMin = 6, DamageBonusMax = 18,
         UnarmedAttackMin = 25, UnarmedAttackMax = 80,
         UnarmedDefenseMin = 15, UnarmedDefenseMax = 40,
         SearchingMin = 10, SearchingMax = 50,
@@ -156,9 +156,9 @@ public class Genus
     /// </summary>
     public static Genus Jelly { get; } = new("Jelly")
     {
-        MinEnergyRegenRate = 30, MaxEnergyRegenRate = 70,
-        MinHitPoints = 10, MaxHitPoints = 35,
-        MinDamageBonus = 0, MaxDamageBonus = 3,
+        EnergyRegenRateMin = 30, EnergyRegenRateMax = 70,
+        HitPointsMin = 10, HitPointsMax = 35,
+        DamageBonusMin = 0, DamageBonusMax = 3,
         UnarmedAttackMin = 5, UnarmedAttackMax = 20,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
         SearchingMin = 5, SearchingMax = 30,
@@ -170,9 +170,9 @@ public class Genus
     /// </summary>
     public static Genus Construct { get; } = new("Construct")
     {
-        MinEnergyRegenRate = 70, MaxEnergyRegenRate = 110,
-        MinHitPoints = 90, MaxHitPoints = 130,
-        MinDamageBonus = 2, MaxDamageBonus = 16,
+        EnergyRegenRateMin = 70, EnergyRegenRateMax = 110,
+        HitPointsMin = 90, HitPointsMax = 130,
+        DamageBonusMin = 2, DamageBonusMax = 16,
         UnarmedAttackMin = 15, UnarmedAttackMax = 60,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
         SearchingMin = 20, SearchingMax = 70,
@@ -184,9 +184,9 @@ public class Genus
     /// </summary>
     public static Genus Zombius { get; } = new("Zombius")
     {
-        MinEnergyRegenRate = 60, MaxEnergyRegenRate = 90,
-        MinHitPoints = 40, MaxHitPoints = 120,
-        MinDamageBonus = 1, MaxDamageBonus = 6,
+        EnergyRegenRateMin = 60, EnergyRegenRateMax = 90,
+        HitPointsMin = 40, HitPointsMax = 120,
+        DamageBonusMin = 1, DamageBonusMax = 6,
         UnarmedAttackMin = 15, UnarmedAttackMax = 40,
         UnarmedDefenseMin = 0, UnarmedDefenseMax = 10,
         SearchingMin = 5, SearchingMax = 30,
