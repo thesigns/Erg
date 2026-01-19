@@ -17,6 +17,7 @@ public class SfmlOutput : IOutput, IOverlayRenderer
     private readonly uint _fontSize;
     private readonly Vector2f _cellSize;
     private readonly Vector2f _textOffset;
+    private readonly float _horizontalOffset;
     private readonly Cell[,] _cells;
     private readonly Clock _clock;
     private readonly Text _textDrawer;
@@ -36,12 +37,14 @@ public class SfmlOutput : IOutput, IOverlayRenderer
 
         _font = new Font(fontPath);
         (_cellSize, _textOffset) = MeasureCharacter();
+        _horizontalOffset = _cellSize.X * 0.08f;
 
         var width = (uint)(cols * _cellSize.X);
         var height = (uint)(rows * _cellSize.Y);
 
         var videoMode = new VideoMode(new Vector2u(width, height));
         _window = new RenderWindow(videoMode, title);
+        Console.WriteLine($"Window size: {width}x{height} px");
         _window.SetFramerateLimit(60);
         _window.Closed += (_, _) => _window.Close();
 
@@ -109,7 +112,7 @@ public class SfmlOutput : IOutput, IOverlayRenderer
         {
             for (var x = 0; x < Cols; x++)
             {
-                var cellX = x * _cellSize.X;
+                var cellX = x * _cellSize.X + _horizontalOffset;
                 var cellY = y * _cellSize.Y;
 
                 // Background
@@ -141,7 +144,7 @@ public class SfmlOutput : IOutput, IOverlayRenderer
 
             _rectDrawer.Size = new Vector2f(_cellSize.X, cursorHeight);
             _rectDrawer.Position = new Vector2f(
-                _cursor.Col * _cellSize.X,
+                _cursor.Col * _cellSize.X + _horizontalOffset,
                 _cursor.Row * _cellSize.Y + cursorYOffset
             );
             // Invert color effect (simplified - just use white)
@@ -176,7 +179,7 @@ public class SfmlOutput : IOutput, IOverlayRenderer
         const int barHeight = 1;
         const int yOffset = 1;
 
-        float cellX = col * _cellSize.X;
+        float cellX = col * _cellSize.X + _horizontalOffset;
         float cellY = row * _cellSize.Y;
         float barWidth = _cellSize.X - (margin * 2);
 
