@@ -2,23 +2,23 @@ namespace Erg.Core.Systems;
 
 /// <summary>
 /// Collection of all basic skills for a critter.
-/// Each skill ranges from 0 to 1 and represents trained abilities.
+/// Each skill ranges from 0 to 1 and represents trained skills.
 /// </summary>
 public class Skills
 {
-    /// <summary>Ability to read and comprehend written text.</summary>
+    /// <summary>Skill in reading and comprehending written text.</summary>
     public Skill LiteracySkill { get; }
 
-    /// <summary>Ability to swim and move through water.</summary>
+    /// <summary>Skill in swimming and moving through water.</summary>
     public Skill SwimmingSkill { get; }
 
-    /// <summary>Proficiency in unarmed combat (punching, kicking, grappling).</summary>
+    /// <summary>Skill in unarmed combat (punching, kicking, grappling).</summary>
     public Skill UnarmedSkill { get; }
 
-    /// <summary>General attack proficiency - hitting, aiming, timing.</summary>
+    /// <summary>Skill in attacking - hitting, aiming, timing.</summary>
     public Skill AttackSkill { get; }
 
-    /// <summary>General defense proficiency - dodging, blocking, parrying.</summary>
+    /// <summary>Skill in defending - dodging, blocking, parrying.</summary>
     public Skill DefenseSkill { get; }
 
     /// <summary>
