@@ -12,6 +12,8 @@ public class Game
 
     private Session _currentSession = null!;
     public Session CurrentSession => _currentSession;
+
+    public bool ShouldQuit { get; set; }
     
     public Game(IOutput output, IInput input)
     {

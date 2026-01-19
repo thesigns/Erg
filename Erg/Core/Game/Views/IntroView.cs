@@ -15,7 +15,7 @@ public class IntroView : IGameView
     
     public void Update(IInput input)
     {
-        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Space))
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.N))
         {
             _game.NewSession();
         }
@@ -23,6 +23,11 @@ public class IntroView : IGameView
         if (input.KeyPulse.GetValueOrDefault(KeyboardKey.D))
         {
             _game.SwitchView(new DebugGenerationView(_game));
+        }
+
+        if (input.KeyPulse.GetValueOrDefault(KeyboardKey.Q))
+        {
+            _game.ShouldQuit = true;
         }
     }
 
@@ -39,10 +44,13 @@ public class IntroView : IGameView
         writer.Write("Development version");
         writer.Locate(4, 5);
         writer.SetForegroundColor(200, 200, 200);
-        writer.Write("Press [SPACE] to start");
+        writer.Write("Press [N] to start a new game");
         writer.Locate(4, 6);
         writer.SetForegroundColor(150, 150, 150);
-        writer.Write("Press [D] for debug generation");
+        writer.Write("Press [D] for debug dungeon generation");
+        writer.Locate(4, 7);
+        writer.SetForegroundColor(150, 150, 150);
+        writer.Write("Press [Q] to quit");
         output.Render();
     }
 }
