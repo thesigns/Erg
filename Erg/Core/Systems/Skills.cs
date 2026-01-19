@@ -23,33 +23,26 @@ public class Skills
 
     /// <summary>
     /// Creates skills with all values set to the same default.
-    /// Each skill has configured theory/practice limits based on its nature.
     /// </summary>
     public Skills(double defaultValue = 0.0)
     {
-        // Literacy: 40% theory, 60% practice (reading itself is practice)
-        LiteracySkill = new Skill(defaultValue) { TheoryMax = 0.4, PracticeMax = 0.6 };
-
-        // Swimming: 20% theory, 80% practice (can't learn to swim from books alone)
-        SwimmingSkill = new Skill(defaultValue) { TheoryMax = 0.2, PracticeMax = 0.8 };
-
-        // Combat skills: 30% theory, 70% practice (fighting requires real experience)
-        UnarmedSkill = new Skill(defaultValue) { TheoryMax = 0.3, PracticeMax = 0.7 };
-        AttackSkill = new Skill(defaultValue) { TheoryMax = 0.3, PracticeMax = 0.7 };
-        DefenseSkill = new Skill(defaultValue) { TheoryMax = 0.3, PracticeMax = 0.7 };
+        LiteracySkill = new Skill(defaultValue);
+        SwimmingSkill = new Skill(defaultValue);
+        UnarmedSkill = new Skill(defaultValue);
+        AttackSkill = new Skill(defaultValue);
+        DefenseSkill = new Skill(defaultValue);
     }
 
     /// <summary>
     /// Creates skills with individual values.
-    /// Each skill has configured theory/practice limits based on its nature.
     /// </summary>
     public Skills(double literacy, double swimming, double unarmed, double attack = 0.0, double defense = 0.0)
     {
-        LiteracySkill = new Skill(literacy) { TheoryMax = 0.4, PracticeMax = 0.6 };
-        SwimmingSkill = new Skill(swimming) { TheoryMax = 0.2, PracticeMax = 0.8 };
-        UnarmedSkill = new Skill(unarmed) { TheoryMax = 0.3, PracticeMax = 0.7 };
-        AttackSkill = new Skill(attack) { TheoryMax = 0.3, PracticeMax = 0.7 };
-        DefenseSkill = new Skill(defense) { TheoryMax = 0.3, PracticeMax = 0.7 };
+        LiteracySkill = new Skill(literacy);
+        SwimmingSkill = new Skill(swimming);
+        UnarmedSkill = new Skill(unarmed);
+        AttackSkill = new Skill(attack);
+        DefenseSkill = new Skill(defense);
     }
 
     /// <summary>

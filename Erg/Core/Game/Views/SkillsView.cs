@@ -31,7 +31,6 @@ public class SkillsView : IGameView
         var writer = new Writer(output);
         var player = _game.CurrentSession.Player;
         var skills = player.Skills;
-        var derived = player.Derived;
 
         writer.Clear();
 
@@ -47,21 +46,16 @@ public class SkillsView : IGameView
         writer.Locate(42, 4);
         writer.Write("-- Other Skills --");
 
-        // Combat Skills (base)
+        // Combat Skills
         int row = 6;
         WriteSkillLine(writer, 2, row++, "Attack", skills.AttackSkill);
         WriteSkillLine(writer, 2, row++, "Defense", skills.DefenseSkill);
         WriteSkillLine(writer, 2, row++, "Unarmed", skills.UnarmedSkill);
 
-        // Other Skills (alphabetical)
+        // Other Skills
         row = 6;
         WriteSkillLine(writer, 42, row++, "Literacy", skills.LiteracySkill);
         WriteSkillLine(writer, 42, row++, "Swimming", skills.SwimmingSkill);
-
-        // Legend
-        writer.Locate(2, 12);
-        writer.SetForegroundColor(128, 128, 128);
-        writer.Write("T = Theory (books), P = Practice (doing)");
 
         // Footer
         writer.Locate(2, output.Rows - 2);
@@ -78,21 +72,7 @@ public class SkillsView : IGameView
         writer.SetForegroundColor(200, 200, 200);
         writer.Write(name.PadRight(12));
 
-        // Theory component (cyan)
-        writer.SetForegroundColor(100, 200, 200);
-        writer.Write($"{skill.TheoryDisplayValue}%T");
-
-        writer.SetForegroundColor(128, 128, 128);
-        writer.Write(" + ");
-
-        // Practice component (yellow)
-        writer.SetForegroundColor(200, 200, 100);
-        writer.Write($"{skill.PracticeDisplayValue}%P");
-
-        writer.SetForegroundColor(128, 128, 128);
-        writer.Write(" = ");
-
-        // Total (green)
+        // Skill value (green)
         writer.SetForegroundColor(100, 255, 100);
         writer.Write($"{skill.DisplayValue}%");
     }

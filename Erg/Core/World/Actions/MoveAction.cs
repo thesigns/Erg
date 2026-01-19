@@ -73,7 +73,7 @@ public class MoveAction : CritterAction
 
         // Train swimming when moving through deep water (all critters)
         if (tile.Type == TileType.DeepWater)
-            critter.TrainSwimmingPractice(0.001, session);
+            critter.TrainSwimming(0.001, session);
 
         // Passive search while moving (1/20 of normal chance) - player only
         if (critter == session.Player)

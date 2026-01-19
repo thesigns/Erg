@@ -22,7 +22,7 @@ public class Amoeba : Critter
     {
         base.DepthTraining(depth, random);
         // Semiaquatic - excellent swimmer
-        Skills.SwimmingSkill.SetPracticeValue(0.7 + random.NextDouble() * 0.2); // 70-90%
+        Skills.SwimmingSkill.SetBaseValue(0.7 + random.NextDouble() * 0.2); // 70-90%
     }
 
     public override void OnDeath(Area area)
