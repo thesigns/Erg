@@ -25,6 +25,25 @@ public class Inventory
         return _items.Remove(item);
     }
 
+    public int RemoveQuantity(Item item, int quantity)
+    {
+        if (!_items.Contains(item))
+            return 0;
+
+        int toRemove = Math.Min(quantity, item.Count);
+
+        if (toRemove >= item.Count)
+        {
+            _items.Remove(item);
+        }
+        else
+        {
+            item.Count -= toRemove;
+        }
+
+        return toRemove;
+    }
+
     public Item? GetAt(int index)
     {
         if (index < 0 || index >= _items.Count)

@@ -8,6 +8,7 @@ namespace Erg.Core.World.Items;
 public abstract class Book : Item
 {
     public override int Value => 200;
+    public override int Mass => 300;
 
     protected Book(string name, int x, int y)
         : base(name, x, y, '«', 0x8B4513FF, 0x000000FF) { }

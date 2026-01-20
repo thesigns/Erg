@@ -44,8 +44,16 @@ public class SfmlInput : IInput
         UpdateKey(KeyboardKey.Kp2, Keyboard.Key.Numpad2, now);
         UpdateKey(KeyboardKey.Kp3, Keyboard.Key.Numpad3, now);
 
+        UpdateKey(KeyboardKey.One, Keyboard.Key.Num1, now);
         UpdateKey(KeyboardKey.Two, Keyboard.Key.Num2, now);
         UpdateKey(KeyboardKey.Three, Keyboard.Key.Num3, now);
+        UpdateKey(KeyboardKey.Four, Keyboard.Key.Num4, now);
+        UpdateKey(KeyboardKey.Five, Keyboard.Key.Num5, now);
+        UpdateKey(KeyboardKey.Six, Keyboard.Key.Num6, now);
+        UpdateKey(KeyboardKey.Seven, Keyboard.Key.Num7, now);
+        UpdateKey(KeyboardKey.Eight, Keyboard.Key.Num8, now);
+        UpdateKey(KeyboardKey.Nine, Keyboard.Key.Num9, now);
+        UpdateKey(KeyboardKey.Zero, Keyboard.Key.Num0, now);
 
         UpdateKey(KeyboardKey.A, Keyboard.Key.A, now);
         UpdateKey(KeyboardKey.B, Keyboard.Key.B, now);
