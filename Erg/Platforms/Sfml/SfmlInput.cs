@@ -22,6 +22,13 @@ public class SfmlInput : IInput
     {
         var now = TimeSpan.FromSeconds(_clock.ElapsedTime.AsSeconds());
 
+        UpdateKey(KeyboardKey.Insert, Keyboard.Key.Insert, now);
+        UpdateKey(KeyboardKey.Delete, Keyboard.Key.Delete, now);
+        UpdateKey(KeyboardKey.Home, Keyboard.Key.Home, now);
+        UpdateKey(KeyboardKey.End, Keyboard.Key.End, now);
+        UpdateKey(KeyboardKey.PageUp, Keyboard.Key.PageUp, now);
+        UpdateKey(KeyboardKey.PageDown, Keyboard.Key.PageDown, now);
+        
         UpdateKey(KeyboardKey.Left, Keyboard.Key.Left, now);
         UpdateKey(KeyboardKey.Right, Keyboard.Key.Right, now);
         UpdateKey(KeyboardKey.Up, Keyboard.Key.Up, now);

@@ -1,4 +1,5 @@
 ﻿using Erg.Core.Abstractions;
+using SFML.Window;
 using static Raylib_cs.Raylib;
 
 namespace Erg.Platforms.Raylib;
@@ -18,6 +19,13 @@ public class RaylibInput : IInput
     public void Update()
     {
         var now = TimeSpan.FromSeconds(GetTime());
+        
+        UpdateKey(KeyboardKey.Insert, Raylib_cs.KeyboardKey.Insert, now);
+        UpdateKey(KeyboardKey.Delete, Raylib_cs.KeyboardKey.Delete, now);
+        UpdateKey(KeyboardKey.Home, Raylib_cs.KeyboardKey.Home, now);
+        UpdateKey(KeyboardKey.End, Raylib_cs.KeyboardKey.End, now);
+        UpdateKey(KeyboardKey.PageUp, Raylib_cs.KeyboardKey.PageUp, now);
+        UpdateKey(KeyboardKey.PageDown, Raylib_cs.KeyboardKey.PageDown, now);
         
         UpdateKey(KeyboardKey.Left, Raylib_cs.KeyboardKey.Left, now);
         UpdateKey(KeyboardKey.Right, Raylib_cs.KeyboardKey.Right, now);
